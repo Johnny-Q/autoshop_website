@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "outDir": "build",
+        "watch":true,
+        "typeRoots": [
+            "node_modules/@types",
+            "src/types.ts"
+        ],
+        "removeComments": true
+    },
+    "exclude": ["src/types.ts"]
+}

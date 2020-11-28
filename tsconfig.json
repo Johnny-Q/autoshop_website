@@ -4,10 +4,9 @@
         "outDir": "build",
         "watch":true,
         "typeRoots": [
-            "node_modules/@types",
-            "src/types.ts"
+            "./src/types.ts",
+            "node_modules/@types"
         ],
         "removeComments": true
-    },
-    "exclude": ["src/types.ts"]
+    }
 }

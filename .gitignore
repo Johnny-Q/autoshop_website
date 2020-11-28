@@ -1,5 +1,7 @@
-.env
+DB.db
 build
+.env
+notes.md
 
 # Logs
 logs

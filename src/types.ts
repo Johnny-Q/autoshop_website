@@ -6,3 +6,9 @@ interface Part{
     description: string
 }
 
+interface Application{
+    model: string,
+    begin_year: number,
+    end_year: number
+}
+

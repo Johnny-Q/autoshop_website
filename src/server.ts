@@ -14,18 +14,25 @@ app.set("views", "build/public");
 //accept json data
 app.use(bodyparser.json());
 
-app.get("/", (req, res) => {
+app.get("/", (req, res)=>{
+    res.render("index.html");
+});
+
+app.get("/test", (req, res) => {
     res.render("test.html");
 });
 
-app.post("/year", async (req, res) => {
+app.post("/search_full", async (req, res) => {
     //get year from the request
-    let { start_year: begin_year, end_year } = req.body;
-    begin_year = parseInt(begin_year);
+    let { make, model, year } = req.body;
+    year = parseInt(year);
+    if(isNaN(year)) year = null;
+    if(!model) model = null;
+    if(!make) make = null;
 
-    debugLog([begin_year]);
+    debugLog([make, model, year]);
     try {
-        let parts = await db.getParts(null, null, begin_year);
+        let parts = await db.getParts(make, model, year);
 
         debugLog(parts);
         res.json(parts);
@@ -35,6 +42,31 @@ app.post("/year", async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+app.post("/search_id_number", async (req, res) => {
+    let {id_number} = req.body;
+    try{
+        let parts = await db.getPartByOEorFrey(id_number);
+        res.json(parts);
+    } catch(err){
+        console.log(err);
+        res.sendStatus(500);
+    }
+})
+
+app.post("/add_part", async (req, res) => {
+    let {part, applications} = req.body as RequestBodyInterface;
+    console.log(part, applications);
+    try{
+        let part_id = await db.addPart(part, applications);
+        res.json(part_id);
+    }
+    catch(err){
+        console.log(err);
+        res.sendStatus(500);
+    }
+})
+
 
 app.post("/debug", async (req, res) => {
 

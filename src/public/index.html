@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/index.js" defer></script>
+</head>
+
+<body>
+    <nav>
+        <div class="content">
+            <div class="left">
+                <h1>ACEWAY</h1>
+                <a href="">Home</a>
+                <a href="">Contact</a>
+                <a href="">Search Products</a>
+            </div>
+            <div>
+                <a href="">Login / Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="hero">
+            <!--Photo by Daen van Beers on Unsplash-->
+            <div class="logo"></div>
+
+            <div class="search_bar">
+                <div class="search_group">
+                    <div>
+                        <input type="text" list="make" placeholder="Search by manufacturer" id="search_make">
+                        <datalist id="make">
+                            <option value="BMW">
+                            <option value="Mercedes Benz">
+                            <option value="Mercedes Benz Sprinter">
+                            <option value="">
+                            <option value="">
+                        </datalist>
+                    </div>
+                    <div>
+                        <input type="text" placeholder="Search by year" id="search_year">
+                        <!-- <datalist id="browsers">
+                            <option value="Internet Explorer">
+                            <option value="Firefox">
+                            <option value="Google Chrome">
+                            <option value="Opera">
+                            <option value="Safari">
+                        </datalist> -->
+                    </div>
+                    <div>
+                        <input type="text" list="model" placeholder="Search by model" id="search_model">
+                        <datalist id="model">
+                            <option value="model 1">
+                            <option value="">
+                            <option value="">
+                            <option value="">
+                            <option value="">
+                        </datalist>
+                    </div>
+                    <div>
+                        <input type="text" list="engine" placeholder="Search by engine size" id="search_engine">
+                        <datalist id="engine">
+                            <option value="engine 1">
+                            <option value="">
+                            <option value="">
+                            <option value="">
+                            <option value="">
+                        </datalist>
+                    </div>
+                </div>
+                <button class="search_button" id="full_search_btn">
+                    <svg width="15" height="15" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
+                        <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white" stroke-width="3" />
+                    </svg>
+                </button>
+            </div>
+            <div class="smaller_search_bar">
+                <input type="text" placeholder="Search by OE number" id="search_oe">
+                <button class="search_button" id="oe_search_btn">
+                    <svg width="15" height="15" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
+                        <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white" stroke-width="3" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="search_results">
+            <div class="container">
+                <div class="filters">
+                    Filter By
+                </div>
+                <table id="parts_container">
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Manufacturer</th>
+                        <th>OE Number</th>
+                        <th>Price</th>
+                        <th>Instock</th>
+                    </tr>
+                </table>
+                <!-- <div class="parts_container">
+                <div class="title">
+                    <p class="grid_name">Name</p>
+                    <p class="grid_make">Manufacturer</p>
+                    <p class="grid_oe_number">OE Number</p>
+                    <p class="grid_price">Price</p>
+                    <p class="grid_instock">Instock</p>
+                </div>
+                <div class="part">
+
+                </div>-->
+            </div>
+            <img src="https://i.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.webp" alt="" id="loader">
+        </div>
+        <div class="content">
+            <div class="container">
+                <div class="left">
+                    <h2>Lorem ipsum dolor sit amet.</h2>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta fuga cum nesciunt, repellendus
+                        quis, eveniet doloremque unde perspiciatis temporibus incidunt doloribus atque architecto. Culpa
+                        labore error, quis molestiae corporis rerum tempora nulla dicta beatae atque vel repellendus
+                        eaque omnis eligendi iure blanditiis mollitia dolorem ullam numquam repudiandae reiciendis
+                        voluptate nostrum?</p>
+                </div>
+                <div class="right">
+                    <img src="https://unsplash.it/550/300" alt="">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+
+    </footer>
+</body>
+
+</html>

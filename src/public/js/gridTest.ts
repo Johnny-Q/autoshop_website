@@ -1,59 +1,30 @@
-let search_names = ["make", "year", "model", "engine"];
-let search = {};
-search_names.forEach(name => {
-    search[name] = document.querySelector(`#search_${name}`);
-});
-
-let full_search_btn = document.querySelector("#full_search_btn") as HTMLElement;
-let oe_search_btn = document.querySelector("#oe_search_btn") as HTMLElement;
-
-let results_div = document.querySelector(".search_results") as HTMLElement;
-let loader_gif = document.querySelector("#loader") as HTMLElement;
-
-// let parts_table = document.querySelector("#parts_container") as HTMLTableElement;
-let parts_grid = document.querySelector(".parts_grid");
+export{};
+let grid = document.querySelector(".grid");
 let check = `<svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1.06066" y1="13.9393" x2="8.56066" y2="21.4393" stroke="#00A825" stroke-width="3"/><line x1="31.0607" y1="1.06066" x2="8.56066" y2="23.5607" stroke="#00A825" stroke-width="3"/></svg>`
 let cross = `<svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1.41102" y1="19.0282" x2="19.0887" y2="1.35054" stroke="#A50000" stroke-width="3"/><line x1="1.41125" y1="1.35053" x2="19.0889" y2="19.0282" stroke="#A50000" stroke-width="3"/></svg>`;
-
 /**
  * @description makes and manages api response to render on page
  */
-class PartsManager {
+class gridTest {
     constructor() {
-        full_search_btn.onclick = async () => {
-            //get the data from the search fields
-            let data = {};
 
-            for (let [name, element] of Object.entries(search)) {
-                data[name] = (element as HTMLInputElement).value;
-            };
+    }
+    async run() {
+        try {
+            //spawn the loader
+            //perform api request
+            let parts = await this.search({});
 
-            //show the results div
-            results_div.style = "display: flex";
+            //hide the loader after the request is done
 
-            try {
-                //spawn the loader
-                loader_gif.style = "display: block";
-                //perform api request
-                let parts = await this.search(this.getSearchData());
-
-                //hide the loader after the request is done
-
-                this.clearResults();
-                parts.forEach(part => {
-                    this.renderPart(part);
-                });
-                //hide the loader after all the parts have been rendered
-                loader_gif.style = "display: none";
-            } catch (err) {
-                //show an error message on screen
-                console.log(err);
-            }
-        };
-
-        oe_search_btn.onclick = () => {
-
-        };
+            parts.forEach(part => {
+                this.renderPart(part);
+            });
+            //hide the loader after all the parts have been rendered
+        } catch (err) {
+            //show an error message on screen
+            console.log(err);
+        }
     }
     async search(data: Object) {
         try {
@@ -81,7 +52,7 @@ class PartsManager {
         //add the elements
         let img = document.createElement("img");
         //render the right image
-        img.src = `..${part.image_url || "/img/image1.jpeg"}`;
+        img.src = "img/image1.jpeg";
 
         let name = document.createElement("p");
         name.innerText = part.frey_number;
@@ -97,15 +68,14 @@ class PartsManager {
 
         let instock = document.createElement("div");
         instock.classList.add("stock_status");
-        instock.innerHTML = Math.round(Math.random()) ? check : cross;
+        instock.innerHTML = Math.round(Math.random())?check:cross; 
 
         let line = document.createElement("div");
         line.classList.add("seperator");
 
-        parts_grid.append(line, img, name, make, oe_number, price, instock);
-
+        grid.append(line, img, name, make, oe_number, price, instock);
         // part.image_url = "image1.jpeg";
-        // let row = parts_div.insertRow();
+        // let row = parts_table.insertRow();
         // let keys = ["image_url", "make", "oe_number", "price", "in_stock"];
         // for(let i = 0;i < keys.length; i++){
         //     let temp = row.insertCell(i);
@@ -123,22 +93,9 @@ class PartsManager {
         //onclick spawn the modal
 
     }
-    getSearchData() {
-        let data = {};
-        for (let [name, element] of Object.entries(search)) {
-            data[name] = (element as HTMLInputElement).value;
-        };
-        return data;
-    }
-    clearResults() {
-        parts_grid.innerHTML = `<p></p>
-        <p>Part</p>
-        <p>Manufacturer</p>
-        <p>OE Number</p>
-        <p>Price</p>
-        <p>Instock</p>`;
-    }
 }
+let asdf;
 window.onload = () => {
-    let asdf = new PartsManager();
+    asdf = new gridTest();
 }
+

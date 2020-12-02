@@ -27,21 +27,26 @@
     </div>
     <h2>add item</h2>
     <div>
-        <div id="part_information">
-            <input type="text" placeholder="OE Number">
-            <input type="text" placeholder="Frey Number">
-            <input type="text" placeholder="Make">
-            <input type="number" placeholder="Price">
-        </div>
+        <form action='/add_part' method="post" enctype="multipart/form-data" id="add_part">
+            <fieldset>
+                <legend>Part Information</legend>
+                <input type="file" name="part_img" required>
+                <input type="text" name="oe_number" placeholder="OE Number" required>
+                <input type="text" name="frey_number" placeholder="Frey Number" required>
+                <input type="text" name="make" placeholder="Make" required>
+                <input type="number" name="price" placeholder="Price" required>
+            </fieldset>
+            <fieldset id="applications">
+                <legend>Applications</legend>
+                <div>
+                    <input type="text" name="model" placeholder="model" required>
+                    <input type="number" name="begin_year" placeholder="begin_year" required>
+                    <input type="number" name="end_year" placeholder="end_year" required>
+                </div>
+            </fieldset>
+            <button type="submit">Submit</button>
+        </form>
         <button id="add_app">Add Application</button>
-        <div id="applications">
-            <div>
-                <input type="text" placeholder="model">
-                <input type="number" placeholder="begin_year">
-                <input type="number" placeholder="end_year">
-            </div>
-        </div>
-        <button id="add_part">Add Part</button>
     </div>
     <p id="status_text"></p>
 </body>

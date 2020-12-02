@@ -19,12 +19,18 @@ add_app_button.addEventListener("click", function () {
     let parent_div = document.createElement("div");
     let model = document.createElement("input");
     model.placeholder = "model";
+    model.name="model";
+    model.required=true;
 
     let input_begin_year = document.createElement("input");
     input_begin_year.placeholder = "begin_year";
+    input_begin_year.name="begin_year";
+    input_begin_year.required=true;
 
     let input_end_year = document.createElement("input");
     input_end_year.placeholder = "end_year";
+    input_end_year.name="end_year";
+    input_end_year.required=true;
 
     parent_div.append(model, input_begin_year, input_end_year);
     app_div.append(parent_div);
@@ -93,61 +99,61 @@ int_button.addEventListener("click", async function () {
     console.log(part_name);
 });
 
-add_part_button.addEventListener("click", async function () {
-    // select all the divs which fall under applications
-    let applications = document.querySelectorAll("#applications > div");
-    // assert that all of the application fields are filled out, otherwise alert user
-    if (!assertValue(applications[applications.length - 1].children)) {
-        alert("rart app");
-        return;
-    }
-    // select part information div
-    let part_information = document.querySelector("#part_information").children;
-    // assert that all of the part information fields are filled out, otherwise alert user
-    if (!assertValue(part_information)) {
-        alert("rart info");
-        return;
-    }
+// add_part_button.addEventListener("click", async function () {
+//     // select all the divs which fall under applications
+//     let applications = document.querySelectorAll("#applications > div");
+//     // assert that all of the application fields are filled out, otherwise alert user
+//     if (!assertValue(applications[applications.length - 1].children)) {
+//         alert("rart app");
+//         return;
+//     }
+//     // select part information div
+//     let part_information = document.querySelector("#part_information").children;
+//     // assert that all of the part information fields are filled out, otherwise alert user
+//     if (!assertValue(part_information)) {
+//         alert("rart info");
+//         return;
+//     }
 
-    try {
-        let part = {
-            'make': part_information[2].value, 
-            'oe_number': part_information[0].value, 
-            'frey_number': part_information[1].value, 
-            'price': part_information[3].value, 
-            'description': "", 
-            'enabled': 1, 
-            'in_stock': 1};
-        let part_applications = [];
-        for(let i = 0; i < applications.length; i++){
-            let temp = {
-                'model': applications[i].children[0].value, 
-                'begin_year': applications[i].children[1].value, 
-                'end_year': applications[i].children[2].value
-            };
-            part_applications.push(temp);
-        }
-        console.log(part, part_applications);
-        let body = JSON.stringify({
-            'part': part,
-            'applications': part_applications
-        });
-        console.log(body);
-        let res = await fetch("/add_part", {
-            "method": "POST",
-            "headers": {
-                "Authorization": "Basic ",
-                "Content-Type": "application/json"
-            },
-            "body": body
-        })
-        let json = await res.json();
-        status_text.innerText = JSON.stringify(json);
-        console.log(json);
-    } catch (err) {
-        console.log(err);
-    }
-});
+//     try {
+//         let part = {
+//             'make': part_information[2].value, 
+//             'oe_number': part_information[0].value, 
+//             'frey_number': part_information[1].value, 
+//             'price': part_information[3].value, 
+//             'description': "", 
+//             'enabled': 1, 
+//             'in_stock': 1};
+//         let part_applications = [];
+//         for(let i = 0; i < applications.length; i++){
+//             let temp = {
+//                 'model': applications[i].children[0].value, 
+//                 'begin_year': applications[i].children[1].value, 
+//                 'end_year': applications[i].children[2].value
+//             };
+//             part_applications.push(temp);
+//         }
+//         console.log(part, part_applications);
+//         let body = JSON.stringify({
+//             'part': part,
+//             'applications': part_applications
+//         });
+//         console.log(body);
+//         let res = await fetch("/add_part", {
+//             "method": "POST",
+//             "headers": {
+//                 "Authorization": "Basic ",
+//                 "Content-Type": "application/json"
+//             },
+//             "body": body
+//         })
+//         let json = await res.json();
+//         status_text.innerText = JSON.stringify(json);
+//         console.log(json);
+//     } catch (err) {
+//         console.log(err);
+//     }
+// });
 
 function assertValue(elements) {
     for (let i = 0; i < elements.length; i++) {

@@ -68,7 +68,7 @@ main {
         justify-content: center;
         align-items: center;
         height: 600px;
-        background: linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)), url("../img/hero.jpg");
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("../img/hero.jpg");
 
         div.logo {
             width: 400px;
@@ -128,6 +128,7 @@ main {
             }
         }
     }
+
     div.search_results {
         padding-top: 30px;
         width: 100%;
@@ -138,34 +139,88 @@ main {
         align-items: center;
 
         background-color: #ffffff;
-        div.container{
+
+        div.container {
             padding: 20px;
             width: 100%;
             display: grid;
             grid-template-columns: 1fr 8fr 1fr;
 
         }
-        div.filters{
+
+        div.filters {
             width: 100%;
             height: 100%;
         }
 
-        table#parts_container {
+        div.parts_grid {
+            display: grid;
             width: 100%;
+            grid-template-columns: repeat(6, 1fr);
             text-align: center;
-            table-layout: fixed;
-            tr.titles {
-                width: 100%;
-                // text-align: center;
+
+            p,
+            img,
+            div {
+                align-self: center;
+                justify-self: center;
             }
-            tr{
-                // text-align: center;
-                img{
-                    width: 100%;
-                    object-fit: contain;
-                }
+
+            div.stock_status {
+                width: fit-content;
+                height: fit-content;
+            }
+
+            div.seperator {
+                margin: 50px 0;
+                grid-column: 1/-1;
+                width: 80%;
+                height: 1px;
+                background-color: black;
             }
         }
+
+        // table#parts_table {
+        //     width: 100%;
+        //     text-align: center;
+        //     table-layout: fixed;
+        //     border-spacing: 0;
+        //     border-collapse: collapse;
+
+        //     thead {
+        //         tr {
+        //             text-align: center;
+        //             height: fit-content;
+
+        //             th {
+        //                 padding-bottom: 30px;
+        //             }
+        //         }
+        //     }
+
+        //     tbody {
+        //         tr {
+        //             text-align: center;
+        //             height: 150px;
+        //             // border-top: 1px solid black;
+        //             // img {
+        //             //     width: 100%;
+        //             //     height: 100%;
+        //             //     object-fit: contain;
+        //             // }
+
+        //             td.img {
+        //                 background-color: white;
+        //                 background-repeat: no-repeat;
+        //                 background-position: center;
+        //                 background-size: contain;
+        //             }
+        //         }
+        //         tr:nth-child(even) {
+        //             background-color: #cccccc;
+        //         }
+        //     }
+        // }
 
     }
 

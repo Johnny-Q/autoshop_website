@@ -5,6 +5,13 @@ const express = require('express');
 const app = express();
 const { PORT } = process.env;
 const db = require("./db_helper");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+const upload = multer({
+    dest: path.join(__dirname, "./temp")
+  });
 
 //to render pure html and css files
 app.engine("html", require("ejs").renderFile);
@@ -20,6 +27,10 @@ app.get("/", (req, res)=>{
 
 app.get("/test", (req, res) => {
     res.render("test.html");
+});
+
+app.get("/grid_test", (req, res)=>{
+    res.render("grid_test.html");
 });
 
 app.post("/search_full", async (req, res) => {
@@ -54,9 +65,56 @@ app.post("/search_id_number", async (req, res) => {
     }
 })
 
-app.post("/add_part", async (req, res) => {
-    let {part, applications} = req.body as RequestBodyInterface;
-    console.log(part, applications);
+app.post("/add_part", upload.single("part_img"), async (req, res) => {
+    // construct part db entry
+    let part: PartDBEntry = null, applications: Array<Application> = null;
+    try{
+        part = {
+            'make': req.body.make,
+            'oe_number': req.body.oe_number,
+            'frey_number': req.body.frey_number,
+            'price': req.body.price,
+            'image_url': null,
+            'description': null,
+            'enabled': 1,
+            'in_stock': 1
+        }
+        // save image
+        const tempPath = req.file.path;
+        const fileExtension = path.extname(req.file.originalname).toLowerCase();
+        let image_url = "/img/"+part.make + part.oe_number + fileExtension
+        debugLog(image_url);
+        const targetPath = path.join(__dirname, "./public", image_url);
+        if (fileExtension === ".png"){
+            fs.rename(tempPath, targetPath, err=> {
+                if (err){
+                    return debugLog([err, res]);
+                }
+            })
+            part.image_url= image_url;
+        }
+        // construct applications array
+        applications = [];
+        if(typeof req.body.model != 'string'){
+            for(let i = 0; i < req.body.model.length; i++){
+                applications.push({
+                    'model': req.body.model[i],
+                    'begin_year': req.body.begin_year[i],
+                    'end_year': req.body.end_year[i]
+                });
+            }
+        }else{
+            applications.push({
+                'model': req.body.model,
+                'begin_year': req.body.begin_year,
+                'end_year': req.body.end_year
+            });
+        }
+        debugLog([part, applications]);
+    }catch(err){
+        debugLog(err);
+        res.sendStatus(500);
+    }
     try{
         let part_id = await db.addPart(part, applications);
         res.json(part_id);
@@ -68,7 +126,9 @@ app.post("/add_part", async (req, res) => {
 })
 
 
-app.post("/debug", async (req, res) => {
+app.post("/debug", upload.single("part_img"), async (req, res) => {
+    
+    debugLog(req.body);
 
 })
 

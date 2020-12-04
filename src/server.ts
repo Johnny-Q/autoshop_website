@@ -11,7 +11,7 @@ const fs = require("fs");
 
 const upload = multer({
     dest: path.join(__dirname, "./temp")
-  });
+});
 
 //to render pure html and css files
 app.engine("html", require("ejs").renderFile);
@@ -21,7 +21,9 @@ app.set("views", "build/public");
 //accept json data
 app.use(bodyparser.json());
 
-app.get("/", (req, res)=>{
+
+//serve web pages
+app.get("/", (req, res) => {
     res.render("index.html");
 });
 
@@ -29,23 +31,30 @@ app.get("/test", (req, res) => {
     res.render("test.html");
 });
 
-app.get("/grid_test", (req, res)=>{
+app.get("/grid_test", (req, res) => {
     res.render("grid_test.html");
 });
 
+app.get("/about", (req, res) => {
+    res.render("about.html");
+});
+
+
+//api routes
 app.post("/search_full", async (req, res) => {
     //get year from the request
-    let { make, model, year } = req.body;
+    let { make, model, year, engine } = req.body;
     year = parseInt(year);
-    if(isNaN(year)) year = null;
-    if(!model) model = null;
-    if(!make) make = null;
+    if (isNaN(year)) year = null;
+    if (!model) model = null;
+    if (!make) make = null;
+    if (!engine) engine = null;
 
-    debugLog([make, model, year]);
+    debugLog([make, model, year, engine]);
     try {
-        let parts = await db.getParts(make, model, year);
+        let parts = await db.getPartsEngine(make, model, year, engine);
 
-        debugLog(parts);
+        // debugLog(parts);
         res.json(parts);
         // res.sendStatus(200);
     } catch (err) {
@@ -54,12 +63,22 @@ app.post("/search_full", async (req, res) => {
     }
 });
 
+app.get('/init', async (req, res) => {
+    try {
+        let parts = await db.getModelNames();
+        res.json(parts);
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(500);
+    }
+})
+
 app.post("/search_id_number", async (req, res) => {
-    let {id_number} = req.body;
-    try{
+    let { id_number } = req.body;
+    try {
         let parts = await db.getPartByOEorFrey(id_number);
         res.json(parts);
-    } catch(err){
+    } catch (err) {
         console.log(err);
         res.sendStatus(500);
     }
@@ -68,42 +87,39 @@ app.post("/search_id_number", async (req, res) => {
 app.post("/add_part", upload.single("part_img"), async (req, res) => {
     // construct part db entry
     let part: PartDBEntry = null, applications: Array<Application> = null;
-    try{
-        part = {
-            'make': req.body.make,
-            'oe_number': req.body.oe_number,
-            'frey_number': req.body.frey_number,
-            'price': req.body.price,
-            'image_url': null,
-            'description': null,
-            'enabled': 1,
-            'in_stock': 1
-        }
-        // save image
+    try {
+        let { make, oe_number, frey_number, price, description, enabled, in_stock } = req.body;
+        part = { make, oe_number, frey_number, price, 
+            'image_url': null, 
+            'description': description?description:null,
+            'enabled': enabled?enabled:1, 
+            'in_stock': in_stock?in_stock:1 };
+        console.log(part);
+        return;
         const tempPath = req.file.path;
         const fileExtension = path.extname(req.file.originalname).toLowerCase();
-        let image_url = "/img/"+part.make + part.oe_number + fileExtension
+        let image_url = "/img/" + part.make + part.oe_number + fileExtension
         debugLog(image_url);
         const targetPath = path.join(__dirname, "./public", image_url);
-        if (fileExtension === ".png"){
-            fs.rename(tempPath, targetPath, err=> {
-                if (err){
+        if (fileExtension === ".png") {
+            fs.rename(tempPath, targetPath, err => {
+                if (err) {
                     return debugLog([err, res]);
                 }
-            })
-            part.image_url= image_url;
+            });
+            part.image_url = image_url;
         }
         // construct applications array
         applications = [];
-        if(typeof req.body.model != 'string'){
-            for(let i = 0; i < req.body.model.length; i++){
+        if (typeof req.body.model != 'string') {
+            for (let i = 0; i < req.body.model.length; i++) {
                 applications.push({
                     'model': req.body.model[i],
                     'begin_year': req.body.begin_year[i],
                     'end_year': req.body.end_year[i]
                 });
             }
-        }else{
+        } else {
             applications.push({
                 'model': req.body.model,
                 'begin_year': req.body.begin_year,
@@ -111,15 +127,16 @@ app.post("/add_part", upload.single("part_img"), async (req, res) => {
             });
         }
         debugLog([part, applications]);
-    }catch(err){
+    } catch (err) {
         debugLog(err);
         res.sendStatus(500);
     }
-    try{
+    
+    try {
         let part_id = await db.addPart(part, applications);
         res.json(part_id);
     }
-    catch(err){
+    catch (err) {
         console.log(err);
         res.sendStatus(500);
     }
@@ -127,7 +144,7 @@ app.post("/add_part", upload.single("part_img"), async (req, res) => {
 
 
 app.post("/debug", upload.single("part_img"), async (req, res) => {
-    
+
     debugLog(req.body);
 
 })
@@ -138,8 +155,6 @@ app.post("/int", (req, res) => {
     debugLog(part_name);
     res.sendStatus(200);
 });
-
-
 
 app.listen(PORT, () => {
     console.log("started on", PORT);

@@ -2,13 +2,21 @@
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
-    font-size: 14px;
+    // font-size: 14px;
     box-sizing: border-box;
 }
 
+input,
+p {
+    font-size: 14px;
+}
+
+//make images non-selectable
+
+
 body {
     width: 100%;
-    background-color: #cccccc;
+    // background-color: #cccccc;
     // display: flex;
     // flex-direction: column;
     // align-items: center;
@@ -59,6 +67,11 @@ button.search_button {
     outline: none;
     width: 70px;
     height: 50px;
+}
+
+datalist {
+    max-height: 50px;
+    overflow-y: scroll;
 }
 
 main {
@@ -151,6 +164,34 @@ main {
         div.filters {
             width: 100%;
             height: 100%;
+            //disable text selection
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+
+            h2 {
+                // color: #444444;
+            }
+
+            h3 {
+                margin-top: 10px;
+            }
+
+            ul {
+                list-style: none;
+
+                li {
+                    padding-left: 5px;
+                    padding-top: 3px;
+                }
+            }
+
+            // h3{
+
+            // }
         }
 
         div.parts_grid {
@@ -224,30 +265,45 @@ main {
 
     }
 
-    div.content {
-        width: 100%;
-        background-color: white;
+    // div.content {
+    //     width: 100%;
+    //     background-color: white;
+    //     display: flex;
+    //     flex-direction: column;
+    //     align-items: center;
+
+    //     div.container {
+    //         width: 80%;
+    //         display: grid;
+    //         grid-template-columns: 1fr 1fr;
+    //         justify-items: center;
+    //         align-items: center;
+
+    //         div.left {
+    //             width: 50%;
+    //             height: fit-content;
+
+    //             h2 {
+    //                 font-size: 1.5em;
+    //                 margin: 30px 0;
+    //             }
+    //         }
+    //     }
+    // }
+    div.feedback {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
         align-items: center;
+        text-align: center;
+        margin-top: 30px;
 
-        div.container {
-            width: 80%;
-            height: 600px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            justify-items: center;
-            align-items: center;
+        h1 {
+            font-size: 48px;
+            color: #aaaaaa;
+        }
 
-            div.left {
-                width: 50%;
-                height: fit-content;
-
-                h2 {
-                    font-size: 1.5em;
-                    margin: 30px 0;
-                }
-            }
+        h1.error {
+            color: #fc6060;
         }
     }
 }

@@ -4,6 +4,8 @@ search_names.forEach(name => {
     search[name] = document.querySelector(`#search_${name}`);
 });
 
+let oe_input = document.querySelector("#search_oe");
+
 let full_search_btn = document.querySelector("#full_search_btn") as HTMLElement;
 let oe_search_btn = document.querySelector("#oe_search_btn") as HTMLElement;
 
@@ -23,38 +25,31 @@ let cross = `<svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="
 class PartsManager {
     constructor() {
         full_search_btn.onclick = async () => {
-            //get the data from the search fields
-            let data = {};
-
-            for (let [name, element] of Object.entries(search)) {
-                data[name] = (element as HTMLInputElement).value;
-            };
-
-
             try {
                 //spawn the loader
                 feedback_div.style.display = "block";
                 loader_gif.style.display = "inline-block";
-                
+                message_h1.innerText = "";
+
                 //perform api request
                 let parts = await this.search(this.getSearchData());
 
                 if (parts.length) {
                     //hide the loader after the request is done
-                    this.clearResults();
+                    this.clearParts();
                     parts.forEach(part => {
                         this.renderPart(part);
                     });
                     //show the results div
                     results_div.style.display = "flex";
-                    // feedback_div.style.display = "none";
+                    feedback_div.style.display = "none";
                 } else {
                     results_div.style.display = "none";
                     message_h1.innerText = "No Results";
                 }
 
             } catch (err) {
-                this.clearResults();
+                this.clearParts();
                 //hide the results
                 results_div.style.display = "none";
 
@@ -63,11 +58,48 @@ class PartsManager {
                 message_h1.innerText = "Please try again.";
             }
             //hide the loader after the request is done
-            // loader_gif.style = "display: none";
+            loader_gif.style = "display: none";
         };
 
-        oe_search_btn.onclick = () => {
+        oe_search_btn.onclick = async () => {
+            if (!oe_input.value) return;
+            try {
+                //spawn the loader
+                feedback_div.style.display = "block";
+                loader_gif.style.display = "inline-block";
+                message_h1.innerText = "";
 
+                //perform api request
+                let parts = await this.oeSearch(oe_input.value);
+
+                console.log(parts);
+                if (parts.length) {
+                    //hide the loader after the request is done
+                    this.clearParts();
+                    parts.forEach(part => {
+                        this.renderPart(part);
+                    });
+                    //show the results div
+                    results_div.style.display = "flex";
+                    feedback_div.style.display = "none";
+                } else {
+
+                    //show feedback
+                    results_div.style.display = "none";
+                    message_h1.innerText = "No Results";
+                }
+
+            } catch (err) {
+                this.clearParts();
+                //hide the results
+                results_div.style.display = "none";
+
+                //show an error message on screen
+                message_h1.classList.add("error");
+                message_h1.innerText = "Please try again.";
+            }
+            //hide the loader after the request is done
+            loader_gif.style = "display: none";
         };
     }
     async search(data: Object) {
@@ -82,16 +114,32 @@ class PartsManager {
             });
             let json = await resp.json();
 
-            //convert json to array
-            let temp_arr = [];
-            for (let key of Object.keys(json)) {
-                temp_arr.push(json[key]);
-            }
-            return temp_arr;
+            return this.jsonToArr(json);
         } catch (err) {
             throw err;
         }
     }
+
+    async oeSearch(number) {
+        try {
+            //make request to server
+            let resp = await fetch("/search_id_number", {
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/json",
+                },
+                "body": JSON.stringify({
+                    "id_number": number
+                })
+            });
+            let json = await resp.json();
+
+            return this.jsonToArr(json);
+        } catch (err) {
+            throw err;
+        }
+    }
+
     renderPart(part: Part) {
         //add the elements
         let img = document.createElement("img");
@@ -143,15 +191,25 @@ class PartsManager {
         for (let [name, element] of Object.entries(search)) {
             data[name] = (element as HTMLInputElement).value;
         };
+        data.year = data.year.toString().substr(2);
+        console.log(data.year);
         return data;
     }
-    clearResults() {
+    clearParts() {
         parts_grid.innerHTML = `<p></p>
         <p>Part</p>
         <p>Manufacturer</p>
         <p>OE Number</p>
         <p>Price</p>
         <p>Instock</p>`;
+    }
+    jsonToArr(json) {
+        //convert json to array
+        let temp_arr = [];
+        for (let key of Object.keys(json)) {
+            temp_arr.push(json[key]);
+        }
+        return temp_arr;
     }
 }
 window.onload = () => {

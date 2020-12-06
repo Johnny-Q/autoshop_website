@@ -3,6 +3,7 @@ DB_backup.db
 build
 .env
 notes.md
+run.bat
 
 # Logs
 logs

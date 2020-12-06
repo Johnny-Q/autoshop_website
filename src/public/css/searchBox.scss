@@ -1,0 +1,13 @@
+*{
+
+}
+body{
+    div.search_field{
+        div.options{
+            display: none;
+        }
+        div.options.active{
+            display: block;
+        }
+    }
+}

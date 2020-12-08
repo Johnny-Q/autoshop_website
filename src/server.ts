@@ -21,7 +21,6 @@ app.set("views", "build/public");
 //accept json data
 app.use(bodyparser.json());
 
-
 //serve web pages
 app.get("/", (req, res) => {
     res.render("index.html");
@@ -37,6 +36,10 @@ app.get("/grid_test", (req, res) => {
 
 app.get("/about", (req, res) => {
     res.render("about.html");
+});
+
+app.get("/search_box", (req, res)=>{
+    res.render("search_box.html");
 });
 
 
@@ -94,8 +97,6 @@ app.post("/add_part", upload.single("part_img"), async (req, res) => {
             'description': description?description:null,
             'enabled': enabled?enabled:1, 
             'in_stock': in_stock?in_stock:1 };
-        console.log(part);
-        return;
         const tempPath = req.file.path;
         const fileExtension = path.extname(req.file.originalname).toLowerCase();
         let image_url = "/img/" + part.make + part.oe_number + fileExtension

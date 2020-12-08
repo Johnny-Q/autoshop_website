@@ -15,7 +15,7 @@
     <nav>
         <div class="content">
             <div class="left">
-                <h1>ACEWAY</h1>
+                <h1>Aceway Canada Inc.</h1>
                 <a href="">Home</a>
                 <a href="">Contact</a>
                 <a href="">Search Products</a>
@@ -36,15 +36,14 @@
                     <div>
                         <input type="text" list="make" placeholder="Search by manufacturer" id="search_make">
                         <datalist id="make">
-                            <option value="BMW">
-                            <option value="Mercedes Benz">
-                            <option value="Mercedes Benz Sprinter">
-                            <option value="">
-                            <option value="">
+                            <option value="BMW"></option>
+                            <option value="Mercedes Benz"></option>
+                            <option value="Audi"></option>
+                            <option value="Volkswagen"></option>
                         </datalist>
                     </div>
                     <div>
-                        <input type="text" placeholder="Search by year" id="search_year">
+                        <input type="number" placeholder="Search by year" id="search_year">
                         <!-- <datalist id="browsers">
                             <option value="Internet Explorer">
                             <option value="Firefox">
@@ -56,11 +55,11 @@
                     <div>
                         <input type="text" list="model" placeholder="Search by model" id="search_model">
                         <datalist id="model">
-                            <option value="model 1">
-                            <option value="">
-                            <option value="">
-                            <option value="">
-                            <option value="">
+                            <option value="model 1"></option>
+                            <option value=""></option>
+                            <option value=""></option>
+                            <option value=""></option>
+                            <option value=""></option>
                         </datalist>
                     </div>
                     <div>
@@ -91,38 +90,40 @@
                 </button>
             </div>
         </div>
+        <div class="feedback">
+            <img src="https://i.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.webp" alt="" id="loader"
+                style="display: none;">
+            <h1 id="message">
+                Search Products
+            </h1>
+        </div>
         <div class="search_results">
             <div class="container">
                 <div class="filters">
-                    Filter By<br>
-                    <strong>Manufacturer</strong><br>
-                    BMW<br>
-                    Mercedes Benz<br>
-
+                    <h2>Filters</h2>
+                    <h3>Manufacturer</h3>
+                    <ul>
+                        <div>
+                            <li>Audi</li>
+                        </div>
+                        <li>BMW</li>
+                        <li>Mercedes Benz</li>
+                        <li>Volkswagen</li>
+                    </ul>
+                    <h3>Engine Size</h3>
+                    <ul>
+                        <li>S</li>
+                        <li>M</li>
+                        <li>L</li>
+                    </ul>
                 </div>
                 <div class="parts_grid">
                     <p></p>
                     <p>Part</p>
                     <p>Manufacturer</p>
                     <p>OE Number</p>
-                    <p>Price</p>
+                    <p>PPU</p>
                     <p>Instock</p>
-                </div>
-            </div>
-            <img src="https://i.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.webp" alt="" id="loader">
-        </div>
-        <div class="content">
-            <div class="container">
-                <div class="left">
-                    <h2>Lorem ipsum dolor sit amet.</h2>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta fuga cum nesciunt, repellendus
-                        quis, eveniet doloremque unde perspiciatis temporibus incidunt doloribus atque architecto. Culpa
-                        labore error, quis molestiae corporis rerum tempora nulla dicta beatae atque vel repellendus
-                        eaque omnis eligendi iure blanditiis mollitia dolorem ullam numquam repudiandae reiciendis
-                        voluptate nostrum?</p>
-                </div>
-                <div class="right">
-                    <img src="https://unsplash.it/550/300" alt="">
                 </div>
             </div>
         </div>

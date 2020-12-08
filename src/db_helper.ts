@@ -48,6 +48,9 @@ async function getPartsEngine(make: string, model: string, year: number, engine:
     )
     */
     try{
+        // if(make) make = '%'+make+'%';
+        // if(model) model = '%'+model+'%';
+        if(!engine) engine = '%'+engine+'%';
         return db.select().from('parts').whereRaw('make like IFNULL(?, make)', [make]).whereIn('id', function() {
             this.distinct('year_model_connect.parts_id').from('year_model_connect')
             .leftJoin('engine_connect', 'year_model_connect.id', 'engine_connect.model_id')
@@ -63,7 +66,7 @@ async function getPartsEngine(make: string, model: string, year: number, engine:
 
 async function getPartByOEorFrey(id_number: string): Promise<Array<PartDBEntry>> {
     try{
-        return db.select().from('parts').where('oe_number', id_number).orWhere('frey_number', id_number);
+        return db.select().from('parts').whereRaw('oe_number like ?', id_number+'%').orWhereRaw('frey_number like ?', id_number+'%');
     } catch (err){
         console.log(err);
         throw err;

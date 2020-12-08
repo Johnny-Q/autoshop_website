@@ -91,12 +91,12 @@ async function getModelNames(): Promise<Array<string>> {
  */
 async function addPart(part: PartDBEntry, applications: Array<Application>) : Promise<number> {
     try {
-        let part_id = await db('parts').insert(part, ['id']);
+        let part_id = (await db('parts').insert(part));
         applications.forEach(async (app: Application)=>{
             try{
                 await db('year_model_connect').insert({...app, 'parts_id': part_id});
             }catch(err){
-                console.log(err);
+                // console.log(err);
             }
         });
         return part_id;

@@ -1,7 +1,7 @@
 let search_names = ["make", "year", "model", "engine"];
 let search = {};
 search_names.forEach(name => {
-    search[name] = document.querySelector(`#search_${name}`);
+    search[name] = document.querySelector(`input[name=search_${name}]`);
 });
 
 let oe_input = document.querySelector("#search_oe");
@@ -24,46 +24,48 @@ let cross = `<svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="
  */
 class PartsManager {
     constructor() {
-        full_search_btn.onclick = async () => {
-            try {
-                //spawn the loader
-                feedback_div.style.display = "block";
-                loader_gif.style.display = "inline-block";
-                message_h1.innerText = "";
+        // full_search_btn.onclick = async () => {
+        //     try {
+        //         if (message_h1.classList.contains("error")) message_h1.classList.remove("error");
+        //         //spawn the loader
+        //         feedback_div.style.display = "block";
+        //         loader_gif.style.display = "inline-block";
+        //         message_h1.innerText = "";
 
-                //perform api request
-                let parts = await this.search(this.getSearchData());
+        //         //perform api request
+        //         let parts = await this.api_search_full(this.getSearchData());
 
-                if (parts.length) {
-                    //hide the loader after the request is done
-                    this.clearParts();
-                    parts.forEach(part => {
-                        this.renderPart(part);
-                    });
-                    //show the results div
-                    results_div.style.display = "flex";
-                    feedback_div.style.display = "none";
-                } else {
-                    results_div.style.display = "none";
-                    message_h1.innerText = "No Results";
-                }
+        //         if (parts.length) {
+        //             //hide the loader after the request is done
+        //             this.clearParts();
+        //             parts.forEach(part => {
+        //                 this.renderPart(part);
+        //             });
+        //             //show the results div
+        //             results_div.style.display = "flex";
+        //             feedback_div.style.display = "none";
+        //         } else {
+        //             results_div.style.display = "none";
+        //             message_h1.innerText = "No Results";
+        //         }
 
-            } catch (err) {
-                this.clearParts();
-                //hide the results
-                results_div.style.display = "none";
+        //     } catch (err) {
+        //         this.clearParts();
+        //         //hide the results
+        //         results_div.style.display = "none";
 
-                //show an error message on screen
-                message_h1.classList.add("error");
-                message_h1.innerText = "Please try again.";
-            }
-            //hide the loader after the request is done
-            loader_gif.style = "display: none";
-        };
+        //         //show an error message on screen
+        //         message_h1.classList.add("error");
+        //         message_h1.innerText = "Please try again.";
+        //     }
+        //     //hide the loader after the request is done
+        //     loader_gif.style = "display: none";
+        // };
 
         oe_search_btn.onclick = async () => {
             if (!oe_input.value) return;
             try {
+                if (message_h1.classList.contains("error")) message_h1.classList.remove("error");
                 //spawn the loader
                 feedback_div.style.display = "block";
                 loader_gif.style.display = "inline-block";
@@ -102,7 +104,44 @@ class PartsManager {
             loader_gif.style = "display: none";
         };
     }
-    async search(data: Object) {
+    async search() {
+        try {
+            if (message_h1.classList.contains("error")) message_h1.classList.remove("error");
+            //spawn the loader
+            feedback_div.style.display = "block";
+            loader_gif.style.display = "inline-block";
+            message_h1.innerText = "";
+
+            //perform api request
+            let parts = await this.api_search_full(this.getSearchData());
+
+            if (parts.length) {
+                //hide the loader after the request is done
+                this.clearParts();
+                parts.forEach(part => {
+                    this.renderPart(part);
+                });
+                //show the results div
+                results_div.style.display = "flex";
+                feedback_div.style.display = "none";
+            } else {
+                results_div.style.display = "none";
+                message_h1.innerText = "No Results";
+            }
+
+        } catch (err) {
+            this.clearParts();
+            //hide the results
+            results_div.style.display = "none";
+
+            //show an error message on screen
+            message_h1.classList.add("error");
+            message_h1.innerText = "Please try again.";
+        }
+        //hide the loader after the request is done
+        loader_gif.style = "display: none";
+    }
+    async api_search_full(data: Object) {
         try {
             //make request to server
             let resp = await fetch("/search_full", {
@@ -144,7 +183,8 @@ class PartsManager {
         //add the elements
         let img = document.createElement("img");
         //render the right image
-        img.src = `..${part.image_url || "/img/image1.jpeg"}`;
+        // img.src = `${part.image_url || "/image1.jpeg"}`;
+        img.src = '../img/parts/' + (part.image_url || "image1.jpeg");
 
         let name = document.createElement("p");
         name.innerText = part.frey_number;
@@ -188,11 +228,21 @@ class PartsManager {
     }
     getSearchData() {
         let data = {};
+        let isValid = true;
         for (let [name, element] of Object.entries(search)) {
-            data[name] = (element as HTMLInputElement).value;
+            let value = (element as HTMLInputElement).value;
+            if (!value) {
+                isValid = false;
+                break;
+            }
+            else if (value == "any") {
+                value = "";
+            }
+            data[name] = value;
         };
-        data.year = data.year.toString().substr(2);
-        console.log(data.year);
+        if (!isValid) throw "not all search fields set";
+        // data.year = data.year.toString().substr(2);
+        // console.log(data.year);
         return data;
     }
     clearParts() {
@@ -212,6 +262,5 @@ class PartsManager {
         return temp_arr;
     }
 }
-window.onload = () => {
-    let asdf = new PartsManager();
-}
+
+let asdf = new PartsManager();

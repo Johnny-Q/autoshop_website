@@ -1,13 +1,82 @@
-*{
+$grid_width: 100%;
+$search_bar_width: 75%;
+* {}
 
-}
-body{
-    div.search_field{
-        div.options{
+
+body {
+    div.search_field {
+        position: relative;
+        width: $search_bar_width;
+        margin: 50px 0;
+        div.search_button_group {
+            display: grid;
+            width: $grid_width;
+            grid-template-columns: repeat(4, 1fr); //70px;
+
+            button {
+                background-color: white;
+                color: black;
+                text-align: center;
+                border: none;
+                outline: none;
+                height: 50px;
+
+                padding: 0 10px;
+
+                font-size: 18px;
+            }
+
+            button:disabled {
+                background-color: #cccccc;
+                color: gray;
+            }
+
+            button.search_button {
+                background-color: #333333;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: none;
+                outline: none;
+                width: 70px;
+                height: 50px;
+            }
+        }
+
+        div.options {
             display: none;
         }
-        div.options.active{
+
+        div.options.active {
             display: block;
+            position: absolute;
+            width: $grid_width;
+            background-color: white;
+            max-height: 250px;
+            overflow-y: auto;
+
+            ul {
+                display: grid;
+                row-gap: 5px;
+                padding: 5px;
+                grid-template-columns: repeat(8, 1fr);
+                list-style-type: none;
+                margin: 0;
+                text-align: center;
+
+                li {
+                    width: 100%;
+                    position: relative;
+                    font-size: 18px;
+                }
+
+                li:hover {
+                    color: #aaaaaa;
+                    cursor: pointer;
+                    color: #aaaaaa;
+                    cursor: pointer;
+                }
+            }
         }
     }
 }

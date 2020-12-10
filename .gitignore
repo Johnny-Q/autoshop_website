@@ -1,9 +1,11 @@
 DB.db
+DB1.db
 DB_backup.db
 build
 .env
-notes.md
+sqlinotes.md
 run.bat
+src/public/img/parts
 
 # Logs
 logs

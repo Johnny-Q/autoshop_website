@@ -1,4 +1,5 @@
 require("dotenv").config();
+//@ts-expect-error
 const db = require("./db_helper");
 const path = require("path");
 const fs = require("fs");
@@ -23,8 +24,10 @@ xlReader(path_to_excel).then(async (rows)=>{
                 image_url: null,
                 enabled: 1,
                 in_stock: 1,
-                description: rows[i][2]
+                description: rows[i][2],
+                brand: rows[i][3]
             };
+            part.image_url = part.make + '-' + part.oe_number + '.jpg';
             rows[i][9].split('/').forEach((application)=>{
                 application = application.split(' ');
                 if(application.length != 2){

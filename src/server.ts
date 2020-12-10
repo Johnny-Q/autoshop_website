@@ -17,31 +17,22 @@ const upload = multer({
 app.engine("html", require("ejs").renderFile);
 app.use(express.static('build/public'));
 app.set("views", "build/public");
+app.set("view engine", "ejs");
 
 //accept json data
 app.use(bodyparser.json());
+
+const pages = ["about", "test", "grid_test", "search_box", "search", "contact", ""];
+pages.forEach(page=>{
+    app.get(`/${page}`, (req, res)=>{
+        res.render(`${page}.html`);
+    });
+});
 
 //serve web pages
 app.get("/", (req, res) => {
     res.render("index.html");
 });
-
-app.get("/test", (req, res) => {
-    res.render("test.html");
-});
-
-app.get("/grid_test", (req, res) => {
-    res.render("grid_test.html");
-});
-
-app.get("/about", (req, res) => {
-    res.render("about.html");
-});
-
-app.get("/search_box", (req, res)=>{
-    res.render("search_box.html");
-});
-
 
 //api routes
 app.post("/search_full", async (req, res) => {
@@ -55,7 +46,7 @@ app.post("/search_full", async (req, res) => {
 
     debugLog([make, model, year, engine]);
     try {
-        let parts = await db.getPartsEngine(make, model, year, engine);
+        let parts = await db.paginatedSearch(make, model, year, engine, 0, 10);
 
         // debugLog(parts);
         res.json(parts);
@@ -91,8 +82,9 @@ app.post("/add_part", upload.single("part_img"), async (req, res) => {
     // construct part db entry
     let part: PartDBEntry = null, applications: Array<Application> = null;
     try {
-        let { make, oe_number, frey_number, price, description, enabled, in_stock } = req.body;
-        part = { make, oe_number, frey_number, price, 
+        let { make, oe_number, frey_number, price, description, enabled, in_stock, brand} = req.body;
+        if(!brand) brad = null;
+        part = { make, oe_number, frey_number, price, brand,
             'image_url': null, 
             'description': description?description:null,
             'enabled': enabled?enabled:1, 

@@ -6,14 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx nodemon build/server",
-    "sass": "sass --watch src/public/css:build/public/css"
+    "sass": "sass --watch src/public/css:build/public/css",
+    "copy": "cp src/public/*.html build/public"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "ejs": "^3.1.5",
     "express": "^4.17.1",
     "knex": "^0.21.12"
   },
@@ -21,6 +21,7 @@
     "@types/express": "^4.17.9",
     "@types/node": "^14.14.10",
     "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
     "multer": "^1.4.2",
     "nodemon": "^2.0.6",
     "read-excel-file": "^4.1.0",

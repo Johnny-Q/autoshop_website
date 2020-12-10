@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/searchBox.css">
     <script src="js/index.js" defer></script>
 </head>
 
@@ -16,9 +17,10 @@
         <div class="content">
             <div class="left">
                 <h1>Aceway Canada Inc.</h1>
-                <a href="">Home</a>
-                <a href="">Contact</a>
-                <a href="">Search Products</a>
+                <a href="/">Home</a>
+                <a href="/contact">Contact</a>
+                <a href="/about">About Us</a>
+                <a href="/search">Search Products</a>
             </div>
             <div>
                 <a href="">Login / Sign Up</a>
@@ -30,102 +32,6 @@
         <div class="hero">
             <!--Photo by Daen van Beers on Unsplash-->
             <div class="logo"></div>
-
-            <div class="search_bar">
-                <div class="search_group">
-                    <div>
-                        <input type="text" list="make" placeholder="Search by manufacturer" id="search_make">
-                        <datalist id="make">
-                            <option value="BMW"></option>
-                            <option value="Mercedes Benz"></option>
-                            <option value="Audi"></option>
-                            <option value="Volkswagen"></option>
-                        </datalist>
-                    </div>
-                    <div>
-                        <input type="number" placeholder="Search by year" id="search_year">
-                        <!-- <datalist id="browsers">
-                            <option value="Internet Explorer">
-                            <option value="Firefox">
-                            <option value="Google Chrome">
-                            <option value="Opera">
-                            <option value="Safari">
-                        </datalist> -->
-                    </div>
-                    <div>
-                        <input type="text" list="model" placeholder="Search by model" id="search_model">
-                        <datalist id="model">
-                            <option value="model 1"></option>
-                            <option value=""></option>
-                            <option value=""></option>
-                            <option value=""></option>
-                            <option value=""></option>
-                        </datalist>
-                    </div>
-                    <div>
-                        <input type="text" list="engine" placeholder="Search by engine size" id="search_engine">
-                        <datalist id="engine">
-                            <option value="engine 1">
-                            <option value="">
-                            <option value="">
-                            <option value="">
-                            <option value="">
-                        </datalist>
-                    </div>
-                </div>
-                <button class="search_button" id="full_search_btn">
-                    <svg width="15" height="15" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
-                        <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white" stroke-width="3" />
-                    </svg>
-                </button>
-            </div>
-            <div class="smaller_search_bar">
-                <input type="text" placeholder="Search by OE number" id="search_oe">
-                <button class="search_button" id="oe_search_btn">
-                    <svg width="15" height="15" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
-                        <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white" stroke-width="3" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-        <div class="feedback">
-            <img src="https://i.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.webp" alt="" id="loader"
-                style="display: none;">
-            <h1 id="message">
-                Search Products
-            </h1>
-        </div>
-        <div class="search_results">
-            <div class="container">
-                <div class="filters">
-                    <h2>Filters</h2>
-                    <h3>Manufacturer</h3>
-                    <ul>
-                        <div>
-                            <li>Audi</li>
-                        </div>
-                        <li>BMW</li>
-                        <li>Mercedes Benz</li>
-                        <li>Volkswagen</li>
-                    </ul>
-                    <h3>Engine Size</h3>
-                    <ul>
-                        <li>S</li>
-                        <li>M</li>
-                        <li>L</li>
-                    </ul>
-                </div>
-                <div class="parts_grid">
-                    <p></p>
-                    <p>Part</p>
-                    <p>Manufacturer</p>
-                    <p>OE Number</p>
-                    <p>PPU</p>
-                    <p>Instock</p>
-                </div>
-            </div>
         </div>
     </main>
 

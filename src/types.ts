@@ -23,12 +23,14 @@ class Part{
 class PartDBEntry extends Part{
     enabled: number;
     in_stock: number;
-    description: string[];
+    description: string;
+    brand: string;
 
-    constructor(make: string, oe_number: string, frey_number: string, price: number, image_url: string, enabled: number, in_stock: number){
+    constructor(make: string, oe_number: string, frey_number: string, price: number, image_url: string, enabled: number, in_stock: number, brand: string){
         super(make, oe_number, frey_number, price, image_url);
         this.enabled = enabled;
         this.in_stock = in_stock;
+        this.brand = brand;
     }
 }
 

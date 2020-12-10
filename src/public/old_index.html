@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/searchBox.css">
+    <script src="js/index.js" defer></script>
+</head>
+
+<body>
+    <nav>
+        <div class="content">
+            <div class="left">
+                <h1>Aceway Canada Inc.</h1>
+                <a href="/">Home</a>
+                <a href="/contact">Contact</a>
+                <a href="/about">About Us</a>
+                <a href="/search">Search Products</a>
+            </div>
+            <div>
+                <a href="">Login / Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="hero">
+            <!--Photo by Daen van Beers on Unsplash-->
+            <div class="logo"></div>
+
+            <div class="search_field">
+                <div class="search_button_group">
+                    <button id="make_button">Choose make</button>
+                    <button id="year_button">Choose year</button>
+                    <button id="model_button">Choose model</button>
+                    <button id="engine_button">Choose engine</button>
+                    <button class="search_button" id="full_search_btn">
+                        <svg width="15" height="15" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
+                            <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white" stroke-width="3" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="make_options options">
+                    <ul>
+                        <li><span>make</span></li>
+                        <li>something else</li>
+                    </ul>
+                </div>
+                <div class="year_options options">
+                    <ul>
+                        <li>year</li>
+                        <li>something else</li>
+                    </ul>
+                </div>
+                <div class="model_options options">
+                    <ul>
+                        <li>model</li>
+                        <li>something else</li>
+                    </ul>
+                </div>
+                <div class="engine_options options">
+                    <ul>
+                        <li>engine</li>
+                        <li>something else</li>
+                    </ul>
+                </div>
+                <input type="hidden" name="make">
+                <input type="hidden" name="year">
+                <input type="hidden" name="model">
+                <input type="hidden" name="engine">
+            </div>
+            <div class="smaller_search_bar">
+                <input type="text" placeholder="Search by OE number" id="search_oe">
+                <button class="search_button" id="oe_search_btn">
+                    <svg width="15" height="15" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
+                        <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white" stroke-width="3" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="feedback">
+            <img src="https://i.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.webp" alt="" id="loader"
+                style="display: none;">
+            <h1 id="message">
+                Search Products
+            </h1>
+        </div>
+        <div class="search_results">
+            <div class="container">
+                <div class="filters">
+                    <h2>Filters</h2>
+                    <h3>Manufacturer</h3>
+                    <ul>
+                        <div>
+                            <li>Audi</li>
+                        </div>
+                        <li>BMW</li>
+                        <li>Mercedes Benz</li>
+                        <li>Volkswagen</li>
+                    </ul>
+                    <h3>Engine Size</h3>
+                    <ul>
+                        <li>S</li>
+                        <li>M</li>
+                        <li>L</li>
+                    </ul>
+                </div>
+                <div class="parts_grid">
+                    <p></p>
+                    <p>Part</p>
+                    <p>Manufacturer</p>
+                    <p>OE Number</p>
+                    <p>PPU</p>
+                    <p>Instock</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+
+    </footer>
+</body>
+
+</html>

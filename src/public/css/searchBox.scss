@@ -1,81 +1,93 @@
-$grid_width: 100%;
-$search_bar_width: 75%;
-* {}
+div.search_wrapper {
+    margin-top: 50px;
+    width: 100%;
+
+    div.grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        width: 80%;
+
+        column-gap: 10px;
+
+        div.custom_select {
+            * {
+                user-select: none;
+                -moz-user-select: none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+                -o-user-select: none;
+            }
+
+            select {
+                // width: 100%;
+                // height: 50px;
+                // border-radius: 10px;
+                display: none;
+            }
+
+            div.selector {
+                width: 100%;
+                height: 50px;
+                line-height: 50px;
+                text-align: center;
+                border-radius: 10px;
+                border: 2px solid white;
+                // background-color: blue;
+            }
+
+            // div.options {
+            //     display: none;
+            //     height: 300px;
+            //     overflow: auto;
+            //     color: dodgerblue;
+
+            //     div {
+            //         color: dodgerblue;
+            //         cursor: pointer;
+            //     }
+
+            //     div:hover {
+            //         background-color: rgba(0, 0, 0, 0.1);
+            //     }
+            // }
+
+            // div.options.active {
+            //     display: block;
+            // }
+        }
+
+        div.options_container {
+            grid-column: 1/-1;
+            position: relative;
 
 
-body {
-    div.search_field {
-        position: relative;
-        width: $search_bar_width;
-        margin: 50px 0;
-        div.search_button_group {
-            display: grid;
-            width: $grid_width;
-            grid-template-columns: repeat(4, 1fr); //70px;
+            div.options {
+                position: absolute;
+                top: 100%;
 
-            button {
+                display: none;
+                width: 100%;
+                height: fit-content;
+                max-height: 300px;
+                overflow: auto;
+                color: dodgerblue;
                 background-color: white;
-                color: black;
-                text-align: center;
-                border: none;
-                outline: none;
-                height: 50px;
 
-                padding: 0 10px;
+                div {
+                    color: dodgerblue;
+                    padding: 5px;
+                    cursor: pointer;
+                }
 
-                font-size: 18px;
+                div:hover {
+                    background-color: rgba(0, 0, 0, 0.1);
+                }
             }
 
-            button:disabled {
-                background-color: #cccccc;
-                color: gray;
-            }
+            div.options.active {
 
-            button.search_button {
-                background-color: #333333;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border: none;
-                outline: none;
-                width: 70px;
-                height: 50px;
-            }
-        }
-
-        div.options {
-            display: none;
-        }
-
-        div.options.active {
-            display: block;
-            position: absolute;
-            width: $grid_width;
-            background-color: white;
-            max-height: 250px;
-            overflow-y: auto;
-
-            ul {
                 display: grid;
-                row-gap: 5px;
-                padding: 5px;
                 grid-template-columns: repeat(8, 1fr);
-                list-style-type: none;
-                margin: 0;
-                text-align: center;
-
-                li {
-                    width: 100%;
-                    position: relative;
-                    font-size: 18px;
-                }
-
-                li:hover {
-                    color: #aaaaaa;
-                    cursor: pointer;
-                    color: #aaaaaa;
-                    cursor: pointer;
-                }
             }
         }
     }

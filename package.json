@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx nodemon build/server",
     "sass": "sass --watch src/public/css:build/public/css",
-    "copy": "cp src/public/*.html build/public"
+    "copy": "cp build/public/*.html src/public"
   },
   "keywords": [],
   "author": "",

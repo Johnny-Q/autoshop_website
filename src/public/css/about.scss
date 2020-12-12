@@ -21,3 +21,38 @@ body {
     // flex-direction: column;
     // align-items: center;
 }
+
+main{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    div.double{
+        width: 80%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        div.left{
+            // display: flex;
+            input{
+                width: 100%;
+            }
+            textarea{
+                width: 100%;
+            }
+        }
+        div.right{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: start;
+        }
+    }
+    div.map{
+        width: 80%;
+        height: 700px;
+        background-color: gray;
+    }
+}

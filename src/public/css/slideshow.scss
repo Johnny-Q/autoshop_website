@@ -1,0 +1,132 @@
+// main {
+//     div.cards {
+//         width: 100%;
+//         height: 690px;
+//         overflow: hidden;
+//         display: flex;
+//         flex-direction: row;
+//         justify-content: center;
+//         align-items: center;
+//         background-color: gray;
+
+//         position: relative;
+
+//         img {
+//             max-width: 500px;
+//             width: 90%;
+//             display: none;
+//             object-fit: cover;
+//         }
+
+//         img.active {
+//             display: inline-block;
+//         }
+
+//         div.left_arrow, div.right_arrow{
+//             flex-grow: 1;
+//             height: 100%;
+//             display: flex;
+//             justify-content: center;
+//             align-items: center;
+//         }
+
+//         div.indicators {
+//             position: absolute;
+//             bottom: 15px;
+//             left: 50%;
+//             transform: translate(-50%, 0);
+
+//             div.line {
+//                 display: inline-block;
+//                 width: 15px;
+//                 height: 4px;
+//                 background-color: gray;
+//                 margin: 0 2px;
+//             }
+//             div.line.active{
+//                 background-color: white;
+//             }
+//         }
+//     }
+// }
+main {
+    div.cards {
+        *{
+            user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -o-user-select: none;
+        }
+        // position: relative;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        height: 700px;
+        width: 70%;
+        overflow: hidden;
+        margin-bottom: 30px;
+
+        div.images {
+            height: 100%;
+            width: 100%;
+            position:relative;
+
+            div.img{
+                height: 100%;
+                width: 100%;
+                background: url("../img/catalog1.png") no-repeat center;
+                background-size: contain;
+                // position: relative;
+                display: none;
+            }
+            div.img.active{
+                display: block;
+            }
+
+            // img {
+            //     height: 100%;
+            //     width: 100%;
+            //     display: none;
+            //     // object-fit: scale-down;
+            // }
+
+            // img.active {
+            //     display: block;
+            // }
+
+            div.indicators {
+                position: absolute;
+                bottom: 15px;
+                left: 50%;
+                transform: translate(-50%, 0);
+
+                div.line {
+                    display: inline-block;
+                    width: 15px;
+                    height: 4px;
+                    background-color: gray;
+                    margin: 0 2px;
+                }
+
+                div.line.active {
+                    background-color: black;
+                }
+            }
+        }
+
+        div.left_arrow,
+        div.right_arrow {
+            flex-grow: 1;
+            height: 100%;
+            display: flex;
+            // justify-content: center;
+            align-items: center;
+        }
+        div.left_arrow{
+            justify-content: flex-end;
+        }
+        div.right_arrow{
+            justify-content: flex-start;
+        }
+    }
+}

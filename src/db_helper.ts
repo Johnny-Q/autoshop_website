@@ -108,8 +108,9 @@ async function getYears(make: string): Promise<Array<number>> {
         let make_id = await db('Makes').select('id').where('make', make.toLowerCase());
         if(make_id.length == 0){
             make_id = await db('Makes').insert({'make': make.toLowerCase()});
-        }
-        return db('YearModel').distinct('year').where('make_id', make_id);
+        } make_id = make_id[0].id;
+
+        return db('YearModel').distinct('year').where('make_id', make_id).orderBy('year');
     } catch(err){
         console.log(err);
         throw err;
@@ -127,8 +128,8 @@ async function getModels(make: string, year: number): Promise<Array<string>> {
         let make_id = await db('Makes').select('id').where('make', make.toLowerCase());
         if(make_id.length == 0){
             make_id = await db('Makes').insert({'make': make.toLowerCase()});
-        }
-        return db.distinct('model').from('YearModel').where('make_id', make_id).andWhere('year', year);
+        } make_id = make_id[0].id;
+        return db.distinct('model').from('YearModel').leftJoin('Models', 'Models.id', 'YearModel.model_id').where('YearModel.make_id', make_id).andWhere('year', year);
     } catch(err){
         console.log(err);
         throw err;
@@ -146,17 +147,18 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>) 
         if(make_id.length == 0){
             make_id = await db('Makes').insert({'make': part_raw.make.toLowerCase()});
         }
-        let brand_id = [{'id': null}];
+        else make_id = make_id[0].id;
+        let brand_id = [{id: null}];
         if(part_raw.brand){
             brand_id = await db('Brands').select('id').where('brand', part_raw.brand.toLowerCase());
             if(brand_id.length == 0){
                 brand_id = await db('Brands').insert({'brand': part_raw.brand.toLowerCase()});
             }
+            else brand_id = brand_id[0].id;
         }
-
         let part = part_raw as any;
-        delete part.make; part.make_id = make_id[0].id;
-        delete part.brand; part.brand_id = brand_id[0].id;
+        delete part.make; part.make_id = make_id;
+        delete part.brand; part.brand_id = brand_id;
         let part_id = (await db('Parts').insert(part));
         applications.forEach(async (app_raw: Application)=>{
             let model_id = await db('Models').select('id').where('model', app_raw.model.toLowerCase()).andWhere('make_id', part.make_id);
@@ -165,10 +167,11 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>) 
                     'model': app_raw.model.toLowerCase(),
                     'make_id': part.make_id
                 });
-            }
+            } else model_id = model_id[0].id;
             try{
                 for(var year = app_raw.begin_year; year <= app_raw.end_year; year++){
-                    await db('YearModel').insert({'make_id': make_id, 'model_id': model_id[0].id, 'parts_id': part_id, 'year': year});
+                    //console.log(make_id, model_id, part_id, year)
+                    await db('YearModel').insert({'make_id': make_id, 'model_id': model_id, 'parts_id': part_id, 'year': year});
                 }
             }catch(err){
                 // console.log(err);

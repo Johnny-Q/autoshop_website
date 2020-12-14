@@ -38,6 +38,7 @@ class Application{
     model: string;
     begin_year: number;
     end_year: number;
+    engines: Array<string>;
     
     constructor(model: string, begin_year: number, end_year: number){
         this.model = model;

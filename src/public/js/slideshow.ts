@@ -1,56 +1,63 @@
-// class Slideshow {
-//     current_slide = 0;
-//     image_urls: string[];
-//     max_index = 0;
-//     image_div: HTMLDivElement
-//     constructor(left_arrow: HTMLDivElement, right_arrow: HTMLDivElement, image_div: HTMLDivElement, image_urls: string[], indicator_div: HTMLDivElement) {
-//         this.image_urls = image_urls;
-//         this.max_index = image_urls.length - 1;
-//         this.image_div = image_div;
-//         left_arrow.onclick = () => {
-//             this.current_slide--;
-//             //bound it to 0
-//             this.current_slide = this.current_slide < 0 ? 0 : this.current_slide;
-//             this.renderSlide(this.current_slide);
-//         };
-//         right_arrow.onclick = () => {
-//             this.current_slide++;
-//             this.current_slide = this.current_slide > this.max_index ? this.max_index : this.current_slide;
-//             this.renderSlide(this.current_slide);
-//         }
-//     }
-//     renderSlide(index) {
-//         this.image_div.style = `background-image: url(${this.image_urls[index]})`;
-//     }
-//     hideAllSlides() {
-//     }
-// }
-// let image_urls = [];
-// for (let i = 1; i < 7; i++) {
-//     image_urls.push(`../img/catalog${i}.png`);
-// }
-// let slides = new Slideshow(document.querySelector(".left_arrow"), document.querySelector(".right_arrow"), document.querySelector(".images"), image_urls, document.querySelector(".indicators"));
-
+/**
+ * @param left_arrow div containing the left arrow
+ * @param right_arrow div containing the right_arrow
+ * @param image_divs all div.img in the slideshow, acts as the actual slides
+ * @param indicators array of the small lines
+ */
 class Slideshow {
     current_slide = 0;
     max_index = 0;
-    image_divs: Array<HTMLDivElement>
+    image_divs: Array<HTMLDivElement>;
     indicators: Array<HTMLDivElement>;
     constructor(left_arrow: HTMLDivElement, right_arrow: HTMLDivElement, image_divs: Array<HTMLElement>, indicators: Array<HTMLElement>) {
         this.max_index = image_divs.length - 1;
         this.image_divs = image_divs as Array<HTMLDivElement>
         this.indicators = indicators as Array<HTMLDivElement>;
         left_arrow.onclick = () => {
+            this.removeTag(this.current_slide, 'active');
+            if(this.current_slide > 0) this.removeTag(this.current_slide-1, 'left');
+            if(this.current_slide < this.max_index) this.removeTag(this.current_slide+1, 'right');
             this.current_slide--;
             //bound it to 0
             this.current_slide = this.current_slide < 0 ? 0 : this.current_slide;
-            this.renderSlide(this.current_slide);
+            this.setTag(this.current_slide, 'active');
+            if(this.current_slide > 0){
+                this.setTag(this.current_slide-1, 'left')
+            }
+            if(this.current_slide < this.max_index){
+                this.setTag(this.current_slide+1, 'right')
+            }
+            //this.renderSlide(this.current_slide);
         };
         right_arrow.onclick = () => {
-            this.current_slide++;
+            this.removeTag(this.current_slide, 'active');
+            if(this.current_slide > 0) this.removeTag(this.current_slide-1, 'left');
+            if(this.current_slide < this.max_index) this.removeTag(this.current_slide+1, 'right');
+            this.current_slide++
+            //bound it to 0
             this.current_slide = this.current_slide > this.max_index ? this.max_index : this.current_slide;
-            this.renderSlide(this.current_slide);
-        }
+            this.setTag(this.current_slide, 'active');
+            if(this.current_slide > 0){
+                this.setTag(this.current_slide-1, 'left')
+            }
+            if(this.current_slide < this.max_index){
+                this.setTag(this.current_slide+1, 'right')
+            }
+            //this.renderSlide(this.current_slide);
+        };
+        // right_arrow.onclick = () => {
+        //     this.current_slide++;
+        //     this.current_slide = this.current_slide > this.max_index ? this.max_index : this.current_slide;
+        //     this.renderSlide(this.current_slide);
+        // }
+    }
+    setTag(index, tag){
+        this.image_divs[index].classList.add(tag);
+        this.indicators[index].classList.add(tag);
+    }
+    removeTag(index, tag){
+        this.image_divs[index].classList.remove(tag);
+        this.indicators[index].classList.remove(tag);
     }
     renderSlide(index) {
         this.hideAllSlides();

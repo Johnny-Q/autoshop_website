@@ -1,13 +1,12 @@
 {
     "compilerOptions": {
-        "target": "esnext",
-        "module": "esnext",
-        "outDir": "build",
-        "watch":true,
-        "typeRoots": [
-            "./src/types.ts",
-            "node_modules/@types"
-        ],
-        "removeComments": true
-    }
-}
+      "module": "none",
+      "esModuleInterop": true,
+      "target": "es6",
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "outDir": "build",
+      "watch": true
+    },
+    "lib": ["es2015"]
+  }

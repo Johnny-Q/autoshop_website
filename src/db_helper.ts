@@ -78,7 +78,8 @@ async function paginatedSearch(make: string, model: string, year: number, engine
 
 async function getPartByOEorFrey(id_number: string): Promise<Array<PartDBEntry>> {
     try{
-        return db.select().from('Parts').whereRaw('oe_number like ?', id_number+'%').orWhereRaw('frey_number like ?', id_number+'%');
+        return db.select().from('Parts').leftJoin('Makes', "Makes.id", "Parts.make_id")
+        .whereRaw('oe_number like ?', id_number+'%').orWhereRaw('frey_number like ?', id_number+'%');
     } catch (err){
         console.log(err);
         throw err;
@@ -105,17 +106,18 @@ async function getMakes(): Promise<Array<string>> {
  */
 async function getYears(make: string): Promise<Array<number>> {
     try{
+        if(make == null){
+            return db('YearModel').distinct('year').orderBy('year');
+        }
         let make_id = await db('Makes').select('id').where('make', make.toLowerCase());
-        if(make_id.length == 0){
-            make_id = await db('Makes').insert({'make': make.toLowerCase()});
-        } make_id = make_id[0].id;
-
-        return db('YearModel').distinct('year').where('make_id', make_id).orderBy('year');
+        if(make_id.length == 0) return [];
+        return db('YearModel').distinct('year').where('make_id', make_id[0].id).orderBy('year');
     } catch(err){
         console.log(err);
         throw err;
     }
 }
+
 
 /**
  * @desc obtains array of valid models given a make and year
@@ -125,16 +127,55 @@ async function getYears(make: string): Promise<Array<number>> {
  */
 async function getModels(make: string, year: number): Promise<Array<string>> {
     try{
+        if(make == null){
+            return db.distinct('model').from('YearModel').leftJoin('Models', 'Models.id', 'YearModel.model_id')
+            .whereRaw('year = IFNULL(?, year)', year);
+        }
         let make_id = await db('Makes').select('id').where('make', make.toLowerCase());
         if(make_id.length == 0){
-            make_id = await db('Makes').insert({'make': make.toLowerCase()});
-        } make_id = make_id[0].id;
-        return db.distinct('model').from('YearModel').leftJoin('Models', 'Models.id', 'YearModel.model_id').where('YearModel.make_id', make_id).andWhere('year', year);
+            return [];
+        } else make_id = make_id[0].id;
+        return db.distinct('model').from('YearModel').leftJoin('Models', 'Models.id', 'YearModel.model_id')
+            .where('YearModel.make_id', make_id)
+            .andWhereRaw('year = IFNULL(?, year)', year);
     } catch(err){
         console.log(err);
         throw err;
     }
 }
+
+/**
+ * @desc obtains array of valid engines given a make, year, and model
+ * @return {Promise<Array<string>>} Promise of string array containing engine sizes
+ * @param {string} make the make to query valid models for, null if match all
+ * @param {number} year the year to query valid models for, null if match all
+ */
+async function getEngines(make: string, year: number, model: string): Promise<Array<string>> {
+    try{
+        if(make == null){
+            return db.distinct('engine').from('YearModel').leftJoin('Models', 'Models.id', 'YearModel.model_id')
+            .leftJoin('Engines', 'Engines.model_id', 'YearModel.id')
+            .whereRaw('year = IFNULL(?, year)', year)
+            .andWhereRaw('IFNULL(?, model) like model', model);
+        }
+        let make_id = await db('Makes').select('id').where('make', make.toLowerCase());
+        if(make_id.length == 0){
+            return [];
+        } else make_id = make_id[0].id;
+        return db.distinct('engine').from('YearModel').leftJoin('Models', 'Models.id', 'YearModel.model_id')
+        .leftJoin('Engines', 'Engines.model_id', 'YearModel.id')
+        .whereRaw('year = IFNULL(?, year)', year)
+        .andWhereRaw('IFNULL(?, model) like model', model)
+        .andWhere('YearModel.make_id', make_id);
+    } catch(err){
+        console.log(err);
+        throw err;
+    }
+}
+
+async function getApps(oe_number: string){
+}
+
 /**
  * @param {PartDBEntry} part object of type PartDBEntry with entry data stored inside
  * @param {Array<Application>} applications array of applications of the part with entry data stored inside
@@ -160,8 +201,10 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>) 
         delete part.make; part.make_id = make_id;
         delete part.brand; part.brand_id = brand_id;
         let part_id = (await db('Parts').insert(part));
-        applications.forEach(async (app_raw: Application)=>{
+        for(let i = 0; i < applications.length; i++){
+            let app_raw = applications[i];
             let model_id = await db('Models').select('id').where('model', app_raw.model.toLowerCase()).andWhere('make_id', part.make_id);
+            let ym_id;
             if(model_id.length == 0){
                 model_id = await db('Models').insert({
                     'model': app_raw.model.toLowerCase(),
@@ -171,18 +214,23 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>) 
             try{
                 for(var year = app_raw.begin_year; year <= app_raw.end_year; year++){
                     //console.log(make_id, model_id, part_id, year)
-                    await db('YearModel').insert({'make_id': make_id, 'model_id': model_id, 'parts_id': part_id, 'year': year});
+                    ym_id = await db('YearModel').insert({'make_id': make_id, 'model_id': model_id, 'parts_id': part_id, 'year': year});
                 }
             }catch(err){
                 // console.log(err);
             }
-        });
+            app_raw.engines.forEach(async engine => {
+                await db('Engines').insert({"engine": engine, "model_id": model_id});
+            });
+        }
         return part_id;
     } catch (err) {
         console.log(err);
         throw err;
     }
 }
+
+
 
 async function updatePart() { }
 
@@ -193,6 +241,8 @@ module.exports = {
     getModels,
     getYears,
     getMakes,
+    getEngines,
+    getApps,
     addPart,
     paginatedSearch
 }

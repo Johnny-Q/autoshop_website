@@ -1,6 +1,8 @@
 DB.db
 DB1.db
 DB_backup.db
+.db-journal
+mbdb.db
 build
 .env
 sqlinotes.md

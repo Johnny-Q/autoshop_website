@@ -1,4 +1,3 @@
-export { };
 require("dotenv").config();
 const bodyparser = require("body-parser");
 const express = require('express');
@@ -21,7 +20,7 @@ app.set("view engine", "ejs");
 
 //accept json data
 app.use(bodyparser.json());
-app.use(bodyparser.urlencoded());
+app.use(bodyparser.urlencoded({ extended: true }));
 
 const pages = ["about", "test", "grid_test", "search_box", "search", "contact", "slideshow"];
 pages.forEach(page => {
@@ -38,18 +37,22 @@ app.get("/", (req, res) => {
 //api routes
 app.post("/search_full", async (req, res) => {
     //get year from the request
-    let { make, model, year, engine } = req.body;
+    let { make, model, year, engine, offset, limit } = req.body;
     year = parseInt(year);
     if (isNaN(year)) year = null;
     if (!model) model = null;
     if (!make) make = null;
     if (!engine) engine = null;
+    if (model == 'Any') model = null;
+    if (make == 'Any') make = null;
+    if (year == 'Any') year = null;
+    if (engine == 'Any') engine = null;
 
     debugLog([make, model, year, engine]);
     try {
-        let parts = await db.paginatedSearch(make, model, year, engine, 0, 10);
+        let parts = await db.paginatedSearch(make, model, year, engine, 0, 50);
 
-        // debugLog(parts);
+        debugLog(parts);
         res.json(parts);
         // res.sendStatus(200);
     } catch (err) {
@@ -77,6 +80,19 @@ app.post("/search_id_number", async (req, res) => {
         console.log(err);
         res.sendStatus(500);
     }
+})
+
+app.post("/get_apps", async(req, res) => {
+    let {oe_number} = req.body;
+    debugLog(oe_number);
+    try{
+        await db.getApps(oe_number);
+    }
+    catch(err){
+        debugLog(err);
+        res.sendStatus(500);
+    }
+    res.sendStatus(200);
 })
 
 app.post("/add_part", upload.single("part_img"), async (req, res) => {
@@ -112,14 +128,16 @@ app.post("/add_part", upload.single("part_img"), async (req, res) => {
                 applications.push({
                     'model': req.body.model[i],
                     'begin_year': req.body.begin_year[i],
-                    'end_year': req.body.end_year[i]
+                    'end_year': req.body.end_year[i],
+                    'engines': []
                 });
             }
         } else {
             applications.push({
                 'model': req.body.model,
                 'begin_year': req.body.begin_year,
-                'end_year': req.body.end_year
+                'end_year': req.body.end_year,
+                'engines': []
             });
         }
         debugLog([part, applications]);
@@ -145,12 +163,14 @@ app.get("/names/makes", async (req, res) => {
 })
 
 app.get("/names/years", async (req, res) => {
-    try{
-    let { make } = req.query;
-    let years = await db.getYears(make);
-    debugLog(years);
-    res.json(years);
-    }catch(err){
+    try {
+        let { make } = req.query;
+        make = makeNullIfAny(make);
+        debugLog(make);
+        let years = await db.getYears(make);
+        debugLog(years);
+        res.json(years);
+    } catch (err) {
         debugLog(err);
         res.sendStatus(500);
     }
@@ -158,6 +178,8 @@ app.get("/names/years", async (req, res) => {
 app.get("/names/models", async (req, res) => {
     try {
         let { make, year } = req.query;
+        make = makeNullIfAny(make);
+        year = makeNullIfAny(year);
         let models = await db.getModels(make, year);
         debugLog(models);
         res.json(models);
@@ -168,13 +190,17 @@ app.get("/names/models", async (req, res) => {
     }
     // res.sendStatus(200);
 });
-// app.get("/names/engine", async (req, res)=>{
-//     let {make, year, model} = req.query;
-//     let engines = await db.getPartsEngine(make, year, model);
-//     debugLog(models);
-//     res.json(models);
-//     // res.sendStatus(200);
-// });
+
+app.get("/names/engine", async (req, res)=>{
+    let {make, year, model} = req.query;
+    make = makeNullIfAny(make);
+    year = makeNullIfAny(year);
+    model = makeNullIfAny(model);
+    let engines = await db.getEngines(make, year, model);
+    debugLog(engines);
+    res.json(engines);
+    // res.sendStatus(200);
+});
 
 app.post("/debug", upload.single("part_img"), async (req, res) => {
 
@@ -196,4 +222,7 @@ function debugLog(param) {
     if (process.env.ENVIRONMENT == "dev") {
         console.log(param);
     }
+}
+function makeNullIfAny(value){
+    return value == "Any" ? null : value;
 }

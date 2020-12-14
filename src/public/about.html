@@ -6,8 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Domine&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/about.css">
     <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/slideshow.css">
+
+    <script src="js/about.js" defer></script>
+    <script src="js/slideshow.js" defer></script>
     <title>About Us</title>
 </head>
 
@@ -28,24 +34,84 @@
     </nav>
 
     <main>
-        <div class="double">
-            <div class="left">
-                <input type="text">
-                <textarea name="" id="" cols="30" rows="10"></textarea>
-            </div>
-            <div class="right">
-                <h3>Contact Us</h3>
-                <p>(123) - 456 - 7890</p>
-                <p>aceway@gmail.com</p>
-                <p>123 Seasame Street, L6V 2Y1 ON</p>
-            </div>
-
+        <div class="section_title">
+            <h1>Why Us?</h1>
         </div>
-        <div class="map">
-
+        <div class="about">
+            <div class="content fade">
+                <div class="text1">
+                    <h2>High-Quality OE-Spec Auto Parts</h2>
+                    <p>
+                        ACEWAY Canada Inc. is a Toronto-based Canadian company that is committed to warehouse
+                        distribution of FREY-branded high-quality OE-spec aftermarket auto parts for European makes.
+                        Especially for Mercedes-Benz, BMW, Audi and Volkswagen, across Canada.
+                    </p>
+                </div>
+                <img src="img/aceway_stripped_logo.png" alt="">
+                <div class="color">
+                    <img src="img/certificate.png" alt="">
+                </div>
+                <div class="text2">
+                    <h2>Sole Agent in Canada</h2>
+                    <p>
+                        As the sole agent of the brand FREY, ACEWAY will make a great contribution to the existing auto
+                        parts market in Canada where more cost-competitive high-quality products with more
+                        comprehensive categories for popular European models are badly needed, and here comes the
+                        brand FREY!
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="section_title">
+            <h1>What We Offer</h1>
+        </div>
+        <div class="cards">
+            <div class="left_arrow">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="4.29656" y1="18.5957" x2="25.6666" y2="39.651" stroke="black" stroke-width="10" />
+                    <line x1="4.34898" y1="25.6666" x2="25.4042" y2="4.29659" stroke="black" stroke-width="10" />
+                </svg>
+            </div>
+            <div class="images">
+                <div class="img active" style="background-image: url('../img/catalog1.png')"></div>
+                <div class="img right" style="background-image: url('../img/catalog2.png')"></div>
+                <div class="img" style="background-image: url('../img/catalog3.png')"></div>
+                <div class="img" style="background-image: url('../img/catalog4.png')"></div>
+                <div class="img" style="background-image: url('../img/catalog5.png')"></div>
+                <div class="img" style="background-image: url('../img/catalog6.png')"></div>
+                <div class="indicators">
+                    <div class="line active"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+            </div>
+            <div class="right_arrow">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="39.6776" y1="25.5355" x2="18.4644" y2="4.32233" stroke="black" stroke-width="10" />
+                    <line x1="39.6776" y1="18.4645" x2="18.4644" y2="39.6777" stroke="black" stroke-width="10" />
+                </svg>
+            </div>
         </div>
     </main>
-
+    <footer>
+        <div class="left">
+            <h3>ACEWAY Canada Inc</h3>
+            <div>
+                <a href="">Home</a>
+                <a href="">About</a>
+                <a href="">Contact</a>
+                <a href="">Search</a>
+            </div>
+        </div>
+        <div class="right">
+            <h3>Contact Us</h3>
+            <p>(905) - 330 - 5218</p>
+            <p>acewayauto@gmail.com</p>
+            <p>2505 Dunwin Dr, Mississauga, ON L5L 1T1</p>
+        </div>
+    </footer>
 </body>
-
 </html>

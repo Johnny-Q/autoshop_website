@@ -4,12 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <!-- fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/about.css">
+    <link href="https://fonts.googleapis.com/css2?family=Domine&display=swap" rel="stylesheet">
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/searchBox.css">
+    <link rel="stylesheet" href="css/slideshow.css">
+    <link rel="stylesheet" href="css/search.css">
+    <!-- javascript, class implmenetations first then script for the page -->
+    <script src="js/searchBox.js"></script>
+    <script src="js/PartsManager.js"></script>
+    <script src="js/search.js" defer></script>
 
-    <script src="js/searchBox.ts" defer></script>
     <title>About Us</title>
 </head>
 
@@ -24,11 +32,12 @@
                 <a href="/search">Search Products</a>
             </div>
             <div>
-                <a href="">Login / Sign Up</a>
+                <a href="">Login | Sign Up</a>
             </div>
         </div>
     </nav>
     <main>
+
         <div class="search_wrapper">
             <div class="grid">
                 <div class="custom_select">
@@ -54,17 +63,78 @@
                 <div class="options_container">
                 </div>
             </div>
+
+            <div class="smaller_search_bar">
+                <input type="text" placeholder="Search by OE number" id="search_oe">
+                <button class="search_button" id="oe_search_btn">
+                    <svg width="15" height="15" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
+                        <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white" stroke-width="3" />
+                    </svg>
+                </button>
+            </div>
         </div>
-        <div class="smaller_search_bar">
-            <input type="text" placeholder="Search by OE number" id="search_oe">
-            <button class="search_button" id="oe_search_btn">
-                <svg width="15" height="15" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
-                    <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white" stroke-width="3" />
-                </svg>
-            </button>
+
+        <div class="feedback">
+            <img src="img/loader.gif" alt="" id="loader" style="display: none;">
+            <h1 id="message">
+                Search Products
+            </h1>
         </div>
+        <table class="parts_table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Type</th>
+                    <th>Make</th>
+                    <th>OE Number</th>
+                    <th>Application</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- <tr class="part">
+                    <td></td>
+                    <td class="type">
+                        <div>
+                            <img src="../img/parts/bmw-11120030496.jpg" alt="">
+                            <h3>Lorem, ipsum dolor.</h3>
+                        </div>
+                    </td>
+                    <td class="make">
+                        BMW
+                    </td>
+                    <td class="model">
+                        XC5i
+                    </td>
+                    <td class="oe_number">12345678901</td>
+                    <td class="buttons">
+                        <button>Add</button>
+                    </td>
+                </tr> -->
+            </tbody>
+        </table>
+        <!-- <div class="page_select">
+            <div>1</div>
+        </div> -->
     </main>
+    <!-- <footer>
+        <div class="left">
+            <h3>ACEWAY Canada Inc</h3>
+            <div>
+                <a href="">Home</a>
+                <a href="">About</a>
+                <a href="">Contact</a>
+                <a href="">Search</a>
+            </div>
+        </div>
+        <div class="right">
+            <h3>Contact Us</h3>
+            <p>(905) - 330 - 5218</p>
+            <p>acewayauto@gmail.com</p>
+            <p>2505 Dunwin Dr, Mississauga, ON L5L 1T1</p>
+        </div>
+    </footer> -->
 </body>
 
 </html>

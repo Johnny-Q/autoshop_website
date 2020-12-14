@@ -1,11 +1,13 @@
 require("dotenv").config();
 //@ts-expect-error
 const db = require("./db_helper");
+//@ts-expect-error
 const path = require("path");
+//@ts-expect-error
 const fs = require("fs");
 const xlReader = require("read-excel-file/node");
 
-let path_to_excel = path.join(__dirname, "./parts.xlsx");
+let path_to_excel = path.join(__dirname, "./bmwparts.xlsx");
 
 async function getSheets() {
     return await xlReader(path_to_excel, {getSheets: true});
@@ -14,8 +16,9 @@ async function getSheets() {
 xlReader(path_to_excel).then(async (rows)=>{
     let errors = [];
     for(let i = 4; i < 422; i++){
+        console.log(i*100/rows.length);
         try{
-            let part: PartDBEntry, app = [];
+            let part: PartDBEntry, apps = [];
             part = {
                 make: 'bmw',
                 oe_number: rows[i][4].toString(),
@@ -29,67 +32,56 @@ xlReader(path_to_excel).then(async (rows)=>{
             };
             part.image_url = part.make + '-' + part.oe_number + '.jpg';
             rows[i][9].split('/').forEach((application)=>{
-                application = application.split(' ');
-                if(application.length != 2){
-                    switch(application[0]){
-                        case 'BMW':
-                            application = application.slice(1);
-                            break;
-                        case 'ALPINA':
-                            application[1] = application[0] + ' ' + application[1];
-                            application = application.slice(1);
-                            break;
-                        case 'MINI':
-                            application[1] = application[0] + ' ' + application[1];
-                            application = application.slice(1);
-                            break;
-                        case 'ACTIVEHYBRID':
-                            application[1] = application[0] + ' ' + application[1];
-                            application = application.slice(1);
-                            break;
-                        default:
-                    }
+                if(application.startsWith("BMW")) application = application.substr(3);
+                if(application.startsWith("MB")) application = application.substr(2);
+                if(application.startsWith("MERCEDES-BENZ")) application = application.substr(13);
+                let modelName, begin_year, end_year, engineSizes = [];
+                let yearString = application.substr(application.lastIndexOf(' ')+1);
+                // console.log(yearString, application.lastIndexOf(' '));
+                application = application.substr(0, application.lastIndexOf(' '));
+                let app_years = yearString.split('-');
+                if(app_years.length != 2){
+                    begin_year = end_year = parseInt(app_years[0]);
+                    if(isNaN(begin_year)) throw('year not number');
                 }
-                if(application[1].includes('L')) application.splice(1,1);
-                if(application.length != 2){
-                    throw('application length wrong');
+                else{
+                    begin_year = parseInt(app_years[0]);
+                    if(isNaN(begin_year)) throw('year not number');
+                    if(begin_year > 50) begin_year += 1900; else begin_year += 2000;
+                    
+                    end_year = parseInt(app_years[1]);
+                    if(isNaN(end_year) && app_years[1]!='NE') throw('year not number');
+                    else if(isNaN(end_year)) end_year = 21;
+                    if(end_year > 50) end_year += 1900; else end_year += 2000;
+                    
                 }
-                if(application.length==2 && application[0] != 'BMW'){
-                    if(application[0].includes(',')) throw('format error');
-                    let app_years = application[1].split('-'), begin, end;
-                    if(app_years.length != 2){
-                        begin = end = parseInt(app_years[0]);
-                        if(isNaN(begin)) throw('year not number');
-                    }
-                    else{
-                        begin = parseInt(app_years[0]);
-                        if(isNaN(begin)) throw('year not number');
-                        if(begin > 50) begin += 1900; else begin += 2000;
-                        
-                        end = parseInt(app_years[1]);
-                        if(isNaN(end)) throw('year not number');
-                        if(end > 50) end += 1900; else end += 2000;
-                        
-                    }
-                    app.push({
-                        'model': application[0].toLowerCase(),
-                        'begin_year': begin,
-                        'end_year': end
-                    })
-                } else{
-                    throw('Application length wrong');
+
+                if(application[application.length -1] == 'L' || application[application.length -1] == 'l'){
+                    let engineSizeStr = application.substr(application.lastIndexOf(' ')+1);
+                    application = application.substr(0, application.lastIndexOf(' '));
+                    if(engineSizeStr.indexOf('-') != -1) throw("engine format wrong");
+                    engineSizes = engineSizeStr.split(',');
                 }
-            })
+
+                modelName = application.replace(/"/gi, '');
+                modelName = modelName.trim();
+                apps.push({
+                    model: modelName,
+                    begin_year: begin_year,
+                    end_year: end_year,
+                    engines: engineSizes
+                });
+            });
             try{
-                await db.addPart(part, app);
+                await db.addPart(part, apps);
             }catch(err){
                 //console.log(err);
-                errors.push(i+2);
+                errors.push(i);
             }
         }catch(err){
             console.log(err);
             //console.log(rows[i]);
-            errors.push(i+2);
+            errors.push(i);
         }
     }
     console.log(errors);

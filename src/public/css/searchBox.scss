@@ -1,93 +1,137 @@
-div.search_wrapper {
-    margin-top: 50px;
-    width: 100%;
+main {
 
-    div.grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        width: 80%;
+    div.search_wrapper {
+        margin-top: 20px;
+        width: 100%;
+        border-radius: 10px;
+        background-color: #8A838D;
+        position: relative;
+        left: 50%;
+        top: 40%;
+        width: 100%;
+        transform: translate(-50%, -30%);
+        max-width: 1000px;
+        height: 200px;
+        background-color: #796D74;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
 
-        column-gap: 10px;
-
-        div.custom_select {
-            * {
-                user-select: none;
-                -moz-user-select: none;
-                -khtml-user-select: none;
-                -webkit-user-select: none;
-                -o-user-select: none;
-            }
-
-            select {
-                // width: 100%;
-                // height: 50px;
-                // border-radius: 10px;
-                display: none;
-            }
-
-            div.selector {
-                width: 100%;
-                height: 50px;
-                line-height: 50px;
-                text-align: center;
-                border-radius: 10px;
-                border: 2px solid white;
-                // background-color: blue;
-            }
-
-            // div.options {
-            //     display: none;
-            //     height: 300px;
-            //     overflow: auto;
-            //     color: dodgerblue;
-
-            //     div {
-            //         color: dodgerblue;
-            //         cursor: pointer;
-            //     }
-
-            //     div:hover {
-            //         background-color: rgba(0, 0, 0, 0.1);
-            //     }
-            // }
-
-            // div.options.active {
-            //     display: block;
-            // }
+        h1 {
+            margin-bottom: 30px;
         }
 
-        div.options_container {
-            grid-column: 1/-1;
-            position: relative;
+        div.grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            width: 80%;
 
+            column-gap: 10px;
 
-            div.options {
-                position: absolute;
-                top: 100%;
+            div.custom_select {
 
-                display: none;
-                width: 100%;
-                height: fit-content;
-                max-height: 300px;
-                overflow: auto;
-                color: dodgerblue;
-                background-color: white;
+                border-radius: 10px;
+                border: 2px solid white;
 
-                div {
-                    color: dodgerblue;
-                    padding: 5px;
-                    cursor: pointer;
+                * {
+                    user-select: none;
+                    -moz-user-select: none;
+                    -khtml-user-select: none;
+                    -webkit-user-select: none;
+                    -o-user-select: none;
                 }
 
-                div:hover {
-                    background-color: rgba(0, 0, 0, 0.1);
+                select {
+                    // width: 100%;
+                    // height: 50px;
+                    // border-radius: 10px;
+                    display: none;
+                }
+
+                div.selector {
+                    width: 100%;
+                    height: 50px;
+                    line-height: 50px;
+                    text-align: center;
+
+                    // background-color: blue;
+                }
+
+                div.selector.selected,
+                div.selector:hover {
+                    background-color: rgba(255, 255, 255, 0.3);
+                    // color: black;
+                }
+
+                div.selector.disabled {
+                    background-color: rgba(0, 0, 0, 0.3);
                 }
             }
 
-            div.options.active {
+            div.options_container {
+                margin-top: 10px;
+                border-radius: 5px;
+                grid-column: 1/-1;
+                position: relative;
 
-                display: grid;
-                grid-template-columns: repeat(8, 1fr);
+
+                div.options {
+                    position: absolute;
+                    top: 100%;
+
+                    width: 100%;
+                    height: fit-content;
+                    max-height: 0px;
+                    overflow: hidden;
+                    color: dodgerblue;
+                    background-color: white;
+                    opacity: 0;
+
+                    div {
+                        color: dodgerblue;
+                        padding: 5px;
+                        cursor: pointer;
+                    }
+
+                    div:hover {
+                        background-color: rgba(0, 0, 0, 0.1);
+                    }
+                }
+
+                div.options.active {
+                    border-radius: 5px;
+                    max-height: 30vh;
+                    background-color: white;
+                    overflow: auto;
+                    border: 2px solid black;
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    opacity: 1;
+                    transition: max-height .3s ease-out;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 800px) {
+    main {
+        div.search_wrapper {
+            div.grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    }
+}
+
+@media (max-width: 500px) {
+    main {
+        div.search_wrapper {
+            height: fit-content;
+
+            div.grid {
+                grid-template-columns: 1fr;
             }
         }
     }

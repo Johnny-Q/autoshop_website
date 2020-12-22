@@ -2,7 +2,7 @@
     "compilerOptions": {
       "module": "none",
       "esModuleInterop": true,
-      "target": "es6",
+      "target": "esnext",
       "moduleResolution": "node",
       "sourceMap": true,
       "outDir": "build",

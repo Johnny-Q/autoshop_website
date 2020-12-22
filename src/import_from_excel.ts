@@ -7,7 +7,7 @@ const path = require("path");
 const fs = require("fs");
 const xlReader = require("read-excel-file/node");
 
-let path_to_excel = path.join(__dirname, "./bmwparts.xlsx");
+let path_to_excel = path.join(__dirname, "./mbparts.xlsx");
 
 async function getSheets() {
     return await xlReader(path_to_excel, {getSheets: true});
@@ -15,12 +15,12 @@ async function getSheets() {
 
 xlReader(path_to_excel).then(async (rows)=>{
     let errors = [];
-    for(let i = 4; i < 422; i++){
+    for(let i = 1; i < rows.length; i++){
         console.log(i*100/rows.length);
         try{
             let part: PartDBEntry, apps = [];
             part = {
-                make: 'bmw',
+                make: 'mercedes-benz',
                 oe_number: rows[i][4].toString(),
                 frey_number: rows[i][6].toString(),
                 price: Math.round(rows[i][7]*100),

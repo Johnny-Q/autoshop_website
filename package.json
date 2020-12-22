@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx nodemon build/server",
     "sass": "sass --watch src/public/css:build/public/css",
-    "copy": "cp build/public/*.html src/public"
+    "copy": "cp build/public/*.html src/public",
+    "copyFromSrc": "cp build/public/*.html src/public"
   },
   "keywords": [],
   "author": "",
@@ -15,14 +16,18 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "knex": "^0.21.12"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",
     "@types/node": "^14.14.10",
+    "bcrypt": "^5.0.0",
+    "connect-sqlite3": "^0.9.11",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "multer": "^1.4.2",
+    "nodemailer": "^6.4.17",
     "nodemon": "^2.0.6",
     "read-excel-file": "^4.1.0",
     "sqlite3": "^5.0.0"

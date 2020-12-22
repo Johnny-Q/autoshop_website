@@ -1,36 +1,29 @@
-body {
-    width: 100%;
-    // background-color: #cccccc;
-    // display: flex;
-    // flex-direction: column;
-    // align-items: center;
-}
+// body {
+//     width: 100%;
+//     // background-color: #cccccc;
+//     // display: flex;
+//     // flex-direction: column;
+//     // align-items: center;
+// }
 
-main {
-    div.section_title {
-        font-size: 35px;
-        margin-top: 10vh;
-    }
+// main {
+//     div.section_title {
+//         font-size: 35px;
+//         margin-top: 10vh;
+//     }
 
-    div.grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        width: 80%;
+//     div.grid {
+//         display: grid;
+//         grid-template-columns: repeat(4, 1fr);
+//         width: 80%;
 
 
-        // div{
-        //     grid-column: 1/-1;
-        // }
-    }
-}
+//         // div{
+//         //     grid-column: 1/-1;
+//         // }
+//     }
+// }
 
-* {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    // font-size: 14px;
-    box-sizing: border-box;
-}
 
 input,
 p {
@@ -54,14 +47,16 @@ main {
     justify-content: center;
     align-items: center;
     margin-top: 50px;
-    .section_title{
 
+    .section_title {
+        font-size: 35px;
+        margin-top: 10vh;
     }
 
     div.double {
         width: 80%;
         display: grid;
-        grid-template-columns: 1fr;// 1fr;
+        grid-template-columns: 1fr 1fr;
 
         div.left {
             display: flex;
@@ -73,6 +68,7 @@ main {
 
             form {
                 margin-bottom: 40px;
+
                 // display: flex;
                 .input {
                     position: relative;
@@ -113,6 +109,7 @@ main {
                         color: black;
                     }
                 }
+
                 textarea {
                     width: 100%;
                     background-color: transparent;
@@ -122,7 +119,8 @@ main {
                     font-size: 14px;
 
                 }
-                button{
+
+                button {
                     width: 100%;
                     padding: 16px 8px;
                 }

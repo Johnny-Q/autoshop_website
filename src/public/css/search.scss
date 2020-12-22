@@ -81,6 +81,7 @@ main {
         width: 90%;
         max-width: 1300px;
 
+        // table-layout: fixed;
         border-collapse: collapse;
 
         display: none;
@@ -91,39 +92,84 @@ main {
                 th {
                     padding: 5px 0;
                 }
+
+                th.image_col {
+                    width: 65px;
+                }
+                // th.app_col{
+                //     width: 100px;
+                // }
             }
         }
 
         tbody {
 
-            font-size: 12px;
+            // font-size: 12px;
 
             tr.part {
                 border-top: 1px solid black;
 
                 td {
+                    position: relative;
+
                     input[type="checkbox"] {
                         margin-left: 10px;
                     }
+
+                    table.application_popup {
+                        position: absolute;
+                        background-color: #cccccc;
+                        top: 90%;
+                        left: 0;
+                        z-index: 10;
+                        box-shadow: 3px 4px #333333;
+                        border: 1px solid black;
+
+                        border-collapse: collapse;
+
+                        tbody tr td {
+                            padding: 0px 3px;
+                        }
+                    }
+
+                    img {
+                        height: 50px;
+                        width: 65px;
+                        object-fit: contain;
+                        background-color: white;
+                    }
+
+
+                    // td.type {
+                    //     div {
+                    //         text-align: left;
+                    //         display: flex;
+                    //         flex-direction: row;
+                    //         align-items: center;
+
+                    //         img {
+                    //             height: 50px;
+                    //             width: 65px;
+                    //             object-fit: contain;
+                    //             background-color: white;
+                    //         }
+
+                    //         h3 {
+                    //             margin: 0 5px;
+                    //         }
+                    //     }
+                    // }
+
+                    button {
+                        padding: 8px 16px;
+                    }
                 }
 
-                td.type {
-                    div {
-                        text-align: left;
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-
-                        img {
-                            height: 50px;
-                            width: 65px;
-                            object-fit: contain;
-                            background-color: white;
-                        }
-
-                        h3 {
-                            margin: 0 5px;
-                        }
+                td.add_cart{
+                    text-align: right;
+                    div{
+                        display: inline-block;
+                        padding: 10px;
                     }
                 }
             }

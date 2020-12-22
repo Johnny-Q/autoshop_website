@@ -1,8 +1,5 @@
-DB.db
-DB1.db
-DB_backup.db
+*.db
 .db-journal
-mbdb.db
 build
 .env
 sqlinotes.md
@@ -80,7 +77,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+# .env
 .env.test
 
 # parcel-bundler cache (https://parceljs.org/)

@@ -3,6 +3,7 @@ let feedback_div = document.querySelector("div.feedback");
 let parts_manager = new PartsManager(table, feedback_div);
 
 //search box
+//@ts-expect-error
 let search_bar = new SearchBar(Array.from(document.querySelectorAll(".custom_select")), ["Select Make", "Select Year", "Select Model", "Select Engine Size"], ["make", "year", "model", "engine"], parts_manager);
 search_bar.selects[0].getOptions = async (filter): Promise<string[]> => {
     try {
@@ -73,6 +74,18 @@ search_bar.selects[3].getOptions = async (filter): Promise<string[]> => {
 }
 search_bar.selects[0].populateOptions("");
 
+document.querySelector(".oe_form").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    if(!oe_input.value) return;
+    let parts = await parts_manager.apiOESearch(oe_input.value);
+    // console.log(parts);
+    parts_manager.clearParts();
+    parts.forEach(part=>{
+        parts_manager.renderPart(part);
+    });
+    parts_manager.showTable();
+});
+
 //smaller search bar
 let oe_input = document.querySelector("div.smaller_search_bar > input") as HTMLInputElement;
 let oe_search_button = document.querySelector("div.smaller_search_bar > button");
@@ -98,6 +111,6 @@ window.onload = () => {
     for(let i = 0;i < params.length; i++){
         search_data[params[i]] = urlParams.get(params[i]);
     }
+    // parts_manager.showTable();
     parts_manager.searchAndRender(search_data);
-
 }

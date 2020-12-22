@@ -93,42 +93,72 @@ class CustomSelect {
         // console.log(this.getOptions.toString());
         // console.log(values);
 
+
+
         //remove the old options
         while (this.options_div.firstChild) {
             this.options_div.removeChild(this.options_div.lastChild);
         }
 
-        values.push('Any');
+        values.unshift('Any');
 
-        //add children
-        values.forEach(value => {
-            if(!value) return;
-            if (value != "Any") {
-                value = value.toString().toUpperCase();
+        //order in columns
+        //will always have 4 columns
+        if (values.length > 4) {
+            //@ts-expect-error
+            let one_column = parseInt(values.length / 4);
+            let extras = values.length % 4; //1 add one more option to the first column, 2 is for second...
+            let first_break = extras >= 1 ? one_column + 1 : one_column;
+            let second_break = extras >= 2 ? first_break + + one_column + 1 : first_break + one_column;
+            let third_break = extras >= 3 ? second_break + one_column + 1 : second_break + one_column;;
+            let temp_values = [[...values.slice(0, first_break)], [...values.slice(first_break, second_break)], [...values.slice(second_break, third_break)], [...values.slice(third_break, values.length)]];
+            console.log(temp_values);
+
+            for (let j = 0; j < one_column; j++) {
+                for (let i = 0; i < 4; i++) {
+                    let value = temp_values[i][j];
+                    this.createOption(value);
+                }
             }
-            let option = document.createElement("div");
-            option.innerText = value;
-
-
-
-            //have to add listeners to them;
-            option.onclick = (event) => {
-                let { target } = event;
-
-                // if (this.input_element.value == target.innerText) {
-                //     // console.log(this.input_element.value, target.innerText);
-                //     this.hideOptions();
-                //     return;
-                // }
-
-                //set the value and update visually
-                this.input_element.value = target.innerText; //== "Any" ? "null" : target.innerText;
-                this.input_element.dispatchEvent(new Event("change"));
-                this.select_div.innerText = target.innerText;
+            for (let i = 0; i < extras; i++) {
+                let value = temp_values[i][temp_values[i].length - 1];
+                this.createOption(value)
             }
+        } else {
+            //add children
+            values.forEach(value => {
+                this.createOption(value);
+            });
+        }
+    }
+    createOption(value) {
+        // if (!value) return;
+        if (value != "Any") {
+            value = value.toString().toUpperCase();
+        }
+        let option = document.createElement("div");
+        option.innerText = value;
 
-            this.options_div.append(option);
-        });
+        //have to add listeners to them;
+        option.onclick = (event) => {
+            let { target } = event;
+
+            // if (this.input_element.value == target.innerText) {
+            //     // console.log(this.input_element.value, target.innerText);
+            //     this.hideOptions();
+            //     return;
+            // }
+
+            //set the value and update visually
+            //@ts-expect-error
+            this.input_element.value = target.innerText; //== "Any" ? "null" : target.innerText;
+            this.input_element.dispatchEvent(new Event("change"));
+            //@ts-expect-error
+            this.select_div.innerText = target.innerText;
+        }
+
+        this.options_div.append(option);
+
     }
     getValue() {
         return this.input_element.value;

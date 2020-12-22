@@ -4,7 +4,9 @@
  */
 class PartsManager {
     table;
-    feedback_div
+    feedback_div;
+    last_popup;
+    last_popup_button;
     constructor(table, feedback_div) {
         this.table = table;
         this.feedback_div = feedback_div;
@@ -43,14 +45,28 @@ class PartsManager {
         }
         this.hideLoader();
     }
+    /**
+     * 
+     * @param data {make, year, model, engine}
+     */
     async apiSearchFull(data: Object) {
         this.showLoader();
         try {
             //make request to server
+            //@ts-expect-error
+            // let query_string = `/search?make=${data.make}&year=${data.year}&model=${data.model}&engine=${data.engine}`;
+            // window.location.href = query_string;
+            // let resp = await fetch(query_string, {
+            //     "method": "GET",
+            //     "headers": {
+            //         "Content-Type": "application/json",
+            //     },
+            //     "body": JSON.stringify(data)
+            // });
             let resp = await fetch("/search_full", {
                 "method": "POST",
                 "headers": {
-                    "Content-Type": "application/json",
+                    "content-type": "application/json"
                 },
                 "body": JSON.stringify(data)
             });
@@ -117,41 +133,100 @@ class PartsManager {
         let row = tbody.insertRow();
         row.classList.add("part");
         //checkbox
-        let checkbox_cell = row.insertCell(0);
-        let checkout_input = document.createElement("input");
-        checkout_input.type = "checkbox";
+        // let checkbox_cell = row.insertCell();
+        // let checkout_input = document.createElement("input");
+        // checkout_input.type = "checkbox";
         // checkbox_cell.append(checkout_input);
 
         //image and type
-        let type_td = row.insertCell(1);
-        type_td.classList.add("type");
-        let div = document.createElement("div");
+        // let type_td = row.insertCell();
+        // type_td.classList.add("type");
+        // let div = document.createElement("div");
+        // let img = document.createElement("img");
+        // img.src = `../img/parts/${part.image_url}`;
+        // let type = document.createElement("h3");
+        // type.innerText = part.description;
+        // div.append(img, type)
+        // type_td.append(div);
+
+        //add image
+        let image_td = row.insertCell();
         let img = document.createElement("img");
         img.src = `../img/parts/${part.image_url}`;
-        let type = document.createElement("h3")
+        image_td.append(img);
+
+
+        let type_td = row.insertCell();
+        // type_td.classList.add("type");
+        // let div = document.createElement("div");
+        // let img = document.createElement("img");
+        // img.src = `../img/parts/${part.image_url}`;
+        let type = document.createElement("h3");
         type.innerText = part.description;
-        div.append(img, type)
-        type_td.append(div);
+        type_td.append(type);
+
+
 
         //make
         //model
         //oenumber
         let keys = ["make", "oe_number"];
         for (let i = 0; i < keys.length; i++) {
-            let temp = row.insertCell(i + 2);
+            let temp = row.insertCell();
             if (part[keys[i]]) {
                 temp.innerText = part[keys[i]].toString().toUpperCase();
             }
         }
 
         //applicatoins
-        let applications_td = row.insertCell(4);
+        let applications_td = row.insertCell();
+        applications_td.classList.add("application");
         let view = document.createElement("button");
-        view.innerText = "view";
+        view.innerText = "View";
         applications_td.append(view);
 
         //should cache the request, to prevent spam and stuff
-        view.onclick = async ()=>{
+        view.onclick = async () => {
+            if (this.last_popup_button == view) {
+                console.log("ree");
+                this.last_popup.remove();
+                this.last_popup_button.innerText = "View";
+                this.last_popup_button = null;
+            } else {
+                //remove the old popup from the screen
+                try {
+                    this.last_popup.remove();
+                    this.last_popup_button.innerText = "View";
+                } catch (err) {
+
+                }
+                let resp = await fetch('/applications?part_id=' + part.id/*, {
+                "method": "GET"//,
+                // "headers": {
+                //     "Content-Type": "application/json",
+                // },
+                // "body": JSON.stringify({part_id: id}})
+            }*/);
+                let data = await resp.json();
+                console.log(data);
+                //spawn the popup
+                let popup = document.createElement("table");
+                popup.classList.add("application_popup");
+
+
+                data.forEach(app => {
+                    let row = popup.insertRow();
+                    row.insertCell().innerText = app.model;
+                    row.insertCell().innerText = `${app.begin_year} - ${app.end_year}`;
+                });
+
+                applications_td.append(popup);
+                this.last_popup = popup;
+                this.last_popup_button = view;
+                view.innerHTML = "Close";
+            }
+        };
+        /*async ()=>{
             try{
                 fetch("/get_apps", {
                     "method":"post",
@@ -165,16 +240,21 @@ class PartsManager {
             }catch(err){
                 console.log(err);
             }
-        }
+        }*/
 
 
         //buttons
-        let button_td = row.insertCell(5);
-        let add_to_cart = document.createElement("button");
-        add_to_cart.innerText = "Add";
-        button_td.append(add_to_cart);//, view);
-
-
+        if (part.price) {
+            let button_td = row.insertCell();
+            button_td.classList.add("add_cart");
+            let add_to_cart = document.createElement("button");
+            add_to_cart.innerText = "Add";
+            let price = document.createElement("div");
+            let cents = part.price%100;
+            if(cents < 10) cents = "0"+cents.toString();
+            price.innerText = `$${parseInt(part.price/100)}.${cents}`;
+            button_td.append(price, add_to_cart);//, view);
+        }
 
         //onclick spawn the modal
     }
@@ -229,9 +309,12 @@ class PartsManager {
         let loader_gif = this.feedback_div.querySelector("img");
         loader_gif.style.display = "none";
     }
-    showTable(){
+    hideFeedback() {
+        this.feedback_div.style.display = "none";
+    }
+    showTable() {
         this.hideLoader();
-        this.feedback_div.display= "none";
+        this.feedback_div.display = "none";
         this.table.style.display = "table";
     }
 }

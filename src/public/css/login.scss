@@ -1,0 +1,40 @@
+main {
+    justify-content: center;
+    background: transparent;
+    padding: 30px 0;
+
+    // height: 100%;
+    .error_message {
+        color: rgb(196, 0, 0);
+    }
+
+    div.form_background {
+        width: 90%;
+        max-width: 350px;
+        text-align: center;
+        background-color: #aaaaaa;
+        padding: 30px;
+
+        form {
+            .input {
+                width: 100%;
+                input {
+                    -webkit-box-shadow: 0 0 0 50px #aaaaaa inset;
+                }
+            }
+
+            button {
+                display: block;
+                width: 100%;
+                padding: 16px 8px;
+            }
+        }
+        
+        div.login_options {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            margin: 10px 0 20px 0;
+        }
+    }
+}

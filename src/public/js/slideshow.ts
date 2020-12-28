@@ -76,3 +76,7 @@ class Slideshow {
     }
 }
 let slides = new Slideshow(document.querySelector(".left_arrow"), document.querySelector(".right_arrow"), Array.from(document.querySelectorAll("div.cards > div.images > div.img")), Array.from(document.querySelectorAll(".indicators > .line")));
+
+function activate(img){
+    slides.renderSlide(img-1);
+}

@@ -15,4 +15,9 @@ window.addEventListener("load", event => {
     let fadeDownObserver = new IntersectionObserver(onScreenCallback, onScreenOptions);
     let hiddenContent = document.querySelector('.content.fade');
     fadeDownObserver.observe(hiddenContent);
-})
+
+    document.querySelectorAll("div.img").forEach(async (div)=>{
+        console.log(div.getAttribute("data-src"));
+        div.style["background-image"] = `url('${div.getAttribute("data-src")}')`;
+    });
+});

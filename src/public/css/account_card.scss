@@ -1,0 +1,28 @@
+div.card{
+    background-color: #ECECEC;
+    width: 100%;
+    padding: 30px;
+    display: flex;
+    flex-flow: column;
+    div.card_header{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        h3{
+            display: inline-block;
+        }
+        div{
+            display: inline-block;
+            button{
+                outline: none;
+                height: 100%;
+                background-color: transparent;
+                border: none;
+                margin: 0 5px;
+            }
+        }
+    }
+    div.group{
+        margin: 10px 0;
+    }
+}

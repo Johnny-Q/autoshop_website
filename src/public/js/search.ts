@@ -1,6 +1,8 @@
 let table = document.querySelector("table");
 let feedback_div = document.querySelector("div.feedback");
-let parts_manager = new PartsManager(table, feedback_div);
+let toast = document.querySelector("div.toast");
+let image_modal = document.querySelector(".image_modal");
+let parts_manager = new PartsManager(table, feedback_div, toast, image_modal);
 
 //search box
 //@ts-expect-error
@@ -33,6 +35,7 @@ search_bar.selects[1].getOptions = async (filter): Promise<string[]> => {
         json.forEach((object: any) => {
             data.push(object.year);
         });
+        data.reverse();
         return data;
     } catch (err) {
         return [];
@@ -74,43 +77,41 @@ search_bar.selects[3].getOptions = async (filter): Promise<string[]> => {
 }
 search_bar.selects[0].populateOptions("");
 
-document.querySelector(".oe_form").addEventListener("submit", async (e)=>{
+let oe_input = document.querySelector("div.smaller_search_bar > input") as HTMLInputElement;
+let oe_search_button = document.querySelector("div.smaller_search_bar > button");
+document.querySelector(".oe_form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    if(!oe_input.value) return;
+    if (!oe_input.value) return;
     let parts = await parts_manager.apiOESearch(oe_input.value);
     // console.log(parts);
     parts_manager.clearParts();
-    parts.forEach(part=>{
+    parts.forEach(part => {
         parts_manager.renderPart(part);
     });
     parts_manager.showTable();
 });
-
-//smaller search bar
-let oe_input = document.querySelector("div.smaller_search_bar > input") as HTMLInputElement;
-let oe_search_button = document.querySelector("div.smaller_search_bar > button");
-oe_search_button.onclick = async ()=>{
-    if(!oe_input.value) return;
-    let parts = await parts_manager.apiOESearch(oe_input.value);
-    // console.log(parts);
-    parts_manager.clearParts();
-    parts.forEach(part=>{
-        parts_manager.renderPart(part);
-    });
-    parts_manager.showTable();
-}
-
-window.onload = () => {
+window.onload = async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    
-    //do nothing if we didn't request a search
-    if(!urlParams.get("make")) return;
-    
-    let params = ["make", "year", "model", "engine"];
-    let search_data = {};
-    for(let i = 0;i < params.length; i++){
-        search_data[params[i]] = urlParams.get(params[i]);
+
+    if (urlParams.get("make")) {
+
+        let params = ["make", "year", "model", "engine"];
+        let search_data = {};
+        for (let i = 0; i < params.length; i++) {
+            search_data[params[i]] = urlParams.get(params[i]) || "Any";
+        }
+        // parts_manager.showTable();
+        parts_manager.searchAndRender(search_data);
     }
-    // parts_manager.showTable();
-    parts_manager.searchAndRender(search_data);
+    else if (urlParams.get("oe_number")) {
+        let parts = await parts_manager.apiOESearch(urlParams.get("oe_number"));
+        // console.log(parts);
+        parts_manager.clearParts();
+        parts.forEach(part => {
+            parts_manager.renderPart(part);
+        });
+        parts_manager.showTable();
+    }
+    
 }
+

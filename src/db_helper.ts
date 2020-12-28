@@ -6,7 +6,15 @@ const db = require('knex')({
     },
     useNullAsDefault: true // so we can avoid sqlite specific bugs
 });
-
+const nodemailer = require('nodemailer');
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth:{
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 function DBtoCSV() {
     console.log("asdf");
@@ -232,6 +240,8 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>):
         let part = part_raw as any;
         delete part.make; part.make_id = make_id;
         delete part.brand; part.brand_id = brand_id;
+        // delete part if already exists
+        await db("Parts").where("oe_number", part.oe_number).del()
         let part_id = (await db('Parts').insert(part));
         for (let i = 0; i < applications.length; i++) {
             let app_raw = applications[i];
@@ -267,46 +277,124 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>):
  * @param {string} user desired registration username
  * @return {Promise<Array<string>>} array of error messages, if exists
  */
-async function register(user, pass, additional_info) {
-    let errmsgs = [];
+async function register(email, pass, additional_info) {
+    let res = {
+        email_token: null,
+        errmsgs: []
+    };
     // check if user already exists
-    let user_count = await db('Accounts').where('user', user).count('user', { as: 'count' });
-    console.log(user_count);
+    let user_count = await db('Accounts').where('email', email).count('email', { as: 'count' });
     if (user_count[0].count > 0) {
-        errmsgs.push('that username already exists');
+        res.errmsgs.push('That email already exists');
     }
     else {
+        let email_hashed = crypto.createHash('md5').update(email).digest("hex");
+        let email_token = email_hashed + randString(15);
+        res.email_token = email_token;
         bcrypt.hash(pass, 12).then(async hash => {
+            let expiry_time = Date.now() + 7*24*60*60*1000;
             await db('Accounts').insert({
-                user: user,
-                hash: hash
+                email: email,
+                hash: hash,
+                email_token: email_token,
+                email_expiry: expiry_time,
+                ...additional_info
             });
         });
     }
-
-    return errmsgs;
+    return res;
 }
 
 async function login(user, pass) {
     let errmsgs = [];
     let match = false;
-    let user_entry = await db('Accounts').select('hash', 'id').where("user", user);
-    let user_id = -1;
+    let user_entry = await db('Accounts').leftJoin('Admins', "Admins.account_id", "Accounts.id").select().where("email", user);
     if (user_entry.length == 0) {
         errmsgs.push('Username or password incorrect.');
     } else {
         match = await bcrypt.compare(pass, user_entry[0].hash);
         if (!match) errmsgs.push('Username or password incorrect.');
-        else {
-            user_id = user_entry[0].id;
-        }
     }
-    return { match, errmsgs, user_id };
+    return { match, errmsgs, user: user_entry[0] };
 }
 
+async function queryPassToken(token: string){
+    let res = null;
+    let user = await db('Accounts').where('pass_token', token);
+    if( user.length > 0 ){
+        let res = user[0];
+    }
+    return res;
+}
 
+async function changePass(user: string, pass: string) {
+    bcrypt.hash(pass, 12).then(async hash => {
+        await db('Accounts').where('email', user).update({
+            hash: hash,
+            temp_pass: 0
+        });
+    });
+}
 
-async function updatePart() { }
+async function verifyEmail(token:string) {
+    let res = {
+        errmsg: ""
+    }
+    let users = await db('Accounts').where('email_token', token);
+    if (users.length == 0){
+        res.errmsg = "Token not found";
+        return res;
+    }
+    else{
+        await db('Accounts').where('email_token', token).update({
+            email_token: null,
+            verified_email: 1
+        })
+    }
+    return res;
+}
+
+async function resetPassword(email:string){
+    let res={
+        user: null,
+        pass_token: null,
+        msg: 'A password recovery email has been sent!'
+    };
+    let user = await db('Accounts').where('email', email);
+    if(user.length > 0){
+        // don't say that no email found if no users found
+        res.user = user[0];
+        let email_hashed = crypto.createHash('md5').update(email).digest("hex");
+        let pass_token = email_hashed + randString(30);
+        res.pass_token = pass_token;
+        let expiry_time = Date.now() + 24*60*60*1000;
+        await db('Accounts').where('email', email).update({
+            pass_token: pass_token,
+            pass_expiry: expiry_time
+        })
+    }
+    return res;
+}
+
+function randString(length) {
+    let result = '';
+    const charset = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
+    const set_length = charset.length;
+    for (let i = 0; i < length; i++) {
+        result += charset[Math.floor(Math.random() * set_length)];
+    }
+    return result;
+}
+
+async function approveUser(id: number, status: number){
+    return await db("Accounts").where('id', id).update({
+        approved: status
+    });
+}
+
+async function getUnapprovedUsers() {
+    return await db("Accounts").where('approved', 0);
+}
 
 module.exports = {
     DBtoCSV,
@@ -320,5 +408,11 @@ module.exports = {
     addPart,
     paginatedSearch,
     register,
-    login
+    verifyEmail,
+    login,
+    changePass,
+    resetPassword,
+    getUnapprovedUsers,
+    queryPassToken,
+    approveUser
 }

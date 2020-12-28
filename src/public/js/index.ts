@@ -108,3 +108,12 @@ search_bar.selects[3].getOptions = async (filter): Promise<string[]> => {
     }
 }
 search_bar.selects[0].populateOptions("");
+
+let oe_input = document.querySelector("div.smaller_search_bar > input") as HTMLInputElement;
+let oe_search_button = document.querySelector("div.smaller_search_bar > button");
+document.querySelector(".oe_form").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    if(!oe_input.value) return;
+    if(!oe_input.value) return;
+    window.location.assign(`/search?oe_number=${oe_input.value}`);
+});

@@ -1,7 +1,7 @@
 
 input,
 p {
-    font-size: 14px;
+    font-size: 18px;
 }
 
 //make images non-selectable
@@ -102,6 +102,7 @@ main{
     justify-content: center;
     align-items: center;
     margin-top: 50px;
+
     div.double{
         width: 80%;
         display: grid;
@@ -129,4 +130,8 @@ main{
         height: 700px;
         background-color: gray;
     }
+}
+
+main{
+    
 }

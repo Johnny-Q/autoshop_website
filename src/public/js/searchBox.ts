@@ -99,7 +99,6 @@ class CustomSelect {
         while (this.options_div.firstChild) {
             this.options_div.removeChild(this.options_div.lastChild);
         }
-
         values.unshift('Any');
 
         //order in columns
@@ -133,7 +132,7 @@ class CustomSelect {
     }
     createOption(value) {
         // if (!value) return;
-        if (value != "Any") {
+        if (value && value != "Any") {
             value = value.toString().toUpperCase();
         }
         let option = document.createElement("div");

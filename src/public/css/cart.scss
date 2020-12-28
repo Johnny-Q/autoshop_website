@@ -1,0 +1,97 @@
+main {
+    table {
+        text-align: left;
+        max-width: 1300px;
+        width: 100%;
+        // table-layout: fixed;
+        border-collapse: collapse;
+        margin: 30px 0;
+        thead {
+            tr {
+                th.image_col {
+                    width: 65px;
+                }
+
+                th.total {
+                    text-align: right;
+                }
+            }
+        }
+
+        tbody {
+            tr.part {
+                border-top: 1px solid black;
+
+                td {
+                    input[type=number] {
+                        width: 60px;
+                        height: 40px;
+                        padding: 0 10px;
+                    }
+
+                    img {
+                        height: 50px;
+                        width: 65px;
+                        object-fit: contain;
+                        background-color: white;
+                    }
+                }
+
+                td.total {
+                    text-align: right;
+                }
+            }
+        }
+    }
+}
+
+main>div.buttons {
+    max-width: 1300px;
+    width: 100%;
+    text-align: right;
+
+    button {
+        padding: 8px 16px;
+    }
+}
+
+main {
+    justify-content: center;
+}
+
+main {
+    h1.cart_text {
+        margin-bottom: 10px;
+    }
+
+    a.back_to_search {
+        margin-bottom: 30px;
+        color: black;
+        text-decoration: underline;
+    }
+}
+
+main {
+    div.order_options {
+        max-width: 1300px;
+        width: 100%;
+        display: flex;
+        flex-flow: row;
+        text-align: left;
+
+        margin: 5px 0;
+
+        div {
+            margin: 0 10px;
+        }
+    }
+}
+
+main {
+    textarea {
+        max-width: 1300px;
+        width: 100%;
+        background-color: rgb(239, 239, 239);
+        margin-bottom: 10px;
+    }
+}

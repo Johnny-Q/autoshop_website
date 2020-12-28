@@ -1,15 +1,23 @@
 /**
  * @description manages the table that actually displays the parts
- * 
+ * @param toast the toast to display when something gets added to the cart
  */
 class PartsManager {
     table;
     feedback_div;
     last_popup;
     last_popup_button;
-    constructor(table, feedback_div) {
+    toast;
+    toast_hide_func;
+    img_modal;
+    constructor(table, feedback_div, toast, img_modal) {
         this.table = table;
         this.feedback_div = feedback_div;
+        this.toast = toast;
+        this.img_modal = img_modal;
+        this.img_modal.onclick = ()=>{
+            this.img_modal.style.display = "none";
+        }
     }
     async searchAndRender(data) {
         try {
@@ -19,7 +27,7 @@ class PartsManager {
 
             //perform api request
             let parts = await this.apiSearchFull(data);
-            console.log(parts);
+            // console.log(parts);
             if (parts.length) {
                 //hide the loader after the request is done
                 this.clearParts();
@@ -151,9 +159,26 @@ class PartsManager {
 
         //add image
         let image_td = row.insertCell();
+        image_td.classList.add("img");
+        image_td.style.postion = "relative";
         let img = document.createElement("img");
         img.src = `../img/parts/${part.image_url}`;
-        image_td.append(img);
+        let bigger_img = document.createElement("img");
+        bigger_img.classList.add("big_img");
+        bigger_img.style.display = "none";
+        bigger_img.src = `../img/parts/${part.image_url}`;
+        image_td.append(img, bigger_img);
+
+
+        //spawn the onclick
+
+        img.addEventListener("mouseenter", ()=>{
+            bigger_img.style.display = "block";
+        });
+
+        img.addEventListener("mouseleave", ()=>{
+            bigger_img.style.display = "none";
+        });
 
 
         let type_td = row.insertCell();
@@ -188,7 +213,6 @@ class PartsManager {
         //should cache the request, to prevent spam and stuff
         view.onclick = async () => {
             if (this.last_popup_button == view) {
-                console.log("ree");
                 this.last_popup.remove();
                 this.last_popup_button.innerText = "View";
                 this.last_popup_button = null;
@@ -208,14 +232,27 @@ class PartsManager {
                 // "body": JSON.stringify({part_id: id}})
             }*/);
                 let data = await resp.json();
-                console.log(data);
+                // console.log(data);
                 //spawn the popup
                 let popup = document.createElement("table");
                 popup.classList.add("application_popup");
 
+                let popup_thead = document.createElement("thead");
+                let popup_tbody = document.createElement("tbody");
+
+                let row = popup_thead.insertRow();
+                let model = row.insertCell();
+                model.innerText = "Model";
+                let year = row.insertCell();
+                year.innerText = "Year Range";
+                model.classList.add("model_col");
+                year.classList.add("year_col");
+
+
+                popup.append(popup_thead, popup_tbody);
 
                 data.forEach(app => {
-                    let row = popup.insertRow();
+                    let row = popup_tbody.insertRow();
                     row.insertCell().innerText = app.model;
                     row.insertCell().innerText = `${app.begin_year} - ${app.end_year}`;
                 });
@@ -245,15 +282,49 @@ class PartsManager {
 
         //buttons
         if (part.price) {
+            let price = row.insertCell();
+            let cents = part.price % 100;
+            if (cents < 10) cents = "0" + cents.toString();
+            price.innerText = `$${parseInt(part.price / 100)}.${cents}`;
+
             let button_td = row.insertCell();
             button_td.classList.add("add_cart");
+
             let add_to_cart = document.createElement("button");
             add_to_cart.innerText = "Add";
-            let price = document.createElement("div");
-            let cents = part.price%100;
-            if(cents < 10) cents = "0"+cents.toString();
-            price.innerText = `$${parseInt(part.price/100)}.${cents}`;
-            button_td.append(price, add_to_cart);//, view);
+
+            let quantity = document.createElement("input");
+            quantity.type = "number";
+            quantity.value = "1";
+            quantity.min = "1";
+
+            //make the request to add to cart
+            add_to_cart.onclick = () => {
+                part.quantity = parseInt(quantity.value);
+                if (part.quantity) {
+                    fetch("/cart/part", {
+                        "method": "post",
+                        "headers": {
+                            "content-type": "application/json"
+                        },
+                        "body": JSON.stringify({ "part": part })
+                    }).then(resp=>{
+                        if(resp.status == 200){
+                            if(this.toast_hide_func){
+                                clearTimeout(this.toast_hide_func);
+                                this.toast.classList.remove("show");
+                            }
+                            this.toast.classList.add("show");
+                            this.toast_hide_func = setTimeout(()=>{
+                                this.toast.classList.remove("show");
+                                this.toast_hide_func = null;
+                            }, 1000);
+                        }
+                    });
+                }
+            }
+
+            button_td.append(quantity, add_to_cart);//, view);
         }
 
         //onclick spawn the modal

@@ -1,5 +1,15 @@
-form{
-    p{
+form {
+    // margin: 30px;
+    p {
         font-weight: 700;
     }
+    button{
+        width: 100%;
+        font-size: 18px;
+        padding: 16px 8px;
+    }
+}
+
+main{
+    margin: 30px;
 }

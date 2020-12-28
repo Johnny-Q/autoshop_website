@@ -1,43 +1,68 @@
 main {
     div.cards {
-        *{
+        * {
             user-select: none;
             -moz-user-select: none;
             -khtml-user-select: none;
             -webkit-user-select: none;
             -o-user-select: none;
         }
+
         // position: relative;
         display: grid;
-        grid-template-columns: 1fr 2fr 1fr;
-        height: 700px;
-        width: 70%;
+        grid-template-columns: 70px 2fr 70px 2fr;
+        height: 75vh;
+        min-height: 400px;
+        width: 85%;
         overflow: hidden;
         margin-bottom: 30px;
+
+        div.gallery {
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            display: grid;
+            grid-gap: 20px;
+
+            a {
+                div.img {
+                    height: 100%;
+                    width: 100%;
+                    // background: url("../img/catalog1_30.png") no-repeat center;
+                    background-size: cover;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    //position: relative;
+                    // display: none;
+                    position: relative;
+                }
+            }
+        }
 
         div.images {
             height: 100%;
             width: 100%;
-            position:relative;
-            grid-template: 
+            position: relative;
+            grid-template:
                 'left main right'
                 'hidden hidden hidden';
 
-            div.img{
+            div.img {
                 height: 100%;
                 width: 100%;
-                background: url("../img/catalog1.png") no-repeat center;
+                // background: url("../img/catalog1_30.png") no-repeat center;
                 background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
                 //position: relative;
                 // display: none;
-                position:relative;
+                position: relative;
                 max-height: 0px;
                 max-width: 0px;
                 grid-area: hidden;
                 opacity: 0;
             }
 
-            div.img.right{
+            div.img.right {
                 display: block;
                 position: relative;
                 max-width: 0;
@@ -45,8 +70,8 @@ main {
                 grid-area: right;
                 transition: opacity 1s, max-width 1s;
             }
-            
-            div.img.left{
+
+            div.img.left {
                 display: block;
                 position: relative;
                 grid-area: left;
@@ -56,14 +81,14 @@ main {
                 transition: opacity 1s, max-width 1s;
             }
 
-            div.img.active{
+            div.img.active {
                 opacity: 1;
                 display: block;
                 grid-area: main;
                 position: relative;
                 max-width: 1000px;
                 max-height: 1000px;
-                transform: translate(0,0);
+                transform: translate(0, 0);
                 transition: opacity 1s;
             }
 
@@ -107,10 +132,12 @@ main {
             align-items: center;
             cursor: pointer;
         }
-        div.left_arrow{
+
+        div.left_arrow {
             justify-content: flex-end;
         }
-        div.right_arrow{
+
+        div.right_arrow {
             justify-content: flex-start;
         }
     }

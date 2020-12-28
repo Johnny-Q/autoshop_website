@@ -1,17 +1,23 @@
 //Hero image
-@keyframes fadeIn{
-    0% {opacity:0;}
-    100% {opacity:1;}
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
-@keyframes moveFade{
-    0%{
+@keyframes moveFade {
+    0% {
         transform: translate(0, -100%);
-        opacity:0;
+        opacity: 0;
     }
-    100%{
+
+    100% {
         transform: translate(0, -50%);
-        opacity:1;
+        opacity: 1;
     }
 }
 
@@ -19,9 +25,10 @@ main {
     position: relative;
 
     div.hero {
+        flex: 1;
         width: 100%;
-        height: 93vh;
-        min-height: 700px;
+        // height: 93vh;
+        // min-height: 700px;
         background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("../img/hero.jpg");
 
         color: white;
@@ -30,15 +37,16 @@ main {
         margin-bottom: 0vh;
 
         div.text {
-            position: relative;
-            top: 30%;
+            position: absolute;
+            top: 15%;
             left: 10%;
-            transform: translate(0, -50%);
-            max-width: 70vw;
+            // transform: translate(0, -50%);
+            // max-width: 70vw;
             margin-bottom: 20px;
             color: #B3B3B3;
             // background-color: rgba(0, 0, 0, 0.5);
             animation: fadeIn 3s ease;
+
             h1 {
 
                 font-size: 72px;
@@ -48,5 +56,53 @@ main {
                 font-size: 24px;
             }
         }
+
+        div.search_wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 0);
+        }
     }
+}
+
+//smaller search button
+main {
+    div.search_wrapper {
+        form.oe_form {
+            width: 100%;
+            div.smaller_search_bar {
+                margin-top: 20px;
+                display: flex;
+                flex-direction: row;
+
+                border-radius: 10px;
+                overflow: hidden;
+
+                input {
+                    border: none;
+                    outline: none;
+                    width: 100%;
+                    height: 50px;
+
+                    padding: 0 10px;
+                }
+
+                button {
+                    background-color: #333333;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border: none;
+                    outline: none;
+                    width: 70px;
+                    height: 50px;
+                }
+            }
+        }
+    }
+}
+
+nav {
+    height: 12vh;
 }

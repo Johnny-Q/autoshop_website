@@ -83,7 +83,7 @@ async function paginatedSearch(make: string, model: string, year: number, engine
                     .whereRaw('YearModel.year = IFNULL(?, YearModel.year)', [year])
                     .andWhereRaw('IFNULL(?, Models.model) like Models.model', [model])
                     .andWhereRaw("IFNULL(?, IFNULL(Engines.engine, 'null_engine')) like IFNULL(Engines.engine, IFNULL(?, 'null_engine'))", [engine, engine])
-            }).orderBy('Parts.id').limit(num_results).offset(offset);
+            }).orderBy('Parts.description').limit(num_results).offset(offset);
     } catch (err) {
         console.log(err);
         throw (err);

@@ -6,6 +6,7 @@ sqlinotes.md
 run.bat
 src/public/img/parts
 sessions
+nohup.out
 
 # Logs
 logs

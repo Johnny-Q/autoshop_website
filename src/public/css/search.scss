@@ -134,16 +134,18 @@ main {
 
                         border-collapse: collapse;
 
-                        width: 200px;
+                        width: 250px;
 
                         thead {
                             tr {
                                 td.model_col {
                                     font-weight: 700;
+                                    max-width: 50%;
                                 }
 
                                 td.year_col {
                                     font-weight: 700;
+                                    max-width: 50%;
                                 }
                             }
                         }
@@ -212,11 +214,11 @@ main {
 
                     }
 
-                    input::-webkit-outer-spin-button,
-                    input::-webkit-inner-spin-button {
-                        -webkit-appearance: none;
-                        margin: 0;
-                    }
+                    // input::-webkit-outer-spin-button,
+                    // input::-webkit-inner-spin-button {
+                    //     -webkit-appearance: none;
+                    //     margin: 0;
+                    // }
 
                     // input[type=number]::before{
                     //     content:"-";
@@ -239,7 +241,7 @@ body {
 }
 
 div.toast {
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 50%;
     transform: translate(-50%, 0%);

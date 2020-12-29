@@ -237,6 +237,12 @@ class PartsManager {
                 let popup = document.createElement("table");
                 popup.classList.add("application_popup");
 
+                let col1 = document.createElement("col");
+                col1.width = "50%";
+
+                let col2 = document.createElement("col");
+                col2.width = "50%";
+
                 let popup_thead = document.createElement("thead");
                 let popup_tbody = document.createElement("tbody");
 
@@ -249,7 +255,7 @@ class PartsManager {
                 year.classList.add("year_col");
 
 
-                popup.append(popup_thead, popup_tbody);
+                popup.append(col1, col2, popup_thead, popup_tbody);
 
                 data.forEach(app => {
                     let row = popup_tbody.insertRow();

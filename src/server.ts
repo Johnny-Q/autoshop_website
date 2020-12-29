@@ -338,6 +338,12 @@ app.post('/register', async (req, res) => {
             text: `Verify your Aceway Auto account by following the link: ${process.env.DOMAIN}/email?token=` + register.email_token,
             html: `<a href=${process.env.DOMAIN}/email?token=${register.email_token}>Verify your email </a>`
         });
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: process.env.REGISTRATION,
+            subject: "A User Has Created an Aceway Account",
+            text: "Please login to your admin account on Aceway Auto to view the registration."
+        })
         res.render('message', {page_name: "Register", message: "Thank you for registering! An email has been sent to your email to verify your email."})
     }
 })
@@ -805,7 +811,7 @@ app.post("/cart/place_order", async (req, res) => {
     let total = 0;
     let num_parts = 0;
     for(let part of Object.values(req.session.cart)){
-        let subtotal = part.price*part.quantity;
+        let subtotal = part.price*part.quantity/100;
         let html = 
         `
         <tr>

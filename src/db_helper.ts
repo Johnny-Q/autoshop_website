@@ -95,7 +95,10 @@ async function getPartByOEorFrey(id_number: string, logged_in = false): Promise<
         let columns = ['Parts.id', 'make', 'oe_number', 'description', 'image_url', 'frey_number', 'in_stock'];
         if (logged_in) columns.push("price");
         return db.select(...columns).from('Parts').leftJoin('Makes', "Makes.id", "Parts.make_id")
-            .whereRaw('oe_number like ?', id_number + '%').orWhereRaw('frey_number like ?', id_number + '%');
+            .leftJoin('Interchange', "Parts.id", "Interchange.part_id")
+            .whereRaw('oe_number like ?', id_number + '%')
+            .orWhereRaw('frey_number like ?', id_number + '%')
+            .orWhereRaw('int_number like ?', id_number + '%');
     } catch (err) {
         console.log(err);
         throw err;
@@ -222,7 +225,7 @@ async function getApps(part_id: string) {
  * @desc takes a part and array of applications for that part and inserts into database
  * @return {Promise<number>} the id of inserted part in database
  */
-async function addPart(part_raw: PartDBEntry, applications: Array<Application>): Promise<number> {
+async function addPart(part_raw: PartDBEntry, applications: Array<Application>, interchange=[]): Promise<number> {
     try {
         let make_id = await db('Makes').select('id').where('make', part_raw.make.toLowerCase());
         if (make_id.length == 0) {
@@ -265,6 +268,10 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>):
                 await db('Engines').insert({ "engine": engine, "model_id": model_id });
             });
         }
+        interchange.forEach( async int => {
+            console.log('here', int);
+            await db('Interchange').insert({int_number: int, "part_id": part_id});
+        })
         return part_id;
     } catch (err) {
         console.log(err);

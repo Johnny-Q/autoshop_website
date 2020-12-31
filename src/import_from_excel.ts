@@ -32,7 +32,7 @@ async function upload_parts(path){
                         part_db[property] = part[property]
                     })
                     part_db.image_url = part.make.toLowerCase() + '-' + part.oe_number.toString() + '.jpg';
-                    db.addPart(part_db, part.apps);
+                    db.addPart(part_db, part.apps, part.interchange);
                 }
                 else errors.push({index: i, msg: part.errors})
             }catch(err){
@@ -50,16 +50,30 @@ function rowToPart(row){
         "price": Math.round(row[7]*100),
         "description": row[2],
         "brand": row[3],
-        "apps": [],
         "errors": null,
         "make": null,
+        "apps": [],
+        "interchange": []
     };
     
     let first_space = row[9].indexOf(' ');
     res.make = row[9].substr(0, first_space).toLowerCase();
     if(res.make == 'mb') res.make = 'mercedes-benz';
+    
     row[9] = row[9].substr(first_space+1);
     try{
+        let interchange = row[5].toString();
+        console.log(interchange, row[5], "asdf")
+        interchange = interchange.split(' ');
+        interchange.forEach( int => {
+            int = int.substr(int.indexOf(' ')+1);
+            int.trim()
+            int.replace(/[-,]/g, '');
+            if(/[^A-Za-z0-9]/.test(int)){
+                res.errors = "invalid interchange format"
+            }
+            res.interchange.push(int);
+        })
         row[9].split('/').forEach(application => {
             let modelName, begin_year, end_year, engineSizes = [];
             let yearString = application.substr(application.lastIndexOf(' ')+1);

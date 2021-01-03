@@ -13,14 +13,23 @@ const SQLiteStore = require('connect-sqlite3')(session);
 const xlImport = require('./import_from_excel');
 let session_store = new SQLiteStore;
 let transporter = {
-    sendMail: function(obj){console.log('sent mail')}
+    sendMail: function (obj) { console.log('sent mail') }
 };
-if(process.env.SEND_MAIL){
+if (process.env.SEND_MAIL) {
     transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
+        }
+    });
+} else {
+    transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        auth: {
+            user: process.env.mail_test,
+            pass: process.env.mail_test_pass
         }
     });
 }
@@ -53,9 +62,11 @@ app.use(session({
 const HTMLpages = ["about", "search_box", "search", "contact", "slideshow", "register", "login", "dashboard", "test", "partials/approve_account", "reset_password"];
 HTMLpages.forEach(page => {
     app.get(`/${page}`, (req, res) => {
-        let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null};
+        let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': false};
         for (let [key, value] of Object.entries(properties)) {
-            properties[key] = req.session[key];
+            if (req.session[key]) {
+                properties[key] = req.session[key];
+            }
         }
         if (page == "login" || page == "register" || page == "reset_password") {
             if (properties.logged_in) res.redirect('/');
@@ -83,6 +94,27 @@ adminPages.forEach(page => {
     });
 })
 
+app.get('/admin/editpart', async (req, res) => {
+    let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
+    for (let [key, value] of Object.entries(properties)) {
+        properties[key] = req.session[key];
+    }
+    if (!properties.logged_in) return res.sendStatus(401);
+    if (!properties.admin) return res.sendStatus(403);
+    // expect req.query.part_id
+    const { part_id } = req.query;
+    if (!part_id) {
+        return res.render('message', { ...properties, message: "Please edit a part by clicking the 'Edit Part' button from the search page!", page_name: 'Edit Part' })
+    }
+    const part = await db.getPartById(part_id);
+    const apps = await db.getApps(part_id);
+    if (!part){
+        return res.render('message', { ...properties, message: "This part is not found!", page_name: 'Edit Part' })
+    }
+    console.log(part.image_url);
+    res.render('admin/editpart', { ...properties, part: part, apps: apps})
+})
+
 //serve web pages
 app.get("/", (req, res) => {
     let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
@@ -97,49 +129,49 @@ app.get('/email', async (req, res) => {
     token = token || '';
     let verification = await db.verifyEmail(token);
     if (verification.errmsg) {
-        res.render('message', {message: verification.errmsg, page_name: "Email Verification"});
+        res.render('message', { message: verification.errmsg, page_name: "Email Verification" });
     }
     else {
-        res.render('message', {message: "Your email has been successfully verified!", page_name: "Email Verification"});
+        res.render('message', { message: "Your email has been successfully verified!", page_name: "Email Verification" });
     }
 });
 
-app.get('/reset', async(req, res)=>{
+app.get('/reset', async (req, res) => {
     let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
     for (let [key, value] of Object.entries(properties)) {
         properties[key] = req.session[key];
     }
-    if(properties.logged_in) res.redirect('/')
+    if (properties.logged_in) res.redirect('/')
     let token = req.query.token;
     token = token || '';
-    res.render('reset', {...properties, token: token});
+    res.render('reset', { ...properties, token: token });
 })
 
 app.post('/reset', async (req, res) => {
-    let properties = { 'logged_in': null, 'user': null, 'user_id': null , 'admin': null};
+    let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
     for (let [key, value] of Object.entries(properties)) {
         properties[key] = req.session[key];
     }
-    if(properties.logged_in) res.redirect('/')
+    if (properties.logged_in) res.redirect('/')
 
-    const {token, pass, passconfirm} = req.body;
-    if(pass != passconfirm) {
+    const { token, pass, passconfirm } = req.body;
+    if (pass != passconfirm) {
         return res.render('reset', {
             ...properties,
             token: token,
-            errors: [{msg: 'Passwords do not match!'}]
+            errors: [{ msg: 'Passwords do not match!' }]
         })
     }
-    if(token){
+    if (token) {
         let user = await db.queryPassToken(token);
-        if(user){
+        if (user) {
             await db.changePass(user.email, pass);
         }
     }
     res.render('reset', {
         ...properties,
         token,
-        errors: [{msg: 'Your password has been reset. You may log in now.'}]
+        errors: [{ msg: 'Your password has been reset. You may log in now.' }]
     })
 })
 
@@ -148,7 +180,7 @@ app.get('/change_password', (req, res) => {
     for (let [key, value] of Object.entries(properties)) {
         properties[key] = req.session[key];
     }
-    if(!properties.logged_in){
+    if (!properties.logged_in) {
         return res.redirect('/');
     }
     properties.temp_pass = properties.temp_pass || 'none';
@@ -227,7 +259,7 @@ app.post('/change_password', async (req, res) => {
         else {
             req.session.logged_in = true;
             delete req.session.temp_pass;
-            res.render('message', {logged_in: true, page_name: "Change Password", message: "Password has been changed"});
+            res.render('message', { logged_in: true, page_name: "Change Password", message: "Password has been changed" });
         }
     }
 })
@@ -344,7 +376,7 @@ app.post('/register', async (req, res) => {
             subject: "A User Has Created an Aceway Account",
             text: "Please login to your admin account on Aceway Auto to view the registration."
         })
-        res.render('message', {page_name: "Register", message: "Thank you for registering! An email has been sent to your email to verify your email."})
+        res.render('message', { page_name: "Register", message: "Thank you for registering! An email has been sent to your email to verify your email." })
     }
 })
 
@@ -442,7 +474,7 @@ app.post('/adminadduser', async (req, res) => {
             ...properties
         })
     } else {
-        res.render('message', {page_name: "Add User", message: "User Password: "+password });
+        res.render('message', { page_name: "Add User", message: "User Password: " + password });
     }
 })
 
@@ -471,7 +503,7 @@ app.post('/login', async (req, res) => {
             req.session.user = user;
             req.session.logged_in = true;
             req.session.admin = login.user.is_admin;
-            if(req.session.admin){
+            if (req.session.admin) {
                 res.redirect('/dashboard');
             } else {
                 res.redirect('/');
@@ -479,7 +511,7 @@ app.post('/login', async (req, res) => {
         }
     }
     else if (login.match && !login.user.approved) {
-        res.render('message', {page_name: "Login", message:'Your account is pending approval. If you have any questions, please contact us through our contact page.'})
+        res.render('message', { page_name: "Login", message: 'Your account is pending approval. If you have any questions, please contact us through our contact page.' })
     }
     else {
         res.render('login', {
@@ -496,11 +528,12 @@ app.post("/logout", (req, res) => {
         properties[key] = req.session[key];
     }
     req.session = null;
-    res.render('message', {logged_in: false, page_name: "Logout", message: "You are now logged out."});
+    res.render('message', { logged_in: false, page_name: "Logout", message: "You are now logged out." });
 });
 
 app.post("/search_full", async (req, res) => {
-
+    let admin = req.session.admin;
+    admin = admin || false;
     //get year from the request
     let { make, model, year, engine, offset, limit, oe_number } = req.body;
 
@@ -521,7 +554,7 @@ app.post("/search_full", async (req, res) => {
         let parts = await db.paginatedSearch(make, model, year, engine, 0, 10000, req.session.logged_in);
         // debugLog(parts);
         // res.render('search', { parts, logged_in });
-        res.json(parts);
+        res.json({ parts, admin });
         // res.sendStatus(200);
     } catch (err) {
         console.log(err);
@@ -532,9 +565,11 @@ app.post("/search_full", async (req, res) => {
 
 app.post("/search_id_number", async (req, res) => {
     let { id_number } = req.body;
+    let { admin } = req.admin;
+    admin = admin || false;
     try {
         let parts = await db.getPartByOEorFrey(id_number, req.session.logged_in);
-        res.json(parts);
+        res.json({ parts, admin });
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
@@ -556,31 +591,31 @@ app.get("/applications", async (req, res) => {
     // res.sendStatus(200);
 })
 
-app.post("/admin/addpart", upload.fields([{name: "parts", maxCount:1}, {name: "image", maxCount:1}]), async (req, res) => {
+app.post("/admin/addpart", upload.fields([{ name: "parts", maxCount: 1 }, { name: "image", maxCount: 1 }]), async (req, res) => {
     try {
         let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
         for (let [key, value] of Object.entries(properties)) {
             properties[key] = req.session[key];
         }
-        if (!properties.logged_in || !properties.admin) { 
+        if (!properties.logged_in || !properties.admin) {
             res.redirect('/');
         }
         if (Object.keys(req.files).length === 0) res.render('admin/addpart', { ...properties, errors: [{ msg: "Please upload a file!" }] })
         else {
             console.log('1')
-            const {fileType} = req.body;
-            if(fileType != 'parts' && fileType != 'image') return res.sendStatus(400);
+            const { fileType } = req.body;
+            if (fileType != 'parts' && fileType != 'image') return res.sendStatus(400);
             const filePath = req.files[fileType][0].path;
             const fileExtension = path.extname(req.files[fileType][0].originalname).toLowerCase();
             console.log('2');
             if (fileType == 'parts' && fileExtension != '.xlsx') {
                 res.render('admin/addpart', { ...properties, errors: [{ msg: "Please upload an Excel file!" }] })
             }
-            if (fileType == 'image' && fileExtension != '.jpg'){
+            if (fileType == 'image' && fileExtension != '.jpg') {
                 res.render('admin/addpart', { ...properties, errors: [{ msg: "Please upload a jpg image!" }] })
             }
             else {
-                if(fileType == 'parts'){
+                if (fileType == 'parts') {
                     console.log('here');
                     let errs = await xlImport.upload_parts(filePath);
                     if (errs.length > 0) {
@@ -593,9 +628,9 @@ app.post("/admin/addpart", upload.fields([{name: "parts", maxCount:1}, {name: "i
                         res.render('admin/addpart', { ...properties, errors })
                     }
                     else {
-                        res.render('admin/addpart', {...properties, errors: [{msg: "Parts uploaded"}]})
+                        res.render('admin/addpart', { ...properties, errors: [{ msg: "Parts uploaded" }] })
                     }
-                } else if (fileType == 'image'){
+                } else if (fileType == 'image') {
                     const targetPath = path.join(__dirname, "./public/img/parts", req.files[fileType][0].originalname);
                     console.log(filePath, targetPath);
                     if (fileExtension === ".jpg") {
@@ -605,7 +640,7 @@ app.post("/admin/addpart", upload.fields([{name: "parts", maxCount:1}, {name: "i
                             }
                         });
                     }
-                    res.render('admin/addpart', {...properties, errors: [{msg: 'Image Added'}]})
+                    res.render('admin/addpart', { ...properties, errors: [{ msg: 'Image Added' }] })
                 }
             }
         }
@@ -798,26 +833,29 @@ app.delete("/cart", async (req, res) => {
 });
 
 app.post("/cart/place_order", async (req, res) => {
-    if(!req.session.logged_in) return res.redirect('/');
-    const {delivery, payment, po_number, comments} = req.body;
+    if (!req.session.logged_in) return res.redirect('/');
+    const { delivery, po_number, comments, updates } = req.body;
+    if (updates && updates.length) {
+
+    }
     debugLog(req.body);
-    if(delivery != 'Delivery' && delivery != 'Pickup') return res.send(400);
-    const validPayment = ['Credit', 'Cash', 'Cheque', 'LOC'];
-    if(validPayment.indexOf(payment) == -1) return res.send(400);
+    if (delivery != 'Delivery' && delivery != 'Pickup') return res.send(400);
+    // const validPayment = ['Credit', 'Cash', 'Cheque', 'LOC'];
+    // if(validPayment.indexOf(payment) == -1) return res.send(400);
     const currentDate = new Date();
     // convert current date to America/Toronto time
-    const localTime = currentDate.toLocaleString('en-CA', {timeZone: process.env.TIME_ZONE});
+    const localTime = currentDate.toLocaleString('en-CA', { timeZone: process.env.TIME_ZONE });
     let parts = '';
     let total = 0;
     let num_parts = 0;
-    for(let part of Object.values(req.session.cart)){
-        let subtotal = part.price*part.quantity/100;
-        let html = 
-        `
+    for (let part of Object.values(req.session.cart)) {
+        let subtotal = part.price * part.quantity / 100;
+        let html =
+            `
         <tr>
             <td>${part.oe_number}</td>
             <td>${part.quantity}</td>
-            <td>$${part.price/100}</td>
+            <td>$${part.price / 100}</td>
             <td>$${subtotal}</td>
         </tr>
         `
@@ -825,8 +863,8 @@ app.post("/cart/place_order", async (req, res) => {
         total += subtotal;
         num_parts += part.quantity;
     }
-    let emailHTML = 
-    `
+    let emailHTML =
+        `
     <p> <b> User contact information: </b> </p>
     <p> <b> First Name: </b> ${req.session.user_db.contact_first} </p>
     <p> <b> Last Name: </b> ${req.session.user_db.contact_last} </p>
@@ -855,22 +893,22 @@ app.post("/cart/place_order", async (req, res) => {
         ${parts}
     </table>
     <p style="text-align:right; margin-right:30px"> <b>Sub-Total</b> $${total} </p>
-    <p style="text-align:right; margin-right:30px"> <b>Total (13% HST)</b> $${Math.round(total/100*1.13)}.${total*1.13%100} </p>
+    <p style="text-align:right; margin-right:30px"> <b>Total (13% HST)</b> $${Math.round(total / 100 * 1.13)}.${total * 1.13 % 100} </p>
     <p style="text-align:right; margin-right:30px"> <b>Total Number of Parts</b> ${num_parts} </p>
     </div>
 
     <p><b>Delivery Option: </b> ${delivery}</p>
-    <p><b>Payment Method: </b> ${payment} </p>
     <p><b>PO Number: </b> ${po_number}</p>
     <p><b>Additional Comments: </b> ${comments}</p>
     `
-    transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: process.env.ORDER_DEST,
-        subject: "An order has been placed",
-        html: emailHTML
-    })
-    res.sendStatus(200);
+    // transporter.sendMail({
+    //     from: process.env.EMAIL_USER,
+    //     to: process.env.ORDER_DEST,
+    //     subject: "An order has been placed",
+    //     html: emailHTML
+    // })
+    // res.sendStatus(200);
+    res.render('message', { page_name: "Cart", message: 'Thank you for placing an order. An email will be sent to you to continue your order.' });
 })
 
 app.post("/debug", upload.single("part_img"), async (req, res) => {
@@ -878,14 +916,14 @@ app.post("/debug", upload.single("part_img"), async (req, res) => {
     debugLog(req.body);
 })
 
-app.post("/user/approve", async (req, res)=>{
-    const {id, status} = req.body;
-    if(!req.session.logged_in) return res.send(401);
-    if(!req.session.admin) return res.send(403);
-    if(!id || !status || (status != 1 && status !=-1)) return res.send(400);
-    try{
+app.post("/user/approve", async (req, res) => {
+    const { id, status } = req.body;
+    if (!req.session.logged_in) return res.send(401);
+    if (!req.session.admin) return res.send(403);
+    if (!id || !status || (status != 1 && status != -1)) return res.send(400);
+    try {
         let user = await db.approveUser(id, status);
-        if(user.length > 0){
+        if (user.length > 0) {
             transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: user[0].email,
@@ -894,7 +932,7 @@ app.post("/user/approve", async (req, res)=>{
             })
         }
         res.sendStatus(200);
-    } catch(err){
+    } catch (err) {
         console.log(err);
         res.send(500);
     }

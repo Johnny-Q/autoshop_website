@@ -10,12 +10,13 @@ class PartsManager {
     toast;
     toast_hide_func;
     img_modal;
+    admin;
     constructor(table, feedback_div, toast, img_modal) {
         this.table = table;
         this.feedback_div = feedback_div;
         this.toast = toast;
         this.img_modal = img_modal;
-        this.img_modal.onclick = ()=>{
+        this.img_modal.onclick = () => {
             this.img_modal.style.display = "none";
         }
     }
@@ -79,8 +80,8 @@ class PartsManager {
                 "body": JSON.stringify(data)
             });
             let json = await resp.json();
-
-            return this.jsonToArr(json);
+            this.admin = json.admin;
+            return json.parts;
         } catch (err) {
             throw err;
         }
@@ -100,8 +101,8 @@ class PartsManager {
                 })
             });
             let json = await resp.json();
-
-            return this.jsonToArr(json);
+            this.admin = json.admin;
+            return json.parts;
         } catch (err) {
             throw err;
         }
@@ -157,6 +158,8 @@ class PartsManager {
         // div.append(img, type)
         // type_td.append(div);
 
+        // add edit part button
+
         //add image
         let image_td = row.insertCell();
         image_td.classList.add("img");
@@ -172,11 +175,11 @@ class PartsManager {
 
         //spawn the onclick
 
-        img.addEventListener("mouseenter", ()=>{
+        img.addEventListener("mouseenter", () => {
             bigger_img.style.display = "block";
         });
 
-        img.addEventListener("mouseleave", ()=>{
+        img.addEventListener("mouseleave", () => {
             bigger_img.style.display = "none";
         });
 
@@ -314,14 +317,14 @@ class PartsManager {
                             "content-type": "application/json"
                         },
                         "body": JSON.stringify({ "part": part })
-                    }).then(resp=>{
-                        if(resp.status == 200){
-                            if(this.toast_hide_func){
+                    }).then(resp => {
+                        if (resp.status == 200) {
+                            if (this.toast_hide_func) {
                                 clearTimeout(this.toast_hide_func);
                                 this.toast.classList.remove("show");
                             }
                             this.toast.classList.add("show");
-                            this.toast_hide_func = setTimeout(()=>{
+                            this.toast_hide_func = setTimeout(() => {
                                 this.toast.classList.remove("show");
                                 this.toast_hide_func = null;
                             }, 1000);
@@ -333,7 +336,19 @@ class PartsManager {
             button_td.append(quantity, add_to_cart);//, view);
         }
 
-        //onclick spawn the modal
+        if (this.admin) {
+            let edit_button_td = row.insertCell();
+            let edit_button = document.createElement("button");
+            edit_button.innerText = "Edit";
+            edit_button.onclick = ()=>{
+                window.open(`/admin/editpart?part_id=${part.id}`);
+            };
+
+            edit_button_td.append(edit_button);
+
+
+        }
+
     }
     // getSearchData() {
     //     let data = {};

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <%- include('partials/header.ejs', {
+            stylesheets: ['about', 'slideshow'], 
+            scripts: [{name: 'about', defer: true}, {name: 'slideshow', defer: true}], 
+            page_name: "About Us"}) %>
+
+<body>
+    <%- include('partials/navbar.ejs', {logged_in}) %> 
+
+    <main>
+        <div class="section_title">
+            <h1>Why Us?</h1>
+        </div>
+        <div class="about">
+            <div class="content fade">
+                <div class="text1">
+                    <h2>High-Quality OE-Spec Auto Parts</h2>
+                    <p>
+                        ACEWAY Canada Inc. is a Toronto-based Canadian company that is committed to warehouse
+                        distribution of FREY-branded high-quality OE-spec aftermarket auto parts for European makes.
+                        Especially for Mercedes-Benz, BMW, Audi and Volkswagen, across Canada.
+                    </p>
+                </div>
+                <img src="/img/aceway_stripped_logo_corrected.png" alt="">
+                <div class="color">
+                    <img src="/img/certificate_25.png" alt="">
+                </div>
+                <div class="text2">
+                    <h2>Sole Agent in Canada</h2>
+                    <p>
+                        As the sole agent of the brand FREY, ACEWAY will make a great contribution to the existing auto
+                        parts market in Canada where more cost-competitive high-quality products with more
+                        comprehensive categories for popular European models are badly needed, and here comes the
+                        brand FREY!
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="section_title">
+            <h1>What We Offer</h1>
+        </div>
+        <div class="cards">
+            <div class="left_arrow">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="4.29656" y1="18.5957" x2="25.6666" y2="39.651" stroke="black" stroke-width="10" />
+                    <line x1="4.34898" y1="25.6666" x2="25.4042" y2="4.29659" stroke="black" stroke-width="10" />
+                </svg>
+            </div>
+            <div class="images">
+                <div class="img active" data-src="/img/catalog1_30.png"></div>
+                <div class="img right" data-src="/img/catalog2_30.png"></div>
+                <div class="img" data-src="/img/catalog3_30.png"></div>
+                <div class="img" data-src="/img/catalog4_30.png"></div>
+                <div class="img" data-src="/img/catalog5_30.png"></div>
+                <div class="img" data-src="/img/catalog6_30.png"></div>
+                <div class="indicators">
+                    <div class="line active"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+            </div>
+            <div class="right_arrow">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="39.6776" y1="25.5355" x2="18.4644" y2="4.32233" stroke="black" stroke-width="10" />
+                    <line x1="39.6776" y1="18.4645" x2="18.4644" y2="39.6777" stroke="black" stroke-width="10" />
+                </svg>
+            </div>
+            <div class="gallery">
+                <a href="#" onclick="activate(1); return false;" >
+                    <div class="img" data-src="/img/catalog1_30.png"></div>
+                </a>
+                <a href="#" onclick="activate(2); return false;" >
+                    <div class="img" data-src="/img/catalog2_30.png"></div>
+                </a>
+                <a href="#" onclick="activate(3); return false;" >
+                    <div class="img" data-src="/img/catalog3_30.png"></div>
+                </a>
+                <a href="#" onclick="activate(4); return false;" >
+                    <div class="img" data-src="/img/catalog4_30.png"></div>
+                </a>
+                <a href="#" onclick="activate(5); return false;" >
+                    <div class="img" data-src="/img/catalog5_30.png"></div>
+                </a>
+                <a href="#" onclick="activate(6); return false;" >
+                    <div class="img" data-src="/img/catalog6_30.png"></div>
+                </a>
+            </div>
+        </div>
+    </main>
+    <%- include("partials/footer.ejs") %> 
+</body>
+</html>

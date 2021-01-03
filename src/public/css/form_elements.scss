@@ -12,7 +12,7 @@
         font-size: 18px;
         padding: 0;
     }
-    
+
 
     label {
         position: absolute;
@@ -38,6 +38,7 @@
         color: black;
     }
 }
+
 textarea {
     width: 100%;
     background-color: transparent;
@@ -56,7 +57,7 @@ div.rounded_input {
     border-radius: 5px;
     // height: 35px;
     padding: 0 5px;
-    
+
     input {
         width: 100%;
         height: 35px;
@@ -69,7 +70,7 @@ div.rounded_input {
         // padding: 0 5px;
         // border-radius: 5px;
         -webkit-box-shadow: 0 0 0 50px #CCCCCC inset;
-        
+
     }
 
     label {
@@ -90,14 +91,29 @@ div.rounded_input {
             transition: all 0.2s ease;
         }
     }
-    input:not(:placeholder-shown)+label span{
+
+    input:not(:placeholder-shown)+label span {
         opacity: 1;
         transform: translate(0, 100%);
         // font-size: 12px;
         color: black;
     }
-    input:not(:placeholder-shown){
+
+    input:not(:placeholder-shown) {
         margin-top: 10px;
         margin-bottom: 0;
+    }
+}
+
+.labelled_input {
+    input {
+        width: 100%;
+        height: 50px;
+        outline: none;
+        border: none;
+        border-bottom: 1px solid rgb(94, 94, 94);
+        background-color: transparent;
+        font-size: 18px;
+        padding: 0;
     }
 }

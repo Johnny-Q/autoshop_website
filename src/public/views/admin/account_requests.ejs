@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("../partials/header.ejs", {stylesheets: ["account_card", "account_requests"], scripts: [{name: "account_requests" , defer: true}], page_name: "Approve Users" } ) %>
+
+<body>
+    <%- include('../partials/navbar.ejs', {logged_in}) %>
+    <div class="toast"></div>
+    <main>
+        <h1>Pending Acccounts</h1>
+        <div class="accounts_container">
+            <!-- <div class="card">
+                <div class="card_header">
+                    <h2>Johnny Qu</h2>
+                    <div>
+                        <svg width="33" height="25" viewBox="0 0 33 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="1.06066" y1="13.9393" x2="8.56066" y2="21.4393" stroke="#00A825" stroke-width="3" />
+                            <line x1="31.0607" y1="1.06066" x2="8.56066" y2="23.5607" stroke="#00A825" stroke-width="3" />
+                        </svg>
+                        <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="1.46623" y1="19.0904" x2="19.0185" y2="1.2882" stroke="#A50000" stroke-width="3" />
+                            <line x1="1.34122" y1="1.41331" x2="19.1434" y2="18.9655" stroke="#A50000" stroke-width="3" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+                <div class="group">
+                    <small>Company Name</small>
+                    <p>Walmart</p>
+                </div>
+            </div> -->
+            
+        </div>
+    </main>
+    <%- include('../partials/footer.ejs') %>
+</body>
+
+</html>

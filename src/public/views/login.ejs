@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <%- include('partials/header.ejs', { stylesheets: ['login', "form_elements" ], scripts: [{name: 'login' , defer:
+        false}], page_name: "Login" }) %>
+
+<body>
+    <%- include('partials/navbar.ejs', {"logged_in": logged_in})%>
+        <main>
+            <div class="form_background">
+                <h1>Login</h1>
+                <% if(typeof errors!='undefined' ) { %>
+                    <% errors.forEach(function(error){ %>
+                        <p class='error_message'>
+                            <%= error.msg %>
+                        </p>
+                    <% }) %>
+                <% } %>
+
+                <form onsubmit="form_submit()" action="/login" id="regform" method="POST">
+                    <div class="input">
+                        <input type="text" name="user" placeholder=" "
+                            value="<%= typeof user != 'undefined' ? user : ''%>">
+                        <label for=user><span>E-Mail</span></label>
+                    </div>
+                    <div class="input">
+                        <input type="password" name="pass" placeholder=" ">
+                        <label for="pass"><span>Password</span></label>
+                    </div>
+                    <button type="submit"> Login </button>
+                </form>
+                <div class="login_options">
+                    <a href="/reset_password">Forgot Password?</a>
+                </div>
+                <p>Don't have an account?</p> 
+                <a href="/register"> Register now</a>
+            </div>
+        </main>
+        <%- include("partials/footer.ejs") %> 
+</body>
+
+</html>

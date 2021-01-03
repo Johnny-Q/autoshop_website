@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/header', { stylesheets: ['searchBox', 'slideshow' , 'search' ], scripts: [ {name: "searchBox" ,
+    defer: false}, {name: "PartsManager" , defer: false}, {name: "search" , defer: true} ], page_name: "Search Parts" })
+    %>
+
+    <body>
+        <%- include("partials/navbar", {logged_in}) %>
+        <div class="toast">Added part to cart</div>
+        <div class="image_modal">
+            <img src="" alt="">
+        </div>
+        <main>
+            <div class="search_wrapper">
+                <div class="grid">
+                    <div class="custom_select">
+                        <select name="" id="" class="search_select">
+                        </select>
+                        <input type="hidden" name="">
+                    </div>
+                    <div class="custom_select">
+                        <select name="" id="" class="search_select">
+                        </select>
+                        <input type="hidden" name="">
+                    </div>
+                    <div class="custom_select">
+                        <select name="" id="" class="search_select">
+                        </select>
+                        <input type="hidden" name="">
+                    </div>
+                    <div class="custom_select">
+                        <select name="" id="" class="search_select">
+                        </select>
+                        <input type="hidden" name="">
+                    </div>
+                    <div class="options_container">
+                    </div>
+                </div>
+
+                <form class="oe_form" action="">
+                    <div class="smaller_search_bar">
+                        <input type="text" placeholder="Search by OE, Frey, or Competitor's number" id="search_oe">
+                        <button class="search_button" id="oe_search_btn">
+                            <svg width="15" height="15" viewBox="0 0 35 35" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
+                                <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white"
+                                    stroke-width="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="feedback">
+                <img src="img/loader.gif" alt="" id="loader" style="display: none;">
+                <h1 id="message">
+                    Search Products
+                </h1>
+            </div>
+            <table class="parts_table">
+                <thead>
+                    <tr>
+                        <th class="image_col"></th>
+                        <th class="type_col">Type</th>
+                        <th class="make_col">Make</th>
+                        <th class="oe_col">OE Number</th>
+                        <th class="app_col">Application</th>
+                        <% if(logged_in){ %>
+                            <th class="price_col">Price</th>
+                            <th class="add_col"></th>
+                            <% } %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr class="part">
+                        <td></td>
+                        <td class="type">
+                            <div><img src="../img/parts/bmw-11120035738.jpg">
+                                <h3>Valve Cover Gasket, new type</h3>
+                            </div>
+                        </td>
+                        <td>BMW</td>
+                        <td>11120035738</td>
+                        <td><button>View</button></td>
+                        <td><button>Add</button></td>
+                    </tr> -->
+                </tbody>
+            </table>
+            <!-- <div class="page_select">
+        <div>1</div>
+    </div> -->
+        </main>
+        <%- include("partials/footer.ejs") %>
+    </body>
+
+</html>

@@ -68,6 +68,7 @@ search_bar.selects[1].getOptions = async (filter): Promise<string[]> => {
         json.forEach((object: any) => {
             data.push(object.year);
         });
+        data = data.reverse();
         return data;
     } catch (err) {
         return [];

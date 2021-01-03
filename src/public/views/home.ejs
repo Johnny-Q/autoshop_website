@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <%- include('partials/header.ejs', {
+        stylesheets: ['searchBox', 'index'], 
+        scripts: [{name: 'searchBox', defer: true}, {name: 'index', defer: true}], 
+        page_name: "Aceway Auto Parts"}) %>
+
+<body>
+    <%- include('partials/navbar.ejs', {logged_in}) %> 
+
+    <main>
+        <div class="hero">
+            <div class="text">
+                <h1>ACEWAY Canada Inc</h1>
+                <h3>High-Quality OE-Spec Auto Parts For Warehouse Distributors</h3>
+            </div>
+            <!--Photo by Daen van Beers on Unsplash-->
+            <!-- <div class="logo"></div> -->
+            <div class="search_wrapper">
+                <h1>Search Our Products</h1>
+                <div class="grid">
+                    <div class="custom_select">
+                        <select name="" id="" class="search_select">
+                        </select>
+                        <input type="hidden" name="">
+                    </div>
+                    <div class="custom_select">
+                        <select name="" id="" class="search_select">
+                        </select>
+                        <input type="hidden" name="">
+                    </div>
+                    <div class="custom_select">
+                        <select name="" id="" class="search_select">
+                        </select>
+                        <input type="hidden" name="">
+                    </div>
+                    <div class="custom_select">
+                        <select name="" id="" class="search_select">
+                        </select>
+                        <input type="hidden" name="">
+                    </div>
+                    <div class="options_container">
+                    </div>
+                </div>
+                
+                <form class="oe_form" action="">
+                    <div class="smaller_search_bar">
+                        <input type="text" placeholder="Search by OE, Frey, or Competitor's number" id="search_oe">
+                        <button class="search_button" id="oe_search_btn">
+                            <svg width="15" height="15" viewBox="0 0 35 35" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="14" cy="14" r="12.5" stroke="white" stroke-width="3" />
+                                <line x1="22.0607" y1="21.9393" x2="34.0607" y2="33.9393" stroke="white"
+                                    stroke-width="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <%- include('partials/footer.ejs') %>
+</body>
+
+</html>

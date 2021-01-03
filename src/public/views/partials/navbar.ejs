@@ -1,0 +1,21 @@
+<nav>
+    <div class="content">
+        <div class="left">
+            <!-- <h1>Aceway Canada Inc.</h1> -->
+            <a href='/'><img src="/img/aceway_stripped_logo_corrected.png" alt="" height="50px"></a>
+            <a href="/">Home</a>
+            <a href="/contact">Contact</a>
+            <a href="/about">About Us</a>
+            <a href="/search">Search Products</a>
+        </div>
+        <div>
+            <% if (typeof logged_in != undefined && logged_in){ %>
+                <a href="/cart"> View Cart </a>
+                <a href="/dashboard"> Dashboard </a>
+                <a href="#" onclick="logout(); return false;"> Log Out </a>
+            <% } else{ %>
+                <a href="/login">Login</a> | <a href="/register">Register</a>
+            <% } %>
+        </div>
+    </div>
+</nav>

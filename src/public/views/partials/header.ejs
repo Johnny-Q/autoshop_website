@@ -1,0 +1,20 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Domine&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/nav.css">
+
+    <% stylesheets.forEach(sheet=>{ %>
+    <link rel="stylesheet" href="/css/<%=sheet%>.css">
+    <% }); %>
+
+    <% scripts.forEach(script => { %>
+        <script src="/js/<%=script.name%>.js" <%= script.defer?"defer":"";%>></script>
+    <% }) %>
+
+    <script src="/js/navbar.js"></script>
+
+    <title><%= page_name %></title>
+</head>

@@ -2,6 +2,7 @@ nav {
     // position:sticky;
     // left: 50%;
     // transform: translate(-50%, 0);
+    overflow: hidden;
 
     background-color: #333333;
     display: flex;
@@ -31,7 +32,13 @@ nav {
             align-items: center;
             color: #FFFFFF;
 
+            a.img{
+                margin: 0;
+                padding: 0;
+            }
             a img {
+                padding: 0;
+                margin: 0;
                 margin-right: 20px;
             }
 

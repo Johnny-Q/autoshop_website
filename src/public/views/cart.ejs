@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('partials/header.ejs', { stylesheets: ['cart', 'form_elements'], scripts: [{"name": "cart", "defer": true}], page_name: "Cart" }) %>
+
+    <body>
+        <%- include('partials/navbar.ejs', {logged_in}) %>
+            <main>
+                <% if(cart.length){ %> 
+                <h1 class="cart_text">Your Cart</h1>
+                <a href="/search" class="back_to_search">Search Products</a>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="image_col"></th>
+                            <th>Part</th>
+                            <th>Make</th>
+                            <th>OE Number</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                            <th class="total_col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% let subtotal = 0; cart.forEach(part=>{ %> 
+                        <% let price_string = `${parseInt(part.price / 100).toString()}.${part.price%100 < 10 ? `0${part.price%100}`: part.price%100}`%> 
+                        <tr class="part">
+                            <td><img src="../img/parts/<%= part.image_url %> "></td>
+                            <td>
+                                <%= part.description %> 
+                            </td>
+                            <td><%= part.make.toUpperCase() %> </td>
+                            <td><%= part.oe_number %> </td>
+                            <td class="unit_price"><%= `$${price_string}`;%> </td>
+                            <td><input type="number" name="<%=part.id%>" id="" min="0" value="<%= part.quantity %>"></td>
+                            <td class="total">$<% let total_price = (part.price * part.quantity) %> <%= `${parseInt(total_price / 100)}.${total_price%100 < 10 ? `0${total_price%100}`: total_price%100}` %> </td> 
+                            <% subtotal += part.price * part.quantity %>
+                        </tr>
+                        <% }) %> 
+                    </tbody>
+                </table>
+                <div class="buttons">
+                    <h4 class="subtotal">Subtotal: $<%= `${parseInt(subtotal / 100)}.${subtotal%100 < 10 ? `0${subtotal%100}`: subtotal%100}`%> CAD</h4>
+                </div>
+                <form action="/place_order" METHOD="POST">
+                    <div class="order_options">
+                        <h3>Delivery:</h3>
+                        <div>
+                            <input type="radio" name="delivery" id="Delivery" value="Delivery" checked>
+                            <label for="Delivery">Delivery</label>
+                        </div>
+                        <div>
+                            <input type="radio" name= "delivery" id="Pickup" value="Pickup">
+                            <label for="Pickup">Pickup</label>
+                        </div>
+                    </div>
+                    <div class="order_options">
+                        <h3>PO Number:</h3>
+                        <div>
+                            <input type="text" id="po_number">
+                        </div>
+                    </div>
+                    <textarea name="" id="" cols="30" rows="10" placeholder="Order Comments"></textarea>
+                    <div class="buttons">
+                        <!-- <button id="save_cart">Save Changes</button> -->
+                        <button id="place_order">Place Order</button>
+                    </div>
+                </form>
+                <% } else{ %> 
+                    <h1 class="cart_text">Cart is empty</h1>
+                    <a class="back_to_search" href="/search">Continue searching for products</a>
+                <% } %> 
+            </main>
+            <%- include("partials/footer.ejs") %>
+    </body>
+
+</html>

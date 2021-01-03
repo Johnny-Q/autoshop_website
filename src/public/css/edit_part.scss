@@ -1,0 +1,50 @@
+div.container {
+    width: 100%;
+    max-width: 1300px;
+    padding: 10px;
+}
+
+fieldset {
+    padding: 20px;
+}
+
+button {
+    padding: 8px 16px;
+}
+
+fieldset#part_info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    input[type="file"] {
+        margin-top: 20px;
+        border: none;
+    }
+}
+
+fieldset#applications {
+
+    table {
+        width: 100%;
+        text-align: center;
+        border-collapse: collapse;
+
+        tbody {
+            input {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    }
+
+
+    div.add_application_wrapper {
+        width: 100%;
+        display: flex;
+        flex-flow: row;
+        justify-content: center;
+        button{
+            margin-top: 10px;;
+        }
+    }
+}

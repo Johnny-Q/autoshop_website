@@ -38,29 +38,8 @@ function removePast2Decimals(price: number): string{
     price_string[1] = price_string[1].substring(0, 2);
 
     return price_string.join(".");
-
 }
 
-
-save_button.onclick = () => {
-    let updates = [];
-    //get the update from the number inputs
-    let inputs = document.querySelectorAll("input[type=number]");
-    inputs.forEach(input => {
-        updates.push({ "id": input.name, "quantity": input.value });
-    });
-    fetch("/cart", {
-        "method": "post",
-        "headers": {
-            "content-type": "application/json"
-        },
-        "body": JSON.stringify({ updates })
-    }).then(resp => {
-        if (resp.status == 200) {
-            window.location.reload();
-        }
-    });
-};
 order_button.onclick = () => {
     //save their changes first
     let updates = [];
@@ -91,7 +70,11 @@ order_button.onclick = () => {
                 "content-type": "application/json"
             },
             "body": JSON.stringify(data)
-        });
+        }).then(res=>{
+            res.text().then((html)=>{
+                document.documentElement.innerHTML = html;
+            })
+        })
     });
 };
 //# sourceMappingURL=cart.js.map

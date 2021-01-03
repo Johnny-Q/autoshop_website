@@ -105,6 +105,17 @@ async function getPartByOEorFrey(id_number: string, logged_in = false): Promise<
     }
 }
 
+async function getPartById(id:string){
+    try{
+        let part = await db("Parts").leftJoin('Makes', "Makes.id", "Parts.make_id")
+        .leftJoin('Interchange', "Parts.id", "Interchange.part_id")
+        .where('Parts.id', id);
+        
+        if(part.length > 0) return part[0]
+        else return null;
+    }
+}
+
 /**
  * @desc obtains an array of distinct make names from database
  * @return {Promise<Array<string>>} a Promise of a string array
@@ -243,9 +254,21 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>, 
         let part = part_raw as any;
         delete part.make; part.make_id = make_id;
         delete part.brand; part.brand_id = brand_id;
+        // if part already exists, query the part_id
+        let part_id = await db("Parts").select('id').where("oe_number", part.oe_number)
+        if(part_id.length > 0){
+            part_id = part_id[0].id
+        }else{
+            // part does not exist
+            part_id = null;
+        }
         // delete part if already exists
         await db("Parts").where("oe_number", part.oe_number).del()
-        let part_id = (await db('Parts').insert(part));
+        if(part_id){
+            await db('Parts').insert({...part, id: part_id});
+        } else {
+            part_id = await db("Parts").insert(part);
+        }
         for (let i = 0; i < applications.length; i++) {
             let app_raw = applications[i];
             let model_id = await db('Models').select('id').where('model', app_raw.model.toLowerCase()).andWhere('make_id', part.make_id);
@@ -406,6 +429,7 @@ async function getUnapprovedUsers() {
 module.exports = {
     DBtoCSV,
     getPartByOEorFrey,
+    getPartById,
     getPartsEngine,
     getModels,
     getYears,

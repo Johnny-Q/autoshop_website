@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang=en>
+<%- include('partials/header.ejs', {stylesheets: ['dashboard'], scripts: [], page_name: "Dashboard" }) %>
+
+    <body>
+        <%- include('partials/navbar.ejs', {logged_in}) %>
+
+            <main>
+                <div class="section_title">
+                    <h1> Hi, <%= user %>! </h1>
+                </div>
+
+                <div class="link_container">
+                    <a href='/change_password'>Change Password</a>
+
+                    <% if(admin) { %>
+                        <a href="/admin/adduser">Add a new user</a>
+                        <a href="/admin/account_requests">View registrations</a>
+                        <a href="/admin/addpart">Upload new part information</a>
+                    <% } %>
+                </div>
+            </main>
+
+
+            <%- include('partials/footer.ejs') %>
+    </body>
+
+</html>

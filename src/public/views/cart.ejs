@@ -42,30 +42,28 @@
                 <div class="buttons">
                     <h4 class="subtotal">Subtotal: $<%= `${parseInt(subtotal / 100)}.${subtotal%100 < 10 ? `0${subtotal%100}`: subtotal%100}`%> CAD</h4>
                 </div>
-                <form action="/place_order" METHOD="POST">
-                    <div class="order_options">
-                        <h3>Delivery:</h3>
-                        <div>
-                            <input type="radio" name="delivery" id="Delivery" value="Delivery" checked>
-                            <label for="Delivery">Delivery</label>
-                        </div>
-                        <div>
-                            <input type="radio" name= "delivery" id="Pickup" value="Pickup">
-                            <label for="Pickup">Pickup</label>
-                        </div>
+                <div class="order_options">
+                    <h3>Delivery:</h3>
+                    <div>
+                        <input type="radio" name="delivery" id="Delivery" value="Delivery" checked>
+                        <label for="Delivery">Delivery</label>
                     </div>
-                    <div class="order_options">
-                        <h3>PO Number:</h3>
-                        <div>
-                            <input type="text" id="po_number">
-                        </div>
+                    <div>
+                        <input type="radio" name= "delivery" id="Pickup" value="Pickup">
+                        <label for="Pickup">Pickup</label>
                     </div>
-                    <textarea name="" id="" cols="30" rows="10" placeholder="Order Comments"></textarea>
-                    <div class="buttons">
-                        <!-- <button id="save_cart">Save Changes</button> -->
-                        <button id="place_order">Place Order</button>
+                </div>
+                <div class="order_options">
+                    <h3>PO Number:</h3>
+                    <div>
+                        <input type="text" id="po_number">
                     </div>
-                </form>
+                </div>
+                <textarea name="" id="" cols="30" rows="10" placeholder="Order Comments"></textarea>
+                <div class="buttons">
+                    <!-- <button id="save_cart">Save Changes</button> -->
+                    <button id="place_order">Place Order</button>
+                </div>
                 <% } else{ %> 
                     <h1 class="cart_text">Cart is empty</h1>
                     <a class="back_to_search" href="/search">Continue searching for products</a>

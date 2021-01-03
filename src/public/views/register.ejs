@@ -14,7 +14,7 @@
                 <form onsubmit="form_submit()" action="/register" id="regform" method="POST">
                     <p> Company Info </p>
                     <div class="rounded_input">
-                        <input type="text" name="company" placeholder="Company Name"
+                        <input type="text" name="company" placeholder="Company Name" required
                         value="<%= typeof company != 'undefined' ? company : ''%>">
                         <label for=company><span>Name</span></label>
                     </div>

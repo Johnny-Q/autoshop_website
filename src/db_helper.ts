@@ -6,6 +6,7 @@ const db = require('knex')({
     },
     useNullAsDefault: true // so we can avoid sqlite specific bugs
 });
+db.raw('PRAGMA foreign_keys = ON');
 const nodemailer = require('nodemailer');
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -113,6 +114,8 @@ async function getPartById(id:string){
         
         if(part.length > 0) return part[0]
         else return null;
+    }catch(err){
+        console.log(err);
     }
 }
 
@@ -254,6 +257,7 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>, 
         let part = part_raw as any;
         delete part.make; part.make_id = make_id;
         delete part.brand; part.brand_id = brand_id;
+        if(part.image_url === null) delete part.image_url;
         // if part already exists, query the part_id
         let part_id = await db("Parts").select('id').where("oe_number", part.oe_number)
         if(part_id.length > 0){
@@ -265,6 +269,8 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>, 
         // delete part if already exists
         await db("Parts").where("oe_number", part.oe_number).del()
         if(part_id){
+            // for some reason knex does not like foreign keys?
+            await db('YearModel').where('parts_id', part_id).del();
             await db('Parts').insert({...part, id: part_id});
         } else {
             part_id = await db("Parts").insert(part);
@@ -292,7 +298,6 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>, 
             });
         }
         interchange.forEach( async int => {
-            console.log('here', int);
             await db('Interchange').insert({int_number: int, "part_id": part_id});
         })
         return part_id;

@@ -94,6 +94,8 @@ adminPages.forEach(page => {
     });
 })
 
+
+
 app.get('/admin/editpart', async (req, res) => {
     let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
     for (let [key, value] of Object.entries(properties)) {
@@ -602,12 +604,10 @@ app.post("/admin/addpart", upload.fields([{ name: "parts", maxCount: 1 }, { name
         }
         if (Object.keys(req.files).length === 0) res.render('admin/addpart', { ...properties, errors: [{ msg: "Please upload a file!" }] })
         else {
-            console.log('1')
             const { fileType } = req.body;
             if (fileType != 'parts' && fileType != 'image') return res.sendStatus(400);
             const filePath = req.files[fileType][0].path;
             const fileExtension = path.extname(req.files[fileType][0].originalname).toLowerCase();
-            console.log('2');
             if (fileType == 'parts' && fileExtension != '.xlsx') {
                 res.render('admin/addpart', { ...properties, errors: [{ msg: "Please upload an Excel file!" }] })
             }
@@ -651,31 +651,35 @@ app.post("/admin/addpart", upload.fields([{ name: "parts", maxCount: 1 }, { name
     }
 })
 
-app.post("/add_part", upload.single("part_img"), async (req, res) => {
+app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
     // construct part db entry
     let part: PartDBEntry = null, applications: Array<Application> = null;
     try {
         let { make, oe_number, frey_number, price, description, enabled, in_stock, brand } = req.body;
         if (!brand) brand = null;
+        make = make || make.toLowerCase();
+        if(price) price = parseFloat(price) * 100;
         part = {
             make, oe_number, frey_number, price, brand,
-            'image_url': null,
+            'image_url': make+'-'+oe_number+'.png',
             'description': description ? description : null,
             'enabled': enabled ? enabled : 1,
             'in_stock': in_stock ? in_stock : 1
         };
-        const tempPath = req.file.path;
-        const fileExtension = path.extname(req.file.originalname).toLowerCase();
-        let image_url = "/img/parts" + part.make + part.oe_number + fileExtension
-        // debugLog(image_url);
-        const targetPath = path.join(__dirname, "./public", image_url);
-        if (fileExtension === ".png") {
-            fs.rename(tempPath, targetPath, err => {
-                if (err) {
-                    return debugLog([err, res]);
-                }
-            });
-            part.image_url = image_url;
+        if(req.file){
+            const tempPath = req.file.path;
+            const fileExtension = path.extname(req.file.originalname).toLowerCase();
+            let image_url = part.make + '-' + part.oe_number + fileExtension
+            // debugLog(image_url);
+            const targetPath = path.join(__dirname, "./public/img/parts", image_url);
+            if (fileExtension === ".png") {
+                fs.rename(tempPath, targetPath, err => {
+                    if (err) {
+                        return debugLog([err, res]);
+                    }
+                });
+                part.image_url = image_url;
+            }
         }
         // construct applications array
         applications = [];
@@ -696,7 +700,6 @@ app.post("/add_part", upload.single("part_img"), async (req, res) => {
                 'engines': []
             });
         }
-        // debugLog([part, applications]);
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
@@ -704,7 +707,7 @@ app.post("/add_part", upload.single("part_img"), async (req, res) => {
 
     try {
         let part_id = await db.addPart(part, applications);
-        res.json(part_id);
+        res.redirect('/admin/editpart?part_id=' + part_id);
     }
     catch (err) {
         console.log(err);

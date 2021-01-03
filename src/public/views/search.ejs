@@ -70,7 +70,10 @@
                         <% if(logged_in){ %>
                             <th class="price_col">Price</th>
                             <th class="add_col"></th>
-                            <% } %>
+                        <% } %>
+                        <%if(admin){%>
+                            <th class="edit_col"></th>
+                        <%}%>
                     </tr>
                 </thead>
                 <tbody>

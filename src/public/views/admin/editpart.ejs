@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <%- include('../partials/header.ejs', {
+            stylesheets: ["form_elements",'edit_part'], 
+            scripts: [{name: 'editpart', defer: true}], 
+            page_name: "Edit Part"}) %>
+
+<body>
+    <%- include('../partials/navbar.ejs', {logged_in}) %> 
+<main>
+    <div class="container">
+        <form action='/admin/editpart' method="POST" enctype="multipart/form-data" id="add_part">
+            <fieldset id="part_info">
+                <div class="labelled_input">
+                    <h2>Current Image</h2>
+                    <img src="<%="/img/parts/" + part.image_url %>" alt="No Image">
+                </div> 
+                <legend>Part Information</legend>
+                <div class="labelled_input">
+                    <label for="part_img">Change Image</label>
+                    <input type="file" name="part_img">
+                </div>
+                <div class="labelled_input">
+                    <label for="oe_number">OE Number</label>
+                    <input type="text" name="oe_number" placeholder="OE Number" required
+                        value="<%=part.oe_number%>">
+                </div>
+                <div class="labelled_input">
+                    <label for="frey_number">Frey Number</label>
+                    <input type="text" name="frey_number" placeholder="Frey Number" required
+                        value="<%=part.frey_number%>">
+                </div>
+                <div class="labelled_input">
+                    <label for="make"> Make </label>
+                    <input type="text" name="make" placeholder="Make" required
+                        value="<%=part.make%>">
+                </div>
+                <div class="labelled_input">
+                    <label for="price">Price</label>
+                    <input type="text" name="price" placeholder="Price" required
+                        value="<%=part.price/100%>">
+                </div>
+                <div class="labelled_input">
+                    <label for="description">Part Description</label>
+                    <input type="text" name="description" placeholder="Description" required
+                        value="<%=part.description%>">
+                </div>
+            </fieldset>
+            <fieldset id="applications">
+                <legend>Applications</legend>
+                <table>
+                    <thead>
+                        <th>Model</th>
+                        <th>Start Year</th>
+                        <th>End Year</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        <% apps.forEach(app => { %>
+                            <tr>
+                                <td class="labelled_input">
+                                    <input type="text" name="model" placeholder="Model" required
+                                        value="<%= app.model %>">
+                                </td>
+                                <td class="labelled_input">
+                                    <input type="text" name="begin_year" placeholder="Start Year" required
+                                        value="<%= app.begin_year %>">
+                                </td>
+                                <td class="labelled_input">
+                                    <input type="text" name="end_year" placeholder="End Year" required
+                                    value="<%= app.end_year %>">
+                                </td>
+                                <td>
+                                    <button onclick="this.parentElement.parentElement.remove()">Delete Application</button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+                <div class="add_application_wrapper">
+                    <button id="add_application">Add Application</button>
+                </div>
+            </fieldset>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</main>
+
+</body>

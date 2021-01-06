@@ -3,9 +3,6 @@
 <%- include('partials/header.ejs', {stylesheets: [], scripts: [], page_name: page_name}) %>
 
 <body>
-    <% let logged = false; if(typeof logged_in != 'undefined'){logged=logged_in} %>
-    <%- include('partials/navbar.ejs', {logged_in: logged}) %> 
-
     <main>
         <div class="section_title">
             <h1> <%= message %> </h1>

@@ -262,7 +262,7 @@ class PartsManager {
 
                 data.forEach(app => {
                     let row = popup_tbody.insertRow();
-                    row.insertCell().innerText = app.model;
+                    row.insertCell().innerText = app.model.toUpperCase();
                     row.insertCell().innerText = `${app.begin_year} - ${app.end_year}`;
                 });
 

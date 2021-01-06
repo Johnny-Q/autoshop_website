@@ -6,7 +6,7 @@ let parts_manager = new PartsManager(table, feedback_div, toast, image_modal);
 
 //search box
 //@ts-expect-error
-let search_bar = new SearchBar(Array.from(document.querySelectorAll(".custom_select")), ["Select Make", "Select Year", "Select Model", "Select Engine Size"], ["make", "year", "model", "engine"], parts_manager);
+let search_bar = new SearchBar(Array.from(document.querySelectorAll(".euro_custom_select")), ["Select Make", "Select Year", "Select Model", "Select Engine Size"], ["make", "year", "model", "engine"], document.querySelector(".part_options"), parts_manager);
 search_bar.selects[0].getOptions = async (filter): Promise<string[]> => {
     try {
         let resp = await fetch("/names/makes", {
@@ -90,6 +90,17 @@ document.querySelector(".oe_form").addEventListener("submit", async (e) => {
     });
     parts_manager.showTable();
 });
+
+let specific_type_bar = new SearchBar(Array.from(document.querySelectorAll(".specific_custom_select")), ["Select Type"], ["type"], document.querySelector(".specific_options"));
+specific_type_bar.selects[0].getOptions = (filter)=>{
+    return [
+        "Alternators and Starters",
+        "Break Sensors",
+        "ABS Sensors",
+        "Crankshaft and Camshaft Sensors"
+    ];
+}
+specific_type_bar.selects[0].populateOptions("");
 window.onload = async () => {
     const urlParams = new URLSearchParams(window.location.search);
 

@@ -5,14 +5,11 @@ const path = require("path");
 const fs = require("fs");
 const xlReader = require("read-excel-file/node");
 
-let path_to_excel = path.join(__dirname, "./mbparts.xlsx");
-
 async function upload_parts(path){
     let errors = [];
     let rows = await xlReader(path)
     {
         for(let i = 1; i< rows.length; i++){
-            console.log(i);
             try{
                 let part = rowToPart(rows[i]);
                 if(part.errors === null){
@@ -27,10 +24,11 @@ async function upload_parts(path){
                         "in_stock": 1,
                         "image_url": null
                     };
-                    let properties = ["make", "oe_number", "frey_number", "price", "description", "brand"];
+                    let properties = ["make", "oe_number", "frey_number", "description", "brand"];
                     properties.forEach( property => {
-                        part_db[property] = part[property]
+                        part_db[property] = part[property].trim();
                     })
+                    part_db.price = part.price;
                     part_db.image_url = part.make.toLowerCase() + '-' + part.oe_number.toString() + '.jpg';
                     db.addPart(part_db, part.apps, part.interchange);
                 }
@@ -62,18 +60,19 @@ function rowToPart(row){
     
     row[9] = row[9].substr(first_space+1);
     try{
-        let interchange = row[5].toString();
-        console.log(interchange, row[5], "asdf")
-        interchange = interchange.split(' ');
-        interchange.forEach( int => {
-            int = int.substr(int.indexOf(' ')+1);
-            int.trim()
-            int.replace(/[-,]/g, '');
-            if(/[^A-Za-z0-9]/.test(int)){
-                res.errors = "invalid interchange format"
-            }
-            res.interchange.push(int);
-        })
+        if(row[5]){
+            let interchange = row[5].toString();
+            interchange = interchange.split(' ');
+            interchange.forEach( int => {
+                int = int.substr(int.indexOf(' ')+1);
+                int.trim()
+                int.replace(/[-,]/g, '');
+                if(/[^A-Za-z0-9]/.test(int)){
+                    res.errors = "invalid interchange format"
+                }
+                res.interchange.push(int);
+            })
+        }
         row[9].split('/').forEach(application => {
             let modelName, begin_year, end_year, engineSizes = [];
             let yearString = application.substr(application.lastIndexOf(' ')+1);

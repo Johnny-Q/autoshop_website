@@ -245,7 +245,9 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>, 
         if (make_id.length == 0) {
             make_id = await db('Makes').insert({ 'make': part_raw.make.toLowerCase() });
         }
-        else make_id = make_id[0].id;
+        else{
+            make_id = make_id[0].id;
+        }
         let brand_id = [{ id: null }];
         if (part_raw.brand) {
             brand_id = await db('Brands').select('id').where('brand', part_raw.brand.toLowerCase());
@@ -257,14 +259,16 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>, 
         let part = part_raw as any;
         delete part.make; part.make_id = make_id;
         delete part.brand; part.brand_id = brand_id;
-        if(part.image_url === null) delete part.image_url;
-        // if part already exists, query the part_id
-        let part_id = await db("Parts").select('id').where("oe_number", part.oe_number)
-        if(part_id.length > 0){
-            part_id = part_id[0].id
-        }else{
-            // part does not exist
-            part_id = null;
+        // if part already exists, query the part_id and image_url
+        let partDB = await db("Parts").select('id', 'image_url').where("oe_number", part.oe_number);
+        let part_id = null;
+        if(partDB.length > 0){
+            // store part_id
+            part_id = partDB[0].id
+            // if passed image_url is null, use original image_url
+            if(part.image_url === null){
+                part.image_url = partDB[0].image_url;
+            }
         }
         // delete part if already exists
         await db("Parts").where("oe_number", part.oe_number).del()
@@ -305,6 +309,11 @@ async function addPart(part_raw: PartDBEntry, applications: Array<Application>, 
         console.log(err);
         throw err;
     }
+}
+
+async function deletePart(part_id: string) {
+    db('Parts').where('id', part_id).del();
+    db('YearModel').where('parts_id', part_id).del();
 }
 
 /**

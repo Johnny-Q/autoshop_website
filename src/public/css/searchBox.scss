@@ -19,7 +19,11 @@ main {
         z-index: 50;
 
         h1 {
-            margin-bottom: 30px;
+            margin: 30px;
+        }
+
+        h1:first-of-type {
+            margin-top: 0;
         }
 
         div.grid {
@@ -28,92 +32,101 @@ main {
             width: 100%;
 
             column-gap: 10px;
+        }
 
-            div.custom_select {
+        div.grid_2{
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            width: 100%;
 
-                border-radius: 10px;
-                border: 2px solid white;
+            column-gap: 10px;
+        }
+        div.custom_select {
 
-                * {
-                    user-select: none;
-                    -moz-user-select: none;
-                    -khtml-user-select: none;
-                    -webkit-user-select: none;
-                    -o-user-select: none;
+            border-radius: 10px;
+            border: 2px solid white;
+
+            * {
+                user-select: none;
+                -moz-user-select: none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+                -o-user-select: none;
+            }
+
+            select {
+                // width: 100%;
+                // height: 50px;
+                // border-radius: 10px;
+                display: none;
+            }
+
+            div.selector {
+                width: 100%;
+                height: 50px;
+                line-height: 50px;
+                text-align: center;
+
+                // background-color: blue;
+            }
+
+            div.selector.selected,
+            div.selector:hover {
+                background-color: rgba(255, 255, 255, 0.3);
+                // color: black;
+            }
+
+            div.selector.disabled {
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        div.options_container {
+            margin-top: 10px;
+            border-radius: 5px;
+            grid-column: 1/-1;
+            position: relative;
+
+
+            div.options {
+                position: absolute;
+                top: 100%;
+
+                width: 100%;
+                height: fit-content;
+                max-height: 0px;
+                overflow: hidden;
+                color: dodgerblue;
+                background-color: white;
+                opacity: 0;
+
+                div {
+                    color: dodgerblue;
+                    padding: 5px;
+                    cursor: pointer;
                 }
 
-                select {
-                    // width: 100%;
-                    // height: 50px;
-                    // border-radius: 10px;
-                    display: none;
-                }
-
-                div.selector {
-                    width: 100%;
-                    height: 50px;
-                    line-height: 50px;
-                    text-align: center;
-
-                    // background-color: blue;
-                }
-
-                div.selector.selected,
-                div.selector:hover {
-                    background-color: rgba(255, 255, 255, 0.3);
-                    // color: black;
-                }
-
-                div.selector.disabled {
-                    background-color: rgba(0, 0, 0, 0.3);
+                div:hover {
+                    background-color: rgba(0, 0, 0, 0.1);
                 }
             }
 
-            div.options_container {
-                margin-top: 10px;
+            div.options.active {
                 border-radius: 5px;
-                grid-column: 1/-1;
-                position: relative;
-
-
-                div.options {
-                    position: absolute;
-                    top: 100%;
-
-                    width: 100%;
-                    height: fit-content;
-                    max-height: 0px;
-                    overflow: hidden;
-                    color: dodgerblue;
-                    background-color: white;
-                    opacity: 0;
-
-                    div {
-                        color: dodgerblue;
-                        padding: 5px;
-                        cursor: pointer;
-                    }
-
-                    div:hover {
-                        background-color: rgba(0, 0, 0, 0.1);
-                    }
-                }
-
-                div.options.active {
-                    border-radius: 5px;
-                    max-height: 30vh;
-                    background-color: white;
-                    overflow: auto;
-                    border: 2px solid black;
-                    display: grid;
-                    grid-template-columns: repeat(4, 1fr);
-                    opacity: 1;
-                    transition: max-height .3s ease-out;
-                }
+                max-height: 30vh;
+                background-color: white;
+                overflow: auto;
+                border: 2px solid black;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                opacity: 1;
+                transition: max-height .3s ease-out;
             }
         }
     }
 }
+
+
 
 @media (max-width: 800px) {
     main {

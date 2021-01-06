@@ -39,7 +39,7 @@ window.addEventListener("load", event => {
 })
 
 //search box
-let search_bar = new SearchBar(Array.from(document.querySelectorAll(".custom_select")), ["Select Make", "Select Year", "Select Model", "Select Engine Size"], ["make", "year", "model", "engine"]);
+let search_bar = new SearchBar(Array.from(document.querySelectorAll(".euro_custom_select")), ["Select Make", "Select Year", "Select Model", "Select Engine Size"], ["make", "year", "model", "engine"], document.querySelector(".part_options"));
 search_bar.selects[0].getOptions = async (filter): Promise<string[]> => {
     try {
         let resp = await fetch("/names/makes", {
@@ -68,7 +68,7 @@ search_bar.selects[1].getOptions = async (filter): Promise<string[]> => {
         json.forEach((object: any) => {
             data.push(object.year);
         });
-        data = data.reverse();
+	    data = data.reverse();
         return data;
     } catch (err) {
         return [];
@@ -118,3 +118,14 @@ document.querySelector(".oe_form").addEventListener("submit", async (e)=>{
     if(!oe_input.value) return;
     window.location.assign(`/search?oe_number=${oe_input.value}`);
 });
+
+let specific_type_bar = new SearchBar(Array.from(document.querySelectorAll(".specific_custom_select")), ["Select Type"], ["type"], document.querySelector(".specific_options"));
+specific_type_bar.selects[0].getOptions = (filter)=>{
+    return [
+        "Alternators and Starters",
+        "Break Sensors",
+        "ABS Sensors",
+        "Crankshaft and Camshaft Sensors"
+    ];
+}
+specific_type_bar.selects[0].populateOptions("");

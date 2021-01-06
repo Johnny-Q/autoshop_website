@@ -13,10 +13,12 @@ main {
         max-width: none;
         border-radius: 0;
 
-        div.grid {
-            div.custom_select {
-                background-color: gray;
-            }
+        h1{
+            color: white;
+        }
+
+        div.custom_select {
+            background-color: gray;
         }
     }
 }
@@ -24,6 +26,7 @@ main {
 //smaller search button
 main {
     div.search_wrapper {
+
         form {
             width: 100%;
             max-width: 875px;
@@ -209,7 +212,9 @@ main {
                     }
 
                     input[type=number] {
-                        width: 30px;
+                        width: 60px;
+                        height: 35px;
+                        padding: 0 5px;
                         -moz-appearance: textfield;
 
                     }

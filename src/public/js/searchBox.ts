@@ -90,6 +90,7 @@ class CustomSelect {
 
     async populateOptions(filter) {
         let values = await this.getOptions(filter);
+        console.log(values);
         // console.log(this.getOptions.toString());
         // console.log(values);
 
@@ -176,10 +177,10 @@ class SearchBar {
     filter = {};
     names: string[];
     parts_manager: PartsManager;
-    constructor(custom_selects: Array<HTMLElement>, default_texts: string[], names: string[], parts_manager: PartsManager = null) {
+    constructor(custom_selects: Array<HTMLElement>, default_texts: string[], names: string[], options_container: HTMLDivElement, parts_manager: PartsManager = null) {
         this.names = names;
         this.parts_manager = parts_manager;
-        let options_container = document.querySelector(".options_container");
+        // let options_container = document.querySelector(".options_container");
 
         //create the CustomSelect Object
         for (let i = 0; i < custom_selects.length; i++) {

@@ -28,7 +28,7 @@ if (process.env.SEND_MAIL) {
         host: 'smtp.ethereal.email',
         port: 587,
         auth: {
-            user: process.env.mail_test,
+            user: process.env.mail_test, 
             pass: process.env.mail_test_pass
         }
     });
@@ -59,7 +59,7 @@ app.use(session({
     "saveUninitialized": true,
     "unset": "destroy"
 }));
-const HTMLpages = ["about", "search_box", "search", "contact", "slideshow", "register", "login", "dashboard", "test", "partials/approve_account", "reset_password"];
+const HTMLpages = ["about", "search_box", "search", "contact", "slideshow", "register", "login", "dashboard", "test", "reset_password","partials/search_box"];
 HTMLpages.forEach(page => {
     app.get(`/${page}`, (req, res) => {
         let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': false};
@@ -567,7 +567,7 @@ app.post("/search_full", async (req, res) => {
 
 app.post("/search_id_number", async (req, res) => {
     let { id_number } = req.body;
-    let { admin } = req.admin;
+    let { admin } = req.session;
     admin = admin || false;
     try {
         let parts = await db.getPartByOEorFrey(id_number, req.session.logged_in);
@@ -658,10 +658,10 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
         let { make, oe_number, frey_number, price, description, enabled, in_stock, brand } = req.body;
         if (!brand) brand = null;
         make = make || make.toLowerCase();
-        if(price) price = parseFloat(price) * 100;
+        if(price) price = parseInt(price.replace(".", ""));
         part = {
             make, oe_number, frey_number, price, brand,
-            'image_url': make+'-'+oe_number+'.png',
+            'image_url': null,
             'description': description ? description : null,
             'enabled': enabled ? enabled : 1,
             'in_stock': in_stock ? in_stock : 1
@@ -672,7 +672,7 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
             let image_url = part.make + '-' + part.oe_number + fileExtension
             // debugLog(image_url);
             const targetPath = path.join(__dirname, "./public/img/parts", image_url);
-            if (fileExtension === ".png") {
+            if (fileExtension === ".jpg" || fileExtension === '.png' || fileExtension === '.jpeg') {
                 fs.rename(tempPath, targetPath, err => {
                     if (err) {
                         return debugLog([err, res]);
@@ -837,12 +837,19 @@ app.delete("/cart", async (req, res) => {
 
 app.post("/cart/place_order", async (req, res) => {
     if (!req.session.logged_in) return res.redirect('/');
-    const { delivery, po_number, comments, updates } = req.body;
+    let { delivery, po_number, comments, updates } = req.body;
     if (updates && updates.length) {
 
     }
     debugLog(req.body);
-    if (delivery != 'Delivery' && delivery != 'Pickup') return res.send(400);
+    if (delivery != 'Delivery' && delivery != 'Pickup') {
+        delivery = "Did not pick";
+    }
+    
+    if(po_number == "N/A" || !po_number){
+        return res.sendStatus(400);
+    }
+    console.log(po_number);
     // const validPayment = ['Credit', 'Cash', 'Cheque', 'LOC'];
     // if(validPayment.indexOf(payment) == -1) return res.send(400);
     const currentDate = new Date();
@@ -852,22 +859,43 @@ app.post("/cart/place_order", async (req, res) => {
     let total = 0;
     let num_parts = 0;
     for (let part of Object.values(req.session.cart)) {
-        let subtotal = part.price * part.quantity / 100;
+        let subtotal = part.price * part.quantity;// / 100;
         let html =
             `
         <tr>
             <td>${part.oe_number}</td>
+            <td>${part.description}</td>
             <td>${part.quantity}</td>
             <td>$${part.price / 100}</td>
-            <td>$${subtotal}</td>
+            <td>$${subtotal / 100}</td>
         </tr>
         `
         parts += html + '\n';
         total += subtotal;
-        num_parts += part.quantity;
+        num_parts += parseInt(part.quantity);
     }
     let emailHTML =
-        `
+    `
+    <p style="margin-bottom: 20px"> <b> List of parts: </b> </p>
+    <table style="width:100%; max-width: 700px;">
+        <tr>
+            <th style="text-align: left">OE #</th>
+            <th style="text-align: left">Description</th>
+            <th style="text-align: left">QTY</th>
+            <th style="text-align: left">PPU</th>
+            <th style="text-align: left">Amount</th>
+        </tr>
+        ${parts}
+    </table>
+    <div style="max-width: 700px">
+        <p style="text-align:right; margin-right:30px"> <b>Sub-Total</b> $${roundTo2Decimals(total)} </p>
+        <p style="text-align:right; margin-right:30px"> <b>HST (13%)</b> $${roundTo2Decimals( Math.round(total * 13 / 100) )} </p>
+        <p style="text-align:right; margin-right:30px"> <b>Total</b> $${roundTo2Decimals( Math.round(total * 113 / 100) )}</p>
+        <p style="text-align:right; margin-right:30px"> <b>Total Number of Parts</b> ${num_parts} </p>
+    </div>
+    
+    <p> <b>PO Number: </b> ${po_number}</p>
+    
     <p> <b> User contact information: </b> </p>
     <p> <b> First Name: </b> ${req.session.user_db.contact_first} </p>
     <p> <b> Last Name: </b> ${req.session.user_db.contact_last} </p>
@@ -883,35 +911,23 @@ app.post("/cart/place_order", async (req, res) => {
     <p> ${req.session.user_db.postal.toUpperCase()} </p>
     <p> <b> Order placed at: </b> ${localTime} </p>
 
-    <p style="margin-bottom: 20px"> <b> List of parts: </b> </p>
-
-    <div style="max-width: 700px">
-    <table style="width:100%">
-        <tr>
-            <th>Part OE Number</th>
-            <th>Quantity Ordered</th>
-            <th>Price per part</th>
-            <th>Sub-Total</th>
-        </tr>
-        ${parts}
-    </table>
-    <p style="text-align:right; margin-right:30px"> <b>Sub-Total</b> $${total} </p>
-    <p style="text-align:right; margin-right:30px"> <b>Total (13% HST)</b> $${Math.round(total / 100 * 1.13)}.${total * 1.13 % 100} </p>
-    <p style="text-align:right; margin-right:30px"> <b>Total Number of Parts</b> ${num_parts} </p>
-    </div>
-
     <p><b>Delivery Option: </b> ${delivery}</p>
-    <p><b>PO Number: </b> ${po_number}</p>
     <p><b>Additional Comments: </b> ${comments}</p>
     `
-    // transporter.sendMail({
-    //     from: process.env.EMAIL_USER,
-    //     to: process.env.ORDER_DEST,
-    //     subject: "An order has been placed",
-    //     html: emailHTML
-    // })
-    // res.sendStatus(200);
-    res.render('message', { page_name: "Cart", message: 'Thank you for placing an order. An email will be sent to you to continue your order.' });
+    transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: process.env.ORDER_DEST,
+        subject: "An order has been placed",
+        html: emailHTML
+    }) 
+    console.log(process.env.EMAIL_USER);
+    transporter.sendMail({  
+        from: process.env.EMAIL_USER,
+        to: req.session.user,
+        subject: "An order has been placed",
+        html: emailHTML
+    })
+    res.render('message', { page_name: "Cart", message: 'Thank you for placing an order. An email will be sent to you to process your order.' });
 })
 
 app.post("/debug", upload.single("part_img"), async (req, res) => {
@@ -982,4 +998,11 @@ function randString(length) {
         result += charset[Math.floor(Math.random() * set_length)];
     }
     return result;
+}
+
+function roundTo2Decimals(cents: number): string{
+    let price_string = cents.toString();
+    let only_cents = price_string.substr(price_string.length - 2);
+    let only_dollars = price_string.substr(0, price_string.length -2);
+    return `${only_dollars}.${only_cents}`;
 }

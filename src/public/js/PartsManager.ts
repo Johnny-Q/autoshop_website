@@ -72,7 +72,7 @@ class PartsManager {
             //     },
             //     "body": JSON.stringify(data)
             // });
-            let resp = await fetch("/search_full", {
+            let resp = await fetch("/search/full", {
                 "method": "POST",
                 "headers": {
                     "content-type": "application/json"
@@ -91,7 +91,7 @@ class PartsManager {
         this.showLoader();
         try {
             //make request to server
-            let resp = await fetch("/search_id_number", {
+            let resp = await fetch("/search/id_number", {
                 "method": "POST",
                 "headers": {
                     "Content-Type": "application/json",
@@ -165,11 +165,19 @@ class PartsManager {
         image_td.classList.add("img");
         image_td.style.postion = "relative";
         let img = document.createElement("img");
-        img.src = `../img/parts/${part.image_url}`;
+        img.src = `/img/parts/${part.make}-${part.oe_number}.png`;
+        img.onerror = ()=>{
+            img.src = `/img/parts/${part.make}-${part.oe_number}.jpg`;
+            img.onerror = null;
+        }
         let bigger_img = document.createElement("img");
         bigger_img.classList.add("big_img");
         bigger_img.style.display = "none";
-        bigger_img.src = `../img/parts/${part.image_url}`;
+        bigger_img.src = `/img/parts/${part.make}-${part.oe_number}.png`;
+        bigger_img.onerror = ()=>{
+            bigger_img.src = `/img/parts/${part.make}-${part.oe_number}.jpg`;
+            bigger_img.onerror = null;
+        }
         image_td.append(img, bigger_img);
 
 

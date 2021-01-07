@@ -63,12 +63,12 @@ search_bar.selects[1].getOptions = async (filter): Promise<string[]> => {
             "method": 'get'
         });
         let json = await resp.json() as Array<Object>;
-        let data = []
-        //json is an array
-        json.forEach((object: any) => {
-            data.push(object.year);
-        });
-	    data = data.reverse();
+        let {begin_year, end_year} = json;
+        console.log(json);
+        let data = [];
+        for(let i = end_year; i>=begin_year; i--){
+            data.push(i);
+        }
         return data;
     } catch (err) {
         return [];

@@ -10,7 +10,6 @@ const fs = require("fs");
 const nodemailer = require('nodemailer');
 const session = require("express-session");
 const SQLiteStore = require('connect-sqlite3')(session);
-const xlImport = require('./import_from_excel');
 let session_store = new SQLiteStore;
 let transporter = {
     sendMail: function (obj) { console.log('sent mail') }
@@ -28,7 +27,7 @@ if (process.env.SEND_MAIL) {
         host: 'smtp.ethereal.email',
         port: 587,
         auth: {
-            user: process.env.mail_test, 
+            user: process.env.mail_test,
             pass: process.env.mail_test_pass
         }
     });
@@ -45,7 +44,7 @@ app.set("views", "build/public/views");
 app.set("view engine", "ejs");
 
 //accept json data
-app.use(bodyparser.json());
+app.use(bodyparser.json({ limit: '10mb' }));
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(session({
     "secret": SESSION_SECRET,
@@ -59,10 +58,10 @@ app.use(session({
     "saveUninitialized": true,
     "unset": "destroy"
 }));
-const HTMLpages = ["about", "search_box", "search", "contact", "slideshow", "register", "login", "dashboard", "test", "reset_password","partials/search_box"];
+const HTMLpages = ["about", "search_box", "search", "contact", "slideshow", "register", "login", "dashboard", "test", "reset_password", "partials/search_box", "import_test"];
 HTMLpages.forEach(page => {
     app.get(`/${page}`, (req, res) => {
-        let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': false};
+        let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': false };
         for (let [key, value] of Object.entries(properties)) {
             if (req.session[key]) {
                 properties[key] = req.session[key];
@@ -78,44 +77,6 @@ HTMLpages.forEach(page => {
 
     });
 });
-
-const adminPages = ['', 'adduser', 'addpart', "account_requests"]
-adminPages.forEach(page => {
-    app.get(`/admin/${page}`, (req, res) => {
-        let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
-        for (let [key, value] of Object.entries(properties)) {
-            properties[key] = req.session[key];
-        }
-        if (!req.session.admin) res.redirect('/');
-        else {
-            if (page != '') page = '/' + page
-            res.render(`admin${page}`, properties);
-        }
-    });
-})
-
-
-
-app.get('/admin/editpart', async (req, res) => {
-    let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
-    for (let [key, value] of Object.entries(properties)) {
-        properties[key] = req.session[key];
-    }
-    if (!properties.logged_in) return res.sendStatus(401);
-    if (!properties.admin) return res.sendStatus(403);
-    // expect req.query.part_id
-    const { part_id } = req.query;
-    if (!part_id) {
-        return res.render('message', { ...properties, message: "Please edit a part by clicking the 'Edit Part' button from the search page!", page_name: 'Edit Part' })
-    }
-    const part = await db.getPartById(part_id);
-    const apps = await db.getApps(part_id);
-    if (!part){
-        return res.render('message', { ...properties, message: "This part is not found!", page_name: 'Edit Part' })
-    }
-    console.log(part.image_url);
-    res.render('admin/editpart', { ...properties, part: part, apps: apps})
-})
 
 //serve web pages
 app.get("/", (req, res) => {
@@ -533,7 +494,19 @@ app.post("/logout", (req, res) => {
     res.render('message', { logged_in: false, page_name: "Logout", message: "You are now logged out." });
 });
 
-app.post("/search_full", async (req, res) => {
+app.use("/search", async (req, res, next) => {
+    // console.log(req.query, req.body);
+    for (let [key, value] of Object.entries(req.query)) {
+        req.query[key] = makeNullIfAny(value);
+    }
+    for (let [key, value] of Object.entries(req.body)) {
+        req.body[key] = makeNullIfAny(value);
+    }
+    // console.log(req.query, req.body);
+    next();
+});
+
+app.post("/search/full", async (req, res) => {
     let admin = req.session.admin;
     admin = admin || false;
     //get year from the request
@@ -541,13 +514,6 @@ app.post("/search_full", async (req, res) => {
 
     year = parseInt(year);
     if (isNaN(year)) year = null;
-    if (!model) model = null;
-    if (!make) make = null;
-    if (!engine) engine = null;
-    if (model == 'Any') model = null;
-    if (make == 'Any') make = null;
-    if (year == 'Any') year = null;
-    if (engine == 'Any') engine = null;
 
     // debugLog([make, model, year, engine]);
     let logged_in = req.session.logged_in || false;
@@ -565,12 +531,12 @@ app.post("/search_full", async (req, res) => {
 });
 
 
-app.post("/search_id_number", async (req, res) => {
+app.post("/search/id_number", async (req, res) => {
     let { id_number } = req.body;
     let { admin } = req.session;
     admin = admin || false;
     try {
-        let parts = await db.getPartByOEorFrey(id_number, req.session.logged_in);
+        let parts = await db.getPartByIdNumber(id_number, req.session.logged_in);
         res.json({ parts, admin });
     } catch (err) {
         console.log(err);
@@ -593,61 +559,84 @@ app.get("/applications", async (req, res) => {
     // res.sendStatus(200);
 })
 
-app.post("/admin/addpart", upload.fields([{ name: "parts", maxCount: 1 }, { name: "image", maxCount: 1 }]), async (req, res) => {
-    try {
+app.use("/admin", async (req, res, next) => {
+    let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
+    for (let [key, value] of Object.entries(properties)) {
+        properties[key] = req.session[key];
+    }
+    if (!properties.logged_in || !properties.admin) {
+        res.redirect('/');
+    } else {
+        next();
+    }
+});
+const adminPages = ['', 'adduser', 'addpart', "account_requests"];
+
+adminPages.forEach(page => {
+    app.get(`/admin/${page}`, (req, res) => {
         let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
         for (let [key, value] of Object.entries(properties)) {
             properties[key] = req.session[key];
         }
-        if (!properties.logged_in || !properties.admin) {
-            res.redirect('/');
-        }
-        if (Object.keys(req.files).length === 0) res.render('admin/addpart', { ...properties, errors: [{ msg: "Please upload a file!" }] })
+        if (!req.session.admin) res.redirect('/');
         else {
-            const { fileType } = req.body;
-            if (fileType != 'parts' && fileType != 'image') return res.sendStatus(400);
-            const filePath = req.files[fileType][0].path;
-            const fileExtension = path.extname(req.files[fileType][0].originalname).toLowerCase();
-            if (fileType == 'parts' && fileExtension != '.xlsx') {
-                res.render('admin/addpart', { ...properties, errors: [{ msg: "Please upload an Excel file!" }] })
-            }
-            if (fileType == 'image' && fileExtension != '.jpg') {
-                res.render('admin/addpart', { ...properties, errors: [{ msg: "Please upload a jpg image!" }] })
+            if (page != '') page = '/' + page
+            res.render(`admin${page}`, properties);
+        }
+    });
+})
+
+
+app.get('/admin/editpart', async (req, res) => {
+    let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
+    for (let [key, value] of Object.entries(properties)) {
+        properties[key] = req.session[key];
+    }
+    if (!properties.logged_in) return res.sendStatus(401);
+    if (!properties.admin) return res.sendStatus(403);
+    // expect req.query.part_id
+    const { part_id } = req.query;
+    if (!part_id) {
+        return res.render('message', { ...properties, message: "Please edit a part by clicking the 'Edit Part' button from the search page!", page_name: 'Edit Part' })
+    }
+    let part = await db.getPartByDbId(part_id);
+    part.image_url = `${part.make}-${part.oe_number}`
+    const apps = await db.getApps(part_id);
+    if (!part) {
+        return res.render('message', { ...properties, message: "This part is not found!", page_name: 'Edit Part' })
+    }
+    res.render('admin/editpart', { ...properties, part: part, apps: apps })
+})
+
+app.post("/admin/addpart", async (req, res) => {
+    debugLog("recieved request to upload parts");
+    let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
+    for (let [key, value] of Object.entries(properties)) {
+        properties[key] = req.session[key];
+    }
+    if (!properties.logged_in) return res.sendStatus(401);
+    if (!properties.admin) return res.sendStatus(403);
+    try {
+        let { parts, errors } = req.body;
+        let errmsgs = []
+        errors.forEach(error => {
+            errmsgs.push({
+                msg: error.message + ' on line ' + error.line
+            })
+        })
+        res.render('admin/addpart', {...properties, errors: errmsgs})
+        for (let i = 0; i < parts.length; i++) {
+            if (parts[i].interchange) {
+                await db.addPart(parts[i].part, parts[i].applications, parts[i].interchange)
             }
             else {
-                if (fileType == 'parts') {
-                    console.log('here');
-                    let errs = await xlImport.upload_parts(filePath);
-                    if (errs.length > 0) {
-                        let errors = [];
-                        errs.forEach(err => {
-                            errors.push({
-                                msg: "error on line " + err.index + ": " + err.msg
-                            })
-                        })
-                        res.render('admin/addpart', { ...properties, errors })
-                    }
-                    else {
-                        res.render('admin/addpart', { ...properties, errors: [{ msg: "Parts uploaded" }] })
-                    }
-                } else if (fileType == 'image') {
-                    const targetPath = path.join(__dirname, "./public/img/parts", req.files[fileType][0].originalname);
-                    console.log(filePath, targetPath);
-                    if (fileExtension === ".jpg") {
-                        fs.rename(filePath, targetPath, err => {
-                            if (err) {
-                                return debugLog([err, res]);
-                            }
-                        });
-                    }
-                    res.render('admin/addpart', { ...properties, errors: [{ msg: 'Image Added' }] })
-                }
+                await db.addPart(parts[i].part, parts[i].applications)
             }
         }
-
+        debugLog("finished uploading");
     } catch (err) {
         console.log(err);
-        res.send(500);
+        res.sendStatus(500);
     }
 })
 
@@ -658,15 +647,13 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
         let { make, oe_number, frey_number, price, description, enabled, in_stock, brand } = req.body;
         if (!brand) brand = null;
         make = make || make.toLowerCase();
-        if(price) price = parseInt(price.replace(".", ""));
+        if (price) price = parseInt(price.replace(".", ""));
         part = {
             make, oe_number, frey_number, price, brand,
-            'image_url': null,
             'description': description ? description : null,
-            'enabled': enabled ? enabled : 1,
-            'in_stock': in_stock ? in_stock : 1
+            'enabled': enabled ? enabled : 1
         };
-        if(req.file){
+        if (req.file) {
             const tempPath = req.file.path;
             const fileExtension = path.extname(req.file.originalname).toLowerCase();
             let image_url = part.make + '-' + part.oe_number + fileExtension
@@ -678,7 +665,6 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
                         return debugLog([err, res]);
                     }
                 });
-                part.image_url = image_url;
             }
         }
         // construct applications array
@@ -715,15 +701,18 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
     }
 })
 
-app.get('/init', async (req, res) => {
-    try {
-        let parts = await db.getModelNames();
-        res.json(parts);
-    } catch (err) {
-        console.log(err);
-        res.sendStatus(500);
+app.use("/names", async(req, res, next)=>{
+    console.log(req.query);
+    for (let [key, value] of Object.entries(req.query)) {
+        req.query[key] = makeNullIfAny(value);
     }
+    for (let [key, value] of Object.entries(req.body)) {
+        req.body[key] = makeNullIfAny(value);
+    }
+    console.log(req.query, req.body);
+    next();
 });
+
 app.get("/names/makes", async (req, res) => {
     let makes = await db.getMakes();
     // debugLog(makes);
@@ -733,7 +722,6 @@ app.get("/names/makes", async (req, res) => {
 app.get("/names/years", async (req, res) => {
     try {
         let { make } = req.query;
-        make = makeNullIfAny(make);
         // debugLog(make);
         let years = await db.getYears(make);
         // debugLog(years);
@@ -746,8 +734,6 @@ app.get("/names/years", async (req, res) => {
 app.get("/names/models", async (req, res) => {
     try {
         let { make, year } = req.query;
-        make = makeNullIfAny(make);
-        year = makeNullIfAny(year);
         let models = await db.getModels(make, year);
         // debugLog(models);
         res.json(models);
@@ -761,9 +747,6 @@ app.get("/names/models", async (req, res) => {
 
 app.get("/names/engine", async (req, res) => {
     let { make, year, model } = req.query;
-    make = makeNullIfAny(make);
-    year = makeNullIfAny(year);
-    model = makeNullIfAny(model);
     let engines = await db.getEngines(make, year, model);
     // debugLog(engines);
     res.json(engines);
@@ -787,7 +770,7 @@ app.get("/cart", async (req, res) => {
 });
 app.post("/cart", async (req, res) => {
     let { updates } = req.body;
-    debugLog(updates);
+    // debugLog(updates);
     req.session.cart = req.session.cart || {};
     updates.forEach(part => {
         if (part.id && part.quantity) {
@@ -845,8 +828,8 @@ app.post("/cart/place_order", async (req, res) => {
     if (delivery != 'Delivery' && delivery != 'Pickup') {
         delivery = "Did not pick";
     }
-    
-    if(po_number == "N/A" || !po_number){
+
+    if (po_number == "N/A" || !po_number) {
         return res.sendStatus(400);
     }
     console.log(po_number);
@@ -875,7 +858,7 @@ app.post("/cart/place_order", async (req, res) => {
         num_parts += parseInt(part.quantity);
     }
     let emailHTML =
-    `
+        `
     <p style="margin-bottom: 20px"> <b> List of parts: </b> </p>
     <table style="width:100%; max-width: 700px;">
         <tr>
@@ -889,8 +872,8 @@ app.post("/cart/place_order", async (req, res) => {
     </table>
     <div style="max-width: 700px">
         <p style="text-align:right; margin-right:30px"> <b>Sub-Total</b> $${roundTo2Decimals(total)} </p>
-        <p style="text-align:right; margin-right:30px"> <b>HST (13%)</b> $${roundTo2Decimals( Math.round(total * 13 / 100) )} </p>
-        <p style="text-align:right; margin-right:30px"> <b>Total</b> $${roundTo2Decimals( Math.round(total * 113 / 100) )}</p>
+        <p style="text-align:right; margin-right:30px"> <b>HST (13%)</b> $${roundTo2Decimals(Math.round(total * 13 / 100))} </p>
+        <p style="text-align:right; margin-right:30px"> <b>Total</b> $${roundTo2Decimals(Math.round(total * 113 / 100))}</p>
         <p style="text-align:right; margin-right:30px"> <b>Total Number of Parts</b> ${num_parts} </p>
     </div>
     
@@ -919,9 +902,9 @@ app.post("/cart/place_order", async (req, res) => {
         to: process.env.ORDER_DEST,
         subject: "An order has been placed",
         html: emailHTML
-    }) 
+    })
     console.log(process.env.EMAIL_USER);
-    transporter.sendMail({  
+    transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: req.session.user,
         subject: "An order has been placed",
@@ -931,7 +914,6 @@ app.post("/cart/place_order", async (req, res) => {
 })
 
 app.post("/debug", upload.single("part_img"), async (req, res) => {
-
     debugLog(req.body);
 })
 
@@ -974,7 +956,7 @@ function debugLog(param) {
     }
 }
 function makeNullIfAny(value) {
-    return value == "Any" ? null : value;
+    return value.toLowerCase() == "any" ? null : value;
 }
 function anyFalse(arr) {
     let anyFalse = false;
@@ -1000,9 +982,9 @@ function randString(length) {
     return result;
 }
 
-function roundTo2Decimals(cents: number): string{
+function roundTo2Decimals(cents: number): string {
     let price_string = cents.toString();
     let only_cents = price_string.substr(price_string.length - 2);
-    let only_dollars = price_string.substr(0, price_string.length -2);
+    let only_dollars = price_string.substr(0, price_string.length - 2);
     return `${only_dollars}.${only_cents}`;
 }

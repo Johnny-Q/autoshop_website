@@ -84,7 +84,6 @@ class CustomSelect {
     disable() {
         if (!this.select_div.classList.contains("disabled")) {
             this.select_div.classList.add("disabled");
-            // console.log("added class");
         }
     }
 
@@ -100,7 +99,7 @@ class CustomSelect {
         while (this.options_div.firstChild) {
             this.options_div.removeChild(this.options_div.lastChild);
         }
-        values.unshift('Any');
+        values.unshift('ANY');
 
         //order in columns
         //will always have 4 columns

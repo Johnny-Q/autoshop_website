@@ -1,4 +1,5 @@
-*.db
+#.db
+DB.db
 .db-journal
 build
 .env

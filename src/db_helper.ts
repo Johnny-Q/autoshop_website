@@ -30,6 +30,7 @@ async function paginatedSearch(make: string, model: string, year: number, engine
             .andWhereRaw("IFNULL(? , begin_year) between begin_year and end_year", year)
             .leftJoin("Engines", "Engines.parts_id", "Parts.id")
             .andWhereRaw("IFNULL(?, IFNULL(engine, 'nullengine')) like IFNULL(engine, 'nullengine')", engine)
+            .orderBy('Parts.description')
     } catch (err) {
         console.log(err);
         throw (err);
@@ -132,8 +133,6 @@ async function addPart(part: Part, applications: Array<Application>, interchange
     let parts = await db('Parts').select('id').where('oe_number', part.oe_number);
     let part_id = null;
     let app_id = null;
-    // console.log(part.price);
-    part.price = Math.round(part.price);
     //clear every entry for the previous part if existed
     if (parts.length > 0) {
         part_id = parts[0].id;
@@ -142,6 +141,7 @@ async function addPart(part: Part, applications: Array<Application>, interchange
             await deletePart(parts[i].id);
         }
         // console.log('insert with delete', parts.length));
+        // console.log(part);
         await db("Parts").insert({ ...part, id: part_id })
     }
     else { // otherwise just insert the part and store autoincremented part id
@@ -160,10 +160,11 @@ async function addPart(part: Part, applications: Array<Application>, interchange
             make: part.make,
             parts_id: part_id
         })
-
+        
+        // if(engines && engines.length > 0) console.log(engines);
         for (let j = 0; j < engines.length; j++) {
-            db("Engines").insert({
-                engine: engines[i],
+            await db("Engines").insert({
+                engine: engines[j],
                 parts_id: part_id,
                 app_id
             })

@@ -27,7 +27,7 @@ function parseExcel(file) {
                     parts.push(part);
                 }
                 catch (err) {
-                    errors.push({ "message": err, "line": XL_row_object[i]["Seq."] || "Excel line " + (i+1)});
+                    errors.push({ "message": err, "line": XL_row_object[i]["Seq."] || "Excel line " + (i + 1) });
                 }
             }
             console.log(errors);
@@ -100,10 +100,10 @@ function parseRow(row) {
     for (let i = 0; i < temp.length; i++) {
         let application = temp[i];
         application = application.trim();
-        
+
         // number of quotation marks must be even
         let count = (application.match(/"/g) || []).length;
-        if (count%2==1) { //can't be any other %2 == 0
+        if (count % 2 == 1) { //can't be any other %2 == 0
             throw "number of quotations wrong on " + application
         }
 
@@ -115,17 +115,17 @@ function parseRow(row) {
                     throw "no closing quote found for " + application;
                 }
                 make = application.substr(1, close); //"[ASLDKFJ ASDLFKJ]" captures between the quotes
-                application = application.substr(close+2).trim();
+                application = application.substr(close + 2).trim();
             } else { //1 word makes
                 let end = application.indexOf(" ");
-                if(end == -1){
+                if (end == -1) {
                     throw "no spaces in " + application;
                 }
                 make = application.substr(0, end).toLowerCase().trim();
                 if (make == "mb") {
                     make = "mercedes-benz";
                 }
-                application = application.substr(end+1).trim();
+                application = application.substr(end + 1).trim();
             }
         }
 
@@ -191,7 +191,7 @@ function parseRow(row) {
             engine_sizes = engine_string.split(',');
             for (let i = 0; i < engine_sizes.length; i++) {
                 engine_sizes[i] = engine_sizes[i].toLowerCase();
-                if(engine_sizes[i][engine_sizes[i].length-1] != "l"){
+                if (engine_sizes[i][engine_sizes[i].length - 1] != "l") {
                     throw "engine size does not end in L";
                 }
             }
@@ -203,7 +203,7 @@ function parseRow(row) {
             end_year: end_year,
             engines: engine_sizes
         });
-    });
+    }
 
     // parse interchangeable numbers into array
     if (int_numbers) {

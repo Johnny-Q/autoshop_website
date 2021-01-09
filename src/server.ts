@@ -343,7 +343,7 @@ app.post('/register', async (req, res) => {
     }
 })
 
-app.post('/adminadduser', async (req, res) => {
+app.post('/admin/adduser', async (req, res) => {
     let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
     for (let [key, value] of Object.entries(properties)) {
         properties[key] = req.session[key];
@@ -419,7 +419,7 @@ app.post('/adminadduser', async (req, res) => {
     }
     if (errmsgs.length > 0) {
         //res.status(400).send(errmsgs);
-        res.render('register', {
+        res.render('admin/adduser', {
             errors: errmsgs,
             email,
             company,
@@ -437,6 +437,20 @@ app.post('/adminadduser', async (req, res) => {
             ...properties
         })
     } else {
+        console.log(process.env.DOMAIN)
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Your Aceway Auto Account Has Been Created!",
+            text: `You may log in using your email at: ${process.env.DOMAIN}/login` + "Your one-time password is " + password,
+            html: `<a href="${process.env.DOMAIN}/login"> Log in to your Aceway Auto account </a> <p> Your one-time password is ${password} </p>`
+        });
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: process.env.REGISTRATION,
+            subject: "An Account has been created for a user",
+            text: `User email: ${email} One-time Password: ${password}`
+        })
         res.render('message', { page_name: "Add User", message: "User Password: " + password });
     }
 })
@@ -449,6 +463,7 @@ app.post('/login', async (req, res) => {
     }
     if (properties.logged_in) res.redirect('/');
     let login = await db.login(user, pass);
+    console.log(login)
     let errmsgs = [];
     login.errmsgs.forEach(msg => {
         errmsgs.push({ msg });
@@ -458,6 +473,7 @@ app.post('/login', async (req, res) => {
             // prompt user to reset password
             req.session.user = user;
             req.session.user_id = login.user_id;
+            req.session.logged_in = true;
             req.session.temp_pass = pass;
             res.redirect('/change_password');
         }
@@ -910,6 +926,7 @@ app.post("/cart/place_order", async (req, res) => {
         subject: "An order has been placed",
         html: emailHTML
     })
+    req.session.cart = {};
     res.render('message', { page_name: "Cart", message: 'Thank you for placing an order. An email will be sent to you to process your order.' });
 })
 

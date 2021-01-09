@@ -5,7 +5,7 @@
     <body>
         <%- include('../partials/navbar.ejs', {logged_in}) %>
             <main>
-                <form onsubmit="form_submit()" action="/adminadduser" id="regform" method="POST">
+                <form onsubmit="form_submit()" action="/admin/adduser" id="regform" method="POST">
                     <p> Company Info </p>
                     <div class="rounded_input">
                         <input type="text" name="company" placeholder="Company Name"

@@ -24,8 +24,9 @@
                     <tbody>
                         <% let subtotal = 0; cart.forEach(part=>{ %> 
                         <% let price_string = `${parseInt(part.price / 100).toString()}.${part.price%100 < 10 ? `0${part.price%100}`: part.price%100}`%> 
+                        <% let image_string = `${part.make}-${part.oe_number}` %>
                         <tr class="part">
-                            <td><img src="../img/parts/<%= part.image_url %> "></td>
+                            <td><img id= '<%= `image-${part.id}` %>' src="/img/parts/<%= image_string + ".jpg" %> " onerror="image_onerror( <%= part.id %>, '<%= image_string %>')"></td>
                             <td>
                                 <%= part.description %> 
                             </td>
@@ -57,6 +58,7 @@
                     <h3>PO Number (required):</h3>
                     <div>
                         <input type="text" id="po_number">
+                        <p id="required" style="display: none; color: red">This field is required</p>
                     </div>
                 </div>
                 <textarea name="" id="" cols="30" rows="10" placeholder="Order Comments"></textarea>

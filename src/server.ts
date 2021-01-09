@@ -14,12 +14,22 @@ let session_store = new SQLiteStore;
 let transporter = {
     sendMail: function (obj) { console.log('sent mail') }
 };
+let registerEmail = {
+    sendMail: function(obj) {console.log(obj) }
+}
 if (process.env.SEND_MAIL) {
     transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
+        }
+    });
+    registerEmail = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.REGISTRATION,
+            pass: process.env.REGISTRATION_PASS
         }
     });
 } else {
@@ -326,15 +336,15 @@ app.post('/register', async (req, res) => {
         })
     } else {
         // everything good, send verification email
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        registerEmail.sendMail({
+            from: process.env.REGISTRATION,
             to: email,
             subject: "Verify Your Aceway Auto Account",
             text: `Verify your Aceway Auto account by following the link: ${process.env.DOMAIN}/email?token=` + register.email_token,
             html: `<a href=${process.env.DOMAIN}/email?token=${register.email_token}>Verify your email </a>`
         });
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        registerEmail.sendMail({
+            from: process.env.REGISTRATION,
             to: process.env.REGISTRATION,
             subject: "A User Has Created an Aceway Account",
             text: "Please login to your admin account on Aceway Auto to view the registration."
@@ -438,15 +448,15 @@ app.post('/admin/adduser', async (req, res) => {
         })
     } else {
         console.log(process.env.DOMAIN)
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        registerEmail.sendMail({
+            from: process.env.REGISTRATION,
             to: email,
             subject: "Your Aceway Auto Account Has Been Created!",
             text: `You may log in using your email at: ${process.env.DOMAIN}/login` + "Your one-time password is " + password,
             html: `<a href="${process.env.DOMAIN}/login"> Log in to your Aceway Auto account </a> <p> Your one-time password is ${password} </p>`
         });
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        registerEmail.sendMail({
+            from: process.env.REGISTRATION,
             to: process.env.REGISTRATION,
             subject: "An Account has been created for a user",
             text: `User email: ${email} One-time Password: ${password}`

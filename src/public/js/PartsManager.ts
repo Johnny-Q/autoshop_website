@@ -109,6 +109,7 @@ class PartsManager {
     }
 
     renderPart(part: Part) {
+        console.log(part);
         // //add the elements
         // let img = document.createElement("img");
         // //render the right image

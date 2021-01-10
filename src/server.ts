@@ -68,6 +68,15 @@ app.use(session({
     "saveUninitialized": true,
     "unset": "destroy"
 }));
+
+function assertObject(obj, keys: string[]): boolean{
+    if(typeof obj != "object") return false;
+    for(let i = 0;i < keys.length; i++){
+        if(!obj[keys[i]]) return false;
+    }
+    return true;
+}
+
 const HTMLpages = ["about", "search_box", "search", "contact", "slideshow", "register", "login", "dashboard", "test", "reset_password", "partials/search_box", "import_test"];
 HTMLpages.forEach(page => {
     app.get(`/${page}`, (req, res) => {
@@ -728,14 +737,12 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
 })
 
 app.use("/names", async(req, res, next)=>{
-    console.log(req.query);
     for (let [key, value] of Object.entries(req.query)) {
         req.query[key] = makeNullIfAny(value);
     }
     for (let [key, value] of Object.entries(req.body)) {
         req.body[key] = makeNullIfAny(value);
     }
-    console.log(req.query, req.body);
     next();
 });
 
@@ -781,11 +788,25 @@ app.get("/names/engine", async (req, res) => {
 
 app.get("/cart", async (req, res) => {
     let cart = [];
+    console.log("before", req.session.cart);
     req.session.cart = req.session.cart || {};
+    console.log("after", req.session.cart);
 
     for (let part of Object.values(req.session.cart)) {
         cart.push(part);
     }
+
+    cart.sort((a, b)=>{
+        if(a.description > b.description){
+           return 1; 
+        }
+        else if(a.description == b.description){
+            return 0; 
+        }
+        else{
+            return -1;
+        }
+    });
 
     // get part info for cart
     res.render('cart', {
@@ -813,6 +834,7 @@ app.post("/cart/part", async (req, res) => {
     let { part } = req.body;
     // debugLog(part);
     req.session.cart = req.session.cart || {};
+
     //check if the part is already in the cart
     if (!part.id) {
         res.sendStatus(403);

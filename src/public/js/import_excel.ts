@@ -22,7 +22,7 @@ function parseExcel(file) {
             let errors = [];
             for (let i = 0; i < XL_row_object.length; i++) {
                 try {
-                    let part = parseRow(XL_row_object[i])
+                    let part = parseRow(XL_row_object[i]);
                     console.log(part);
                     parts.push(part);
                 }
@@ -237,12 +237,6 @@ function standardizeYear(year: number): number {
 
 input.addEventListener('change', function () {
     loader.style.display = "block";
-    // console.log('in here');
-    // console.log(this.files[0]);
-    // // readXlsxFile(this.files[0]).then((rows) => {
-    // //     console.log("found", rows.length, "rows");
-    // //     console.log(rows.length);
-    // // })]
     console.log("ree");
     parseExcel(this.files[0]);
 })

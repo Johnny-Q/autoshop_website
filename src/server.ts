@@ -414,7 +414,7 @@ app.post('/admin/adduser', async (req, res) => {
     if (!isValidEmail(email)) errmsgs.push({ msg: "Please enter a valid email address" })
     if (phone.length != 10) errmsgs.push({ msg: "Please enter a valid phone number" })
     if (!isValidPostal(postalStrip)) errmsgs.push({ msg: "Please enter a valid postal code" })
-    if (!(username && username.indexOf('@') > 0)) errmsgs.push({ msg: "Username cannot contain @ character" })
+    if ((username && username.indexOf('@') > 0)) errmsgs.push({ msg: "Username cannot contain @ character" })
     if (!(purchase == '<$1000' || purchase == '$1000-$5000' || purchase == '$5000-$10000' || purchase == '>$10000')) {
         errmsgs.push({ msg: "Please fill out all fields" })
     }
@@ -707,11 +707,17 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
     let part: PartDBEntry = null, applications: Array<Application> = null;
     let interchanges = null;
     try {
-        console.log(req.body);
         let { make, oe_number, frey_number, price, description, enabled, in_stock, brand } = req.body;
         if (!brand) brand = null;
         make = make || make.toLowerCase();
-        if (price) price = parseInt(price.replace(".", ""));
+        price = price.split('.');
+        if(price.length > 1){
+            if(price[1].length == 1) price[1] += '0';
+            else price[1] = price[1].substr(0, 2);
+        } else {
+            price.push('00');
+        }
+        price = parseInt(price.join(''));
         part = {
             make, oe_number, frey_number, price, brand,
             'description': description ? description : null,

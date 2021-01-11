@@ -1,4 +1,3 @@
-
 /**
  * @description creates styled select and option list as divs
  * @param custom_select the div.custom_select containing a select elmeent
@@ -11,11 +10,20 @@ class CustomSelect {
     select_element: HTMLSelectElement;
     input_element: HTMLInputElement;
     default_text: string;
+    name: string;
+
+    next_select: CustomSelect;
+    is_submit = true;
+    enabled = false;
+    showing = false;
+
+    options = [];
     getOptions = (filter: Object): any => {
         return [this.default_text];
     }
-    constructor(custom_select: HTMLElement, options_container, default_text) {
+    constructor(custom_select: HTMLElement, options_container, default_text, name) {
         this.default_text = default_text;
+        this.name = name;
         //get the actual select element and it's options
         this.select_element = custom_select.querySelector("select");
         let options = this.select_element.children;
@@ -34,7 +42,7 @@ class CustomSelect {
 
         //add listener to select
         // this.select_div.onclick = () => {
-        // this.showOptions();
+        //     this.showOptions();
         // }
 
         //add all the options to the options div, we don't have any options to begin with
@@ -59,29 +67,37 @@ class CustomSelect {
         // }
     }
     hideOptions() {
+        this.showing = false;
         if (this.options_div.classList.contains("active")) {
             this.options_div.classList.remove("active");
             this.select_div.classList.remove("selected");
         }
     }
     showOptions() {
+        this.showing = true;
         if (!this.options_div.classList.contains("active")) {
             this.options_div.classList.add("active");
             this.select_div.classList.add('selected');
-            this.enable();
         }
     }
     reset() {
         this.select_div.innerText = this.default_text;
         this.input_element.value = "";
+        this.options = [];
+        this.disable();
+        if (this.next_select) {
+            this.next_select.reset();
+        }
     }
     //for css
     enable() {
+        this.enabled = true;
         if (this.select_div.classList.contains("disabled")) {
             this.select_div.classList.remove("disabled");
         }
     }
     disable() {
+        this.enabled = false;
         if (!this.select_div.classList.contains("disabled")) {
             this.select_div.classList.add("disabled");
         }
@@ -89,22 +105,21 @@ class CustomSelect {
 
     async populateOptions(filter) {
         let values = await this.getOptions(filter);
+        this.options = values;
         console.log(values);
         // console.log(this.getOptions.toString());
         // console.log(values);
-
-
+        values.unshift("ANY");
 
         //remove the old options
         while (this.options_div.firstChild) {
             this.options_div.removeChild(this.options_div.lastChild);
         }
-        values.unshift('ANY');
 
         //order in columns
         //will always have 4 columns
         if (values.length > 4) {
-            //@ts-expect-error
+            //@ts-expect-error 
             let one_column = parseInt(values.length / 4);
             let extras = values.length % 4; //1 add one more option to the first column, 2 is for second...
             let first_break = extras >= 1 ? one_column + 1 : one_column;
@@ -121,7 +136,7 @@ class CustomSelect {
             }
             for (let i = 0; i < extras; i++) {
                 let value = temp_values[i][temp_values[i].length - 1];
-                this.createOption(value)
+                this.createOption(value);
             }
         } else {
             //add children
@@ -132,9 +147,7 @@ class CustomSelect {
     }
     createOption(value) {
         // if (!value) return;
-        if (value && value != "Any") {
-            value = value.toString().toUpperCase();
-        }
+        value = value.toString().toUpperCase();
         let option = document.createElement("div");
         option.innerText = value;
 
@@ -163,54 +176,124 @@ class CustomSelect {
         return this.input_element.value;
     }
 }
+class FilterBar {
+    filter = {};
+    custom_selects: Array<CustomSelect>;
+    parts_manager = null;
+    constructor(custom_selects: Array<CustomSelect>, parts_manager = null) {
+        this.parts_manager = parts_manager;
+        this.custom_selects = custom_selects;
+        for (let i = 0; i < custom_selects.length; i++) {
+            custom_selects[i].disable();
+            custom_selects[i].select_div.onclick = async () => {
+                let show = !custom_selects[i].showing;
+                this.hideAllOptions();
+                if (custom_selects[i].enabled) {
+                    if (custom_selects[i].options.length == 0) {
+                        await custom_selects[i].populateOptions(this.filter);
+                    }
+                    if (show) {
+                        custom_selects[i].showOptions();
+                    } else {
+                        custom_selects[i].hideOptions();
+                    }
+                }
+            }
+            custom_selects[i].input_element.onchange = async () => {
+                this.hideAllOptions();
+                this.filter[custom_selects[i].name] = custom_selects[i].getValue();
+                if (custom_selects[i].next_select) {
+                    let next_select = custom_selects[i].next_select;
+                    next_select.reset();
+                    next_select.enable();
+                    await next_select.populateOptions(this.filter);
+                    next_select.showOptions();
+                } else {
+                    if (custom_selects[i].name == "category") {
+                        this.submit({ "category": custom_selects[i].getValue() });
+                    } else {
+                        this.submit(this.filter);
+                    }
+                }
+            }
+        }
+        custom_selects[0].enable();
+        custom_selects[4].enable();
+    }
+    hideAllOptions() {
+        this.custom_selects.forEach(select => {
+            select.hideOptions();
+        });
+    }
+    submit(filter) {
+        //perform the search
+        console.log(filter);
+        //this has to be overwritten
+        if (this.parts_manager) {
+            this.parts_manager.searchAndRender(filter);
+        } else {
+            let url = "/search?";
+            let counter = 0;
+            for (let [key, value] of Object.entries(filter)) {
+                if (counter > 0) url += "&";
+                url += `${key}=${value}`;
+                counter++;
+            }
+            window.location.assign(url);
+        }
 
+    }
+}
 /**
  * @param custom_select the array of div.custom_select
  * @param default_text the default texts of each custom select respectively
  * @param name name of each custom select respectively , for key value in filter
  * @description the functionality for a collection of custom selects to form a search filter
  */
+//submit selector
 class SearchBar {
     selects: Array<CustomSelect> = [];
     last_filled = -1;
     filter = {};
     names: string[];
     parts_manager: PartsManager;
-    constructor(custom_selects: Array<HTMLElement>, default_texts: string[], names: string[], options_container: HTMLDivElement, parts_manager: PartsManager = null) {
+    constructor(custom_selects: Array<CustomSelect>, default_texts: string[], names: string[], parts_manager: PartsManager = null) {
         this.names = names;
         this.parts_manager = parts_manager;
         // let options_container = document.querySelector(".options_container");
 
+        custom_selects[0].enable();
         //create the CustomSelect Object
         for (let i = 0; i < custom_selects.length; i++) {
-            let temp = new CustomSelect(custom_selects[i], options_container, default_texts[i])
+            // let temp = new CustomSelect(custom_selects[i], options_container, default_texts[i])
 
             //add listeners to select divs
-            temp.select_div.onclick = () => {
-                if (temp.options_div.classList.contains("active")) {
-                    temp.hideOptions();
+            custom_selects[i].select_div.onclick = () => {
+                if (custom_selects[i].options_div.classList.contains("active")) {
+                    custom_selects[i].hideOptions();
                 } else {
                     this.requestShow(i);
                 }
             }
 
             //autofocus the next one when the current one gets a value
-            temp.input_element.addEventListener("change", (event) => {
+            custom_selects[i].input_element.addEventListener("change", (event) => {
                 // console.log(event);
 
                 //update the filter so we get the new options
                 let key = this.names[i];
-                this.filter[key] = temp.getValue();
+                this.filter[key] = custom_selects[i].getValue();
 
                 //show the next element if there is one
                 if (i + 1 < custom_selects.length) {
                     this.last_filled = i;
 
                     this.resetSelects();
+                    this.selects[i + 1].enable();
                     this.selects[i + 1].populateOptions(this.filter);
                     this.requestShow(i + 1);
                 } else {
-                    temp.hideOptions();
+                    custom_selects[i].hideOptions();
                     //perform the search
 
                     //get the data
@@ -230,13 +313,13 @@ class SearchBar {
                          * @todo see if I can abstract this part somehow
                          */
                         //redirect to the search page
-                        let { make, year, model, engine } = this.filter;
-                        window.location.assign(`/search?make=${make || null}&year=${year || null}&model=${model || null}&engine=${engine || null}`);
+                        let { make, year, model, engine, category } = this.filter;
+                        window.location.assign(`/search?make=${make || "ANY"}&year=${year || "ANY"}&model=${model || "ANY"}&engine=${engine || "ANY"}&category=${category || "ANY"}`);
                     }
                 }
             })
 
-            this.selects.push(temp);
+            this.selects.push(custom_selects[i]);
         }
 
         //init the buttons
@@ -249,12 +332,12 @@ class SearchBar {
     }
     requestShow(index) {
         this.hideAllOptions();
-        if (index <= this.last_filled + 1) {
+        if (this.selects[index].enabled /*index<= this.last_filled + 1*/) {
             this.selects[index].showOptions();
         }
     }
     resetSelects() {
-        for (let i = this.last_filled + 1; i < this.selects.length; i++) {
+        for (let i = this.last_filled + 1; i < this.selects.length - 1; i++) {
             this.selects[i].reset();
             if (i != this.last_filled + 1) {
                 this.selects[i].disable();

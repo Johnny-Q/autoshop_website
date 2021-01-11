@@ -14,8 +14,7 @@
             <fieldset id="part_info">
                 <div class="labelled_input">
                     <h2>Current Image</h2>
-                    <% let image_string = `${part.make}-${part.oe_number}` %>
-                    <img src="<%="/img/parts/" + part.image_url + ".jpg" %>" onerror="this.src = '<%="/img/parts/" + part.image_url + ".png" %>'">
+                    <img src="<%="/img/parts/" + part.image_url + ".jpg" %>" alt="<%="/img/parts/" + part.image_url + ".png" %>">
                 </div> 
                 <legend>Part Information</legend>
                 <div class="labelled_input">
@@ -50,11 +49,12 @@
             </fieldset>
             <fieldset id="applications">
                 <legend>Applications</legend>
-                <table>
+                <table id = 'app_table'>
                     <thead>
                         <th>Model</th>
                         <th>Start Year</th>
                         <th>End Year</th>
+                        <th>Engines</th>
                         <th></th>
                     </thead>
                     <tbody>
@@ -72,6 +72,10 @@
                                     <input type="text" name="end_year" placeholder="End Year" required
                                     value="<%= app.end_year %>">
                                 </td>
+                                <!-- <td class="labelled_input">
+                                    <input type="text" name="engines" placeholder="Engines"
+                                    value="<%= app.end_year %>">
+                                </td> -->
                                 <td>
                                     <button onclick="this.parentElement.parentElement.remove()">Delete Application</button>
                                 </td>
@@ -81,6 +85,31 @@
                 </table>
                 <div class="add_application_wrapper">
                     <button id="add_application">Add Application</button>
+                </div>
+            </fieldset>
+            <fieldset id="applications">
+                <legend>Interchangeable Numbers</legend>
+                <table id="int_table">
+                    <thead>
+                        <th>Interchange Number</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        <% ints.forEach(int => { %>
+                            <tr>
+                                <td class="labelled_input">
+                                    <input type="text" name="int_number" placeholder="Interchange No." required
+                                        value="<%= int.int_number %>">
+                                </td>
+                                <td>
+                                    <button onclick="this.parentElement.parentElement.remove()">Delete Application</button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+                <div class="add_application_wrapper">
+                    <button id="add_int">Add Application</button>
                 </div>
             </fieldset>
             <button type="submit">Save</button>

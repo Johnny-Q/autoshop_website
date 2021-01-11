@@ -20,40 +20,40 @@ class PartsManager {
             this.img_modal.style.display = "none";
         }
     }
-    async searchAndRender(data) {
-        try {
-            // if (message_h1.classList.contains("error")) message_h1.classList.remove("error");
-            //spawn the loader
+    // async searchAndRender(data) {
+    //     try {
+    //         // if (message_h1.classList.contains("error")) message_h1.classList.remove("error");
+    //         //spawn the loader
 
 
-            //perform api request
-            let parts = await this.apiSearchFull(data);
-            // console.log(parts);
-            if (parts.length) {
-                //hide the loader after the request is done
-                this.clearParts();
-                parts.forEach(part => {
-                    this.renderPart(part);
-                });
-                this.table.style.display = "table";
-                this.feedback_div.style.display = "none";
-                this.feedback_div.querySelector("h1").classList.remove("error");
-            }
+    //         //perform api request
+    //         let parts = await this.apiSearchFull(data);
+    //         // console.log(parts);
+    //         if (parts.length) {
+    //             //hide the loader after the request is done
+    //             this.clearParts();
+    //             parts.forEach(part => {
+    //                 this.renderPart(part);
+    //             });
+    //             this.table.style.display = "table";
+    //             this.feedback_div.style.display = "none";
+    //             this.feedback_div.querySelector("h1").classList.remove("error");
+    //         }
 
-        } catch (err) {
-            console.log(err);
-            this.clearParts();
-            //hide the results
-            this.table.style.display = "none";
-            this.feedback_div.style.display = "flex";
+    //     } catch (err) {
+    //         console.log(err);
+    //         this.clearParts();
+    //         //hide the results
+    //         this.table.style.display = "none";
+    //         this.feedback_div.style.display = "flex";
 
-            //show an error message on screen
-            let message_h1 = this.feedback_div.querySelector("h1");
-            message_h1.classList.add("error");
-            message_h1.innerText = "Please try again.";
-        }
-        this.hideLoader();
-    }
+    //         //show an error message on screen
+    //         let message_h1 = this.feedback_div.querySelector("h1");
+    //         message_h1.classList.add("error");
+    //         message_h1.innerText = "Please try again.";
+    //     }
+    //     this.hideLoader();
+    // }
     /**
      * 
      * @param data {make, year, model, engine}
@@ -98,6 +98,25 @@ class PartsManager {
                 },
                 "body": JSON.stringify({
                     "id_number": number
+                })
+            });
+            let json = await resp.json();
+            this.admin = json.admin;
+            return json.parts;
+        } catch (err) {
+            throw err;
+        }
+    }
+    async apiCategorySearch(category) {
+        this.showLoader();
+        try {
+            let resp = await fetch("/search/category", {
+                "method": "POST",
+                "headers": {
+                    "content-type": "application/json"
+                },
+                "body": JSON.stringify({
+                    category
                 })
             });
             let json = await resp.json();
@@ -167,7 +186,7 @@ class PartsManager {
         image_td.style.postion = "relative";
         let img = document.createElement("img");
         img.src = `/img/parts/${part.make}-${part.oe_number}.png`;
-        img.onerror = ()=>{
+        img.onerror = () => {
             img.src = `/img/parts/${part.make}-${part.oe_number}.jpg`;
             img.onerror = null;
         }
@@ -175,7 +194,7 @@ class PartsManager {
         bigger_img.classList.add("big_img");
         bigger_img.style.display = "none";
         bigger_img.src = `/img/parts/${part.make}-${part.oe_number}.png`;
-        bigger_img.onerror = ()=>{
+        bigger_img.onerror = () => {
             bigger_img.src = `/img/parts/${part.make}-${part.oe_number}.jpg`;
             bigger_img.onerror = null;
         }
@@ -349,13 +368,10 @@ class PartsManager {
             let edit_button_td = row.insertCell();
             let edit_button = document.createElement("button");
             edit_button.innerText = "Edit";
-            edit_button.onclick = ()=>{
+            edit_button.onclick = () => {
                 window.open(`/admin/editpart?part_id=${part.id}`);
             };
-
             edit_button_td.append(edit_button);
-
-
         }
 
     }

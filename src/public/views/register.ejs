@@ -24,6 +24,11 @@
                         <label for=email><span>Email Address</span></label>
                     </div>
                     <div class="rounded_input">
+                        <input type="text" name="user" placeholder="Username"
+                        value="<%= typeof username != 'undefined' ? username : ''%>">
+                        <label for=email><span>Username</span></label>
+                    </div>
+                    <div class="rounded_input">
                         <input type="text" name="business" placeholder="Business Type"
                         value="<%= typeof business != 'undefined' ? business : ''%>">
                         <label for=business><span>Business Type</span></label>

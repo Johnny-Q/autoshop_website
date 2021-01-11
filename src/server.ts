@@ -260,6 +260,7 @@ app.post('/register', async (req, res) => {
     const {
         company,
         email,
+        user,
         business,
         purchase,
         telephone,
@@ -275,6 +276,7 @@ app.post('/register', async (req, res) => {
         passconfirm
     } = req.body;
     let phone = "", postalStrip = "";
+    let username = user || null;
     if (telephone) {
         phone = telephone.replace(/[^0-9]/g, "");
     }
@@ -296,6 +298,7 @@ app.post('/register', async (req, res) => {
     if (pass != passconfirm) errmsgs.push({ msg: "Passwords do not match" });
     if (!isValidEmail(email)) errmsgs.push({ msg: "Please enter a valid email address" })
     if (phone.length != 10) errmsgs.push({ msg: "Please enter a valid phone number" })
+    if (username && (username.indexOf('@') > 0)) errmsgs.push({ msg: "Username cannot contain @ character" })
     if (!isValidPostal(postalStrip)) errmsgs.push({ msg: "Please enter a valid postal code" })
     if (!(purchase == '<$1000' || purchase == '$1000-$5000' || purchase == '$5000-$10000' || purchase == '>$10000')) {
         errmsgs.push({ msg: "Please fill out all fields" })
@@ -318,8 +321,9 @@ app.post('/register', async (req, res) => {
     };
     let register = null;
     if (errmsgs.length == 0) {
+        console.log(username)
         // no errors so far, try to register user in db
-        register = await db.register(email, pass, additional_info);
+        register = await db.register(email, username, pass, additional_info);
         register.errmsgs.forEach(msg => {
             errmsgs.push({ msg });
         })
@@ -329,6 +333,7 @@ app.post('/register', async (req, res) => {
         res.render('register', {
             errors: errmsgs,
             email,
+            username,
             company,
             business,
             purchase,
@@ -375,6 +380,7 @@ app.post('/admin/adduser', async (req, res) => {
     const {
         company,
         email,
+        user,
         business,
         purchase,
         telephone,
@@ -387,7 +393,8 @@ app.post('/admin/adduser', async (req, res) => {
         contact_first,
         contact_last
     } = req.body;
-    let phone, postalStrip;
+    let phone = '', postalStrip='';
+    let username = user || null;
     if (telephone) {
         phone = telephone.replace(/[^0-9]/g, "");
     }
@@ -407,6 +414,7 @@ app.post('/admin/adduser', async (req, res) => {
     if (!isValidEmail(email)) errmsgs.push({ msg: "Please enter a valid email address" })
     if (phone.length != 10) errmsgs.push({ msg: "Please enter a valid phone number" })
     if (!isValidPostal(postalStrip)) errmsgs.push({ msg: "Please enter a valid postal code" })
+    if (!(username && username.indexOf('@') > 0)) errmsgs.push({ msg: "Username cannot contain @ character" })
     if (!(purchase == '<$1000' || purchase == '$1000-$5000' || purchase == '$5000-$10000' || purchase == '>$10000')) {
         errmsgs.push({ msg: "Please fill out all fields" })
     }
@@ -431,7 +439,7 @@ app.post('/admin/adduser', async (req, res) => {
     if (errmsgs.length == 0) {
         //generate a temporary password string
         password = randString("12");
-        let register = await db.register(email, password, additional_info);
+        let register = await db.register(email, username, password, additional_info);
         register.errmsgs.forEach(msg => {
             errmsgs.push({ msg });
         })
@@ -565,6 +573,18 @@ app.post("/search/full", async (req, res) => {
     }
 });
 
+app.post("/search/category", async(req, res)=>{
+    let { category } = req.body;
+    let { admin } = req.body;
+    try{
+        let parts = await db.searchCategories(category);
+        res.json({parts, admin});
+        console.log(parts);
+    }catch(err){
+        console.log(err);
+        res.sendStatus(500);
+    }
+});
 
 app.post("/search/id_number", async (req, res) => {
     let { id_number } = req.body;
@@ -636,11 +656,18 @@ app.get('/admin/editpart', async (req, res) => {
     }
     let part = await db.getPartByDbId(part_id);
     part.image_url = `${part.make}-${part.oe_number}`
-    const apps = await db.getApps(part_id);
+    const applications = await db.getApps(part_id);
+    let apps = [];
+    for(let i = 0; i < applications.length; i++){
+        apps.push({
+            ...applications[i],
+        })
+    }
+    const ints = await db.getInts(part_id);
     if (!part) {
         return res.render('message', { ...properties, message: "This part is not found!", page_name: 'Edit Part' })
     }
-    res.render('admin/editpart', { ...properties, part: part, apps: apps })
+    res.render('admin/editpart', { ...properties, part: part, apps: apps, ints: ints})
 })
 
 app.post("/admin/addpart", async (req, res) => {
@@ -678,7 +705,9 @@ app.post("/admin/addpart", async (req, res) => {
 app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
     // construct part db entry
     let part: PartDBEntry = null, applications: Array<Application> = null;
+    let interchanges = null;
     try {
+        console.log(req.body);
         let { make, oe_number, frey_number, price, description, enabled, in_stock, brand } = req.body;
         if (!brand) brand = null;
         make = make || make.toLowerCase();
@@ -721,13 +750,28 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
                 'engines': []
             });
         }
+
+        // construct interchange numbers array
+        interchanges = []
+        // check if int_number exists
+        if(req.body.int_number){
+            //if there are multiple int_numbers then should be array
+            if(Array.isArray(req.body.int_number)){
+                for (let i = 0; i < req.body.int_number.length; i++) {
+                    interchanges.push(req.body.int_number[i]);
+                }
+            } else { // else only one int_number
+                interchanges.push(req.body.int_number)
+            }
+        }
     } catch (err) {
         console.log(err);
         res.sendStatus(500);
     }
 
     try {
-        let part_id = await db.addPart(part, applications);
+        console.log(part, applications, interchanges)
+        let part_id = await db.addPart(part, applications, interchanges);
         res.redirect('/admin/editpart?part_id=' + part_id);
     }
     catch (err) {

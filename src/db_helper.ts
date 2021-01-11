@@ -72,7 +72,7 @@ async function getPartByDbId(id: string) { // refactored
  * @todo sort returned array alphabetically but also by ascending number (aaa10 < aaa2 but aaa10 should come after aaa2)
  */
 async function getMakes(): Promise<Array<string>> { // refactored
-    return db('Parts').distinct('make');
+    return db('Parts').distinct('make').orderBy("make", "asc");
 }
 /**
  * @desc obtains array of valid years given a make
@@ -106,10 +106,11 @@ async function getModels(make: string, year: number): Promise<Array<string>> { /
  * @param {number} year the year to query valid models for, null if match all
  */
 async function getEngines(make: string, year: number, model: string): Promise<Array<string>> { // refactored
-    return db('Engines').leftJoin('Applications', "Engines.app_id", "Applications.id")
+    return db('Engines').distinct('engine').leftJoin('Applications', "Engines.app_id", "Applications.id")
         .whereRaw('IFNULL(? ,make) like make', make)
         .andWhereRaw('IFNULL(?, begin_year) between begin_year and end_year', year)
         .andWhereRaw('IFNULL(?, model) like model', model)
+        //.orderBy('engine');
 }
 
 async function getApps(part_id: string) { // refactored
@@ -197,17 +198,35 @@ async function deletePart(part_id: string) { // refactored
  * @param {string} user desired registration username
  * @return {Promise<Array<string>>} array of error messages, if exists
  */
-async function register(email, pass, additional_info) { // refactored
+async function register(email, username, pass, additional_info) { // refactored
     let res = {
         email_token: null,
         errmsgs: []
     };
-    // check if user already exists
-    let user_count = await db('Accounts').where('email', email).count('email', { as: 'count' });
+    // check if email already exists
+    let user_count = await db('Accounts')
+                        .where('email', email)
+                        .orWhere('username', email)
+                        .count('email', { as: 'count' });
     if (user_count[0].count > 0) {
         res.errmsgs.push('That email already exists');
     }
-    else {
+
+    // check if username already exists
+    if(username){
+        user_count = await db('Accounts')
+                            .where('email', username)
+                            .orWhere('username', username)
+                            .count('username', { as: 'count' });
+        if (user_count[0].count > 0) {
+            res.errmsgs.push('That username already exists');
+        }
+    }
+    // check if there has been error pushed already
+    if(res.errmsgs.length > 0){
+        // on error logic here
+    }
+    else { // no errors up until this point, create password hash and insert user now
         let email_hashed = crypto.createHash('md5').update(email).digest("hex");
         let email_token = email_hashed + randString(15);
         res.email_token = email_token;
@@ -215,6 +234,7 @@ async function register(email, pass, additional_info) { // refactored
             let expiry_time = Date.now() + 7 * 24 * 60 * 60 * 1000;
             await db('Accounts').insert({
                 email: email,
+                username: username,
                 hash: hash,
                 email_token: email_token,
                 email_expiry: expiry_time,
@@ -228,7 +248,9 @@ async function register(email, pass, additional_info) { // refactored
 async function login(user, pass) { // refactored
     let errmsgs = [];
     let match = false;
-    let user_entry = await db('Accounts').leftJoin('Admins', "Admins.account_id", "Accounts.id").select().where("email", user);
+    let user_entry = await db('Accounts').leftJoin('Admins', "Admins.account_id", "Accounts.id").select()
+                        .where("email", user)
+                        .orWhere('username', user);
     if (user_entry.length == 0) {
         errmsgs.push('Username or password incorrect.');
     } else {
@@ -317,6 +339,15 @@ function randString(length) {
     return result;
 }
 
+async function searchCategories(category: string){
+    category = '%' + category + '%';
+    return db('Parts').whereRaw('description like ?', category).orderBy('description', 'asc');
+}
+
+async function getInts(part_id: number){
+    return db('Interchange').where('parts_id', part_id);
+}
+
 module.exports = {
     getPartByIdNumber,
     getPartByDbId,
@@ -334,5 +365,7 @@ module.exports = {
     resetPassword,
     getUnapprovedUsers,
     queryPassToken,
-    approveUser
+    approveUser,
+    searchCategories,
+    getInts
 }

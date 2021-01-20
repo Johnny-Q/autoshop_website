@@ -110,7 +110,7 @@ async function getEngines(make: string, year: number, model: string): Promise<Ar
         .whereRaw('IFNULL(? ,make) like make', make)
         .andWhereRaw('IFNULL(?, begin_year) between begin_year and end_year', year)
         .andWhereRaw('IFNULL(?, model) like model', model)
-        //.orderBy('engine');
+    //.orderBy('engine');
 }
 
 async function getApps(part_id: string) { // refactored
@@ -126,7 +126,7 @@ async function getApps(part_id: string) { // refactored
 async function addPart(part: Part, applications: Array<Application>, interchange = []): Promise<number> { // refactored
     for (let [key, value] of Object.entries(part)) {
         if (typeof (value) == "string") {
-            if(key=="description") continue;
+            if (key == "description") continue;
             part[key] = value.toLowerCase();
         }
     }
@@ -161,7 +161,7 @@ async function addPart(part: Part, applications: Array<Application>, interchange
             make: part.make,
             parts_id: part_id
         })
-        
+
         // if(engines && engines.length > 0) console.log(engines);
         for (let j = 0; j < engines.length; j++) {
             await db("Engines").insert({
@@ -205,25 +205,25 @@ async function register(email, username, pass, additional_info) { // refactored
     };
     // check if email already exists
     let user_count = await db('Accounts')
-                        .where('email', email)
-                        .orWhere('username', email)
-                        .count('email', { as: 'count' });
+        .where('email', email)
+        .orWhere('username', email)
+        .count('email', { as: 'count' });
     if (user_count[0].count > 0) {
         res.errmsgs.push('That email already exists');
     }
 
     // check if username already exists
-    if(username){
+    if (username) {
         user_count = await db('Accounts')
-                            .where('email', username)
-                            .orWhere('username', username)
-                            .count('username', { as: 'count' });
+            .where('email', username)
+            .orWhere('username', username)
+            .count('username', { as: 'count' });
         if (user_count[0].count > 0) {
             res.errmsgs.push('That username already exists');
         }
     }
     // check if there has been error pushed already
-    if(res.errmsgs.length > 0){
+    if (res.errmsgs.length > 0) {
         // on error logic here
     }
     else { // no errors up until this point, create password hash and insert user now
@@ -249,8 +249,8 @@ async function login(user, pass) { // refactored
     let errmsgs = [];
     let match = false;
     let user_entry = await db('Accounts').leftJoin('Admins', "Admins.account_id", "Accounts.id").select()
-                        .where("email", user)
-                        .orWhere('username', user);
+        .where("email", user)
+        .orWhere('username', user);
     if (user_entry.length == 0) {
         errmsgs.push('Username or password incorrect.');
     } else {
@@ -339,12 +339,15 @@ function randString(length) {
     return result;
 }
 
-async function searchCategories(category: string){
+async function searchCategories(category: string, logged_in=false) {
     category = '%' + category + '%';
-    return db('Parts').whereRaw('description like ?', category).orderBy('description', 'asc');
+    let columns = ['Parts.id', 'Parts.make', 'oe_number', 'description', 'frey_number'];
+    if (logged_in) columns.push("price");
+
+    return db('Parts').distinct(...columns).whereRaw('description like ?', category).orderBy('description', 'asc');
 }
 
-async function getInts(part_id: number){
+async function getInts(part_id: number) {
     return db('Interchange').where('parts_id', part_id);
 }
 

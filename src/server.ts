@@ -577,7 +577,7 @@ app.post("/search/category", async(req, res)=>{
     let { category } = req.body;
     let { admin } = req.body;
     try{
-        let parts = await db.searchCategories(category);
+        let parts = await db.searchCategories(category, req.session.logged_in);
         res.json({parts, admin});
         console.log(parts);
     }catch(err){

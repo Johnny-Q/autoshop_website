@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang=en>
-<%- include('../partials/header.ejs', {stylesheets: ['register'], scripts: [{name: 'import_excel', defer: true}], page_name: "Add Parts"}) %>
+<%- include('../partials/header.ejs', {stylesheets: ['register'], scripts: [{name: 'import_excel' , defer: true}], page_name: "Add Parts" }) %>
 
-<body>
-    <%- include('../partials/navbar.ejs', {logged_in}) %> 
+    <body>
+        <%- include('../partials/navbar.ejs', {logged_in}) %>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+        <main>
+            <input type="file" name="" id="file_selector">
+            <img src="/img/loader.gif" alt="" id="loader" style="display: none;">
+            <p class="error_message"></p>
+        </main>
 
-    <main>
-        <input type="file" name="" id="">
-        <img src="/img/loader.gif" alt="" id="loader">
-        <p class="error_message"></p>
-    </main>
-
-    <%- include('../partials/footer.ejs') %>
-</body>
+        <%- include('../partials/footer.ejs') %>
+    </body>
 
 </html>

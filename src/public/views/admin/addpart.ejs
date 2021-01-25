@@ -6,25 +6,9 @@
     <%- include('../partials/navbar.ejs', {logged_in}) %> 
 
     <main>
-        <% if(typeof errors!='undefined' ) { errors.forEach(function(error){ %>
-            <p class='error_message'>
-                <%= error.msg %>
-            </p>
-            <% }) } %>
-
-        <h3> Add Part Info </h3>
-        <form action="/admin/addpart" method="POST" enctype="multipart/form-data">
-            <input type="file" name="parts">
-            <input type="hidden" name="fileType" value="parts">
-            <button type="submit">Submit</button>
-        </form>
-            
-        <h3> Add Part Image </h3>
-        <form action="/admin/addpart" method="POST" enctype="multipart/form-data">
-            <input type="file" name="image">
-            <input type="hidden" name="fileType" value="image">
-            <button type="submit">Submit</button>
-        </form>
+        <input type="file" name="" id="">
+        <img src="/img/loader.gif" alt="" id="loader">
+        <p class="error_message"></p>
     </main>
 
     <%- include('../partials/footer.ejs') %>

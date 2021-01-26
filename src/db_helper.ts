@@ -261,11 +261,7 @@ async function login(user, pass) { // refactored
 }
 
 async function queryPassToken(token: string) { // refactored
-    let res = null;
-    let user = await db('Accounts').where('pass_token', token);
-    if (user.length > 0) {
-        let res = user[0];
-    }
+    let res = await db('Accounts').where('pass_token', token);
     return res;
 }
 

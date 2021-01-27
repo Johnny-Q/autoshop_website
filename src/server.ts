@@ -173,7 +173,7 @@ app.post('/reset', async (req, res) => {
         let user = await db.queryPassToken(token);
         console.log(user);
         if (user) {
-            await db.changePass(user[0].email, pass);
+            await db.changePass(user.email, pass);
         }
     }
     res.render('reset', {

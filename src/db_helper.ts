@@ -262,7 +262,7 @@ async function login(user, pass) { // refactored
 
 async function queryPassToken(token: string) { // refactored
     let res = await db('Accounts').where('pass_token', token);
-    return res;
+    return res[0];
 }
 
 async function changePass(user: string, pass: string) { // refactored

@@ -8,12 +8,12 @@
                 <form onsubmit="form_submit()" action="/admin/adduser" id="regform" method="POST">
                     <p> Company Info </p>
                     <div class="rounded_input">
-                        <input type="text" name="company" placeholder="Company Name"
+                        <input type="text" name="company" placeholder="Company Name" required
                         value="<%= typeof company != 'undefined' ? company : ''%>">
                         <label for=company><span>Name</span></label>
                     </div>
                     <div class="rounded_input">
-                        <input type="text" name="email" placeholder="Email Address"
+                        <input type="text" name="email" placeholder="Email Address" required
                         value="<%= typeof email != 'undefined' ? email : ''%>">
                         <label for=email><span>Email Address</span></label>
                     </div>
@@ -23,13 +23,13 @@
                         <label for=user><span>Username</span></label>
                     </div>
                     <div class="rounded_input">
-                        <input type="text" name="business" placeholder="Business Type"
+                        <input type="text" name="business" placeholder="Business Type" required
                         value="<%= typeof business != 'undefined' ? business : ''%>">
                         <label for=business><span>Business Type</span></label>
                     </div>
                     <div>
                         <label for=purchase> How much do you plan to spend monthly? </label>
-                        <select name="purchase">
+                        <select name="purchase"  required>
                             <% if(typeof purchase != 'undefined'){ %>
                                 <option value="<%=purchase%>"> <%=purchase%> </option>
                             <% } %> 
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="rounded_input">
-                        <input type="text" name="telephone" placeholder="Telephone"
+                        <input type="text" name="telephone" placeholder="Telephone" required
                         value="<%= typeof telephone != 'undefined' ? telephone : ''%>">
                         <label for=telephone><span>Telephone</span></label>
                     </div>
@@ -52,7 +52,7 @@
                     </div>
                     <p> Address </p>
                     <div class="rounded_input">
-                        <input type="text" name="address1" placeholder="Address Line 1"
+                        <input type="text" name="address1" placeholder="Address Line 1" required
                         value="<%= typeof address1 != 'undefined' ? address1 : ''%>">
                         <label for=address1><span>Address Line 1</span></label>
                     </div>
@@ -62,28 +62,28 @@
                         <label for=address2><span>Address Line 2</span></label>
                     </div>
                     <div class="rounded_input">
-                        <input type="text" name="city" placeholder="City"
+                        <input type="text" name="city" placeholder="City" required
                         value="<%= typeof city != 'undefined' ? city : ''%>">
                         <label for=city><span>City</span></label>
                     </div>
                     <div class="rounded_input">
-                        <input type="text" name="province" placeholder="Province"
+                        <input type="text" name="province" placeholder="Province" required
                         value="<%= typeof province != 'undefined' ? province : ''%>">
                         <label for=province><span>Province</span></label>
                     </div>
                     <div class="rounded_input">
-                        <input type="text" name="postal" placeholder="Postal Code"
+                        <input type="text" name="postal" placeholder="Postal Code" required
                         value="<%= typeof postal != 'undefined' ? postal : ''%>">
                         <label for=postal><span>Postal Code</span></label>
                     </div>
                     <p> Contact Person </p>
                     <div class="rounded_input">
-                        <input type="text" name="contact_first" placeholder="First Name"
+                        <input type="text" name="contact_first" placeholder="First Name" required
                         value="<%= typeof contact_first != 'undefined' ? contact_first : ''%>">
                         <label for=contact_first><span>First Name</span></label>
                     </div>
                     <div class="rounded_input">
-                        <input type="text" name="contact_last" placeholder="Last Name"
+                        <input type="text" name="contact_last" placeholder="Last Name" required
                         value="<%= typeof contact_last != 'undefined' ? contact_last : ''%>">
                         <label for=contact_last><span>Last Name</span></label>
                     </div>

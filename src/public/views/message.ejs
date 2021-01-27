@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang=en>
-<%- include('partials/header.ejs', {stylesheets: [], scripts: [], page_name: page_name}) %>
+<%- include('partials/header.ejs', {stylesheets: ['message', 'form_elements'], scripts: [], page_name: page_name}) %>
 
 <body>
     <main>
-        <div class="section_title">
+        <div class="centered">
             <h1> <%= message %> </h1>
+            <button onclick="window.location.assign('/')"> Return to homepage </button>
         </div>
     </main>
 

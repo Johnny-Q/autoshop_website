@@ -6,14 +6,48 @@ let requiredText = document.querySelector("#required")
 
 let subtotal = document.querySelector(".subtotal");
 
+const default_time = 750;
+let time = default_time;
+let changed = false;
+// let current_cart = []; //former updates
 
-window.onload = ()=>{
-    document.querySelectorAll("input[type=number]").forEach((input)=>{
+let timer = setInterval(() => {
+    if (time <= 0) {
+        time = 750;
+        if (changed) {
+            changed = false;
+            // do fetch here
+            console.log('posting cart');
+            // update cart totals
+            let updates = [];
+            //get the update from the number inputs
+            let inputs = document.querySelectorAll("input[type=number]");
+            inputs.forEach(input => {
+                updates.push({ "id": input.name, "quantity": input.value });
+            });
+
+            fetch("/cart", {
+                "method": "post",
+                "headers": {
+                    "content-type": "application/json"
+                },
+                "body": JSON.stringify({ updates, })
+            })
+        }
+
+    } else {
+        time -= 10;
+    }
+}, 10);
+
+
+window.onload = () => {
+    document.querySelectorAll("input[type=number]").forEach((input) => {
         let parent = input.parentElement.parentElement;
         let total = parent.querySelector(".total");
         let price = parent.querySelector(".unit_price");
-        
-        input.onchange = function(){
+
+        input.onchange = function () {
             console.log(this.value);
             console.log(this.parentElement.parentElement);
 
@@ -23,49 +57,27 @@ window.onload = ()=>{
     });
 }
 
-function image_onerror(id, image_string){
+function image_onerror(id, image_string) {
     console.log(id, image_string);
     let image = document.querySelector(`#image-${id}`);
     image.src = `/img/parts/${image_string}.png`;
     image.onerror = null;
 }
 
-function updateSubtotal(){
+function updateSubtotal() {
     let total_price = 0;
-    document.querySelectorAll(".total").forEach(e =>{
+    document.querySelectorAll(".total").forEach(e => {
         total_price += parseFloat(e.innerText.substr(1));
     });
 
     subtotal.innerText = "Subtotal: $" + total_price.toFixed(2) + " CAD";
 
-    // update cart totals
-    let updates = [];
-    //get the update from the number inputs
-    let inputs = document.querySelectorAll("input[type=number]");
-    inputs.forEach(input => {
-        updates.push({ "id": input.name, "quantity": input.value });
-    });
-    fetch("/cart", {
-        "method": "post",
-        "headers": {
-            "content-type": "application/json"
-        },
-        "body": JSON.stringify({ updates })
-    })
+    changed = true;
+    time = default_time;
 }
 
-function removePast2Decimals(price: number): string{
+function removePast2Decimals(price: number): string {
     return price.toFixed(2);
-
-
-    let price_string = price.toString();
-
-    price_string = price_string.split(".");
-    if(price_string.length != 1){
-        price_string[1] = price_string[1].substring(0, 2);
-    } else price_string.push('00')
-
-    return price_string.join(".");
 }
 
 order_button.onclick = () => {
@@ -85,12 +97,12 @@ order_button.onclick = () => {
     }).then(() => {
         let data = {};
         //get the delivery type
-        Array.from(document.querySelectorAll("input[name=delivery]")).forEach(input=>{
-            if(input.checked) data.delivery = input.id;
+        Array.from(document.querySelectorAll("input[name=delivery]")).forEach(input => {
+            if (input.checked) data.delivery = input.id;
         });
 
         data.po_number = po_number.value;
-        if(!data.po_number){
+        if (!data.po_number) {
             po_number.style.borderWidth = "3px";
             po_number.style.borderColor = "red";
             requiredText.style.display = "inline";
@@ -104,11 +116,32 @@ order_button.onclick = () => {
                 "content-type": "application/json"
             },
             "body": JSON.stringify(data)
-        }).then(res=>{
-            res.text().then((html)=>{
+        }).then(res => {
+            res.text().then((html) => {
                 document.documentElement.innerHTML = html;
             })
         })
     });
 };
+
+function deletePart(part, id){
+    part.parentElement.parentElement.remove();
+
+    updateSubtotal();
+    // time = 0;
+
+    fetch("/cart/part", {
+        "method":"delete",
+        "headers": {
+            "content-type": "application/json"
+        },
+        "body": JSON.stringify({
+            "part": {
+                "id": id
+            }
+        })
+    });
+
+    part.onclick = null;
+}
 //# sourceMappingURL=cart.js.map

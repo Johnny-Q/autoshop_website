@@ -15,7 +15,7 @@ let transporter = {
     sendMail: function (obj) { console.log('sent mail') }
 };
 let registerEmail = {
-    sendMail: function(obj) {console.log(obj) }
+    sendMail: function (obj) { console.log(obj) }
 }
 if (process.env.SEND_MAIL) {
     transporter = nodemailer.createTransport({
@@ -69,18 +69,38 @@ app.use(session({
     "unset": "destroy"
 }));
 
-function assertObject(obj, keys: string[]): boolean{
-    if(typeof obj != "object") return false;
-    for(let i = 0;i < keys.length; i++){
-        if(!obj[keys[i]]) return false;
+function assertObject(obj, keys: string[]): boolean {
+    if (typeof obj != "object") return false;
+    for (let i = 0; i < keys.length; i++) {
+        if (!obj[keys[i]]) return false;
     }
     return true;
 }
 
+interface UserSession {
+    "logged_in": boolean,
+    "user": string,
+    "user_id": string, //or number
+    "admin": boolean,
+    "cart": Object
+}
+
+//default values for each unique visit
+app.use("/", (req, res, next) => {
+    let properties = { 'logged_in': false, 'user': null, 'user_id': null, 'admin': false, "cart": {} };
+    for (let [key, value] of Object.entries(properties)) {
+        if (!req.session[key]) { //if the property doesn't exist, set it
+            req.session[key] = value;
+        }
+    }
+    next();
+});
+
+
 const HTMLpages = ["about", "search_box", "search", "contact", "slideshow", "register", "login", "dashboard", "test", "reset_password", "partials/search_box", "import_test"];
 HTMLpages.forEach(page => {
     app.get(`/${page}`, (req, res) => {
-        let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': false };
+        let properties = { 'logged_in': false, 'user': null, 'user_id': null, 'admin': false, "cart": {} };
         for (let [key, value] of Object.entries(properties)) {
             if (req.session[key]) {
                 properties[key] = req.session[key];
@@ -105,6 +125,11 @@ app.get("/", (req, res) => {
     }
     res.render("home", properties);
 });
+
+app.get('/message', async(req, res) => {
+    let {message} = req.query;
+    res.render('message', {message: message, page_name: 'Message'})
+})
 
 app.get('/email', async (req, res) => {
     let token = req.query.token;
@@ -188,10 +213,17 @@ app.post('/reset_password', async (req, res) => {
         res.render('reset_password', { ...properties, errors: [{ msg: data.msg }] });
         console.log(data);
         if (data.pass_token) {
-            transporter.sendMail({
-                from: process.env.EMAIL_USER,
+            registerEmail.sendMail({
+                from: process.env.REGISTRATION,
                 to: email,
                 subject: "Aceway Auto Password Reset",
+                text: `Reset your Aceway Auto account password by following the link: ${process.env.DOMAIN}/reset?token=` + data.pass_token,
+                html: `<a href=${process.env.DOMAIN}/reset?token=${data.pass_token}> Reset your password </a>`
+            });
+            registerEmail.sendMail({
+                from: process.env.REGISTRATION,
+                to: process.env.REGISTRATION,
+                subject: `Aceway Auto Password Reset for user ${email}`,
                 text: `Reset your Aceway Auto account password by following the link: ${process.env.DOMAIN}/reset?token=` + data.pass_token,
                 html: `<a href=${process.env.DOMAIN}/reset?token=${data.pass_token}> Reset your password </a>`
             });
@@ -362,7 +394,7 @@ app.post('/register', async (req, res) => {
             from: process.env.REGISTRATION,
             to: process.env.REGISTRATION,
             subject: "A User Has Created an Aceway Account",
-            text: "Please login to your admin account on Aceway Auto to view the registration."
+            html: "<p>Please login to your admin account on Aceway Auto to view the registration.</p> <a href=${process.env.DOMAIN}/email?token=${register.email_token}>Email Verification Link</a>"
         })
         res.render('message', { page_name: "Register", message: "Thank you for registering! An email has been sent to your email to verify your email." })
     }
@@ -394,7 +426,7 @@ app.post('/admin/adduser', async (req, res) => {
         contact_first,
         contact_last
     } = req.body;
-    let phone = '', postalStrip='';
+    let phone = '', postalStrip = '';
     let username = user || null;
     if (telephone) {
         phone = telephone.replace(/[^0-9]/g, "");
@@ -574,14 +606,14 @@ app.post("/search/full", async (req, res) => {
     }
 });
 
-app.post("/search/category", async(req, res)=>{
+app.post("/search/category", async (req, res) => {
     let { category } = req.body;
     let { admin } = req.body;
-    try{
+    try {
         let parts = await db.searchCategories(category, req.session.logged_in);
-        res.json({parts, admin});
+        res.json({ parts, admin });
         console.log(parts);
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.sendStatus(500);
     }
@@ -659,7 +691,7 @@ app.get('/admin/editpart', async (req, res) => {
     part.image_url = `${part.make}-${part.oe_number}`
     const applications = await db.getApps(part_id);
     let apps = [];
-    for(let i = 0; i < applications.length; i++){
+    for (let i = 0; i < applications.length; i++) {
         apps.push({
             ...applications[i],
         })
@@ -668,7 +700,7 @@ app.get('/admin/editpart', async (req, res) => {
     if (!part) {
         return res.render('message', { ...properties, message: "This part is not found!", page_name: 'Edit Part' })
     }
-    res.render('admin/editpart', { ...properties, part: part, apps: apps, ints: ints})
+    res.render('admin/editpart', { ...properties, part: part, apps: apps, ints: ints })
 })
 
 app.post("/admin/addpart", async (req, res) => {
@@ -687,7 +719,7 @@ app.post("/admin/addpart", async (req, res) => {
                 msg: error.message + ' on line ' + error.line
             })
         })
-        res.render('admin/addpart', {...properties, errors: errmsgs})
+        res.render('admin/addpart', { ...properties, errors: errmsgs })
         for (let i = 0; i < parts.length; i++) {
             if (parts[i].interchange) {
                 await db.addPart(parts[i].part, parts[i].applications, parts[i].interchange)
@@ -712,8 +744,8 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
         if (!brand) brand = null;
         make = make || make.toLowerCase();
         price = price.split('.');
-        if(price.length > 1){
-            if(price[1].length == 1) price[1] += '0';
+        if (price.length > 1) {
+            if (price[1].length == 1) price[1] += '0';
             else price[1] = price[1].substr(0, 2);
         } else {
             price.push('00');
@@ -761,9 +793,9 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
         // construct interchange numbers array
         interchanges = []
         // check if int_number exists
-        if(req.body.int_number){
+        if (req.body.int_number) {
             //if there are multiple int_numbers then should be array
-            if(Array.isArray(req.body.int_number)){
+            if (Array.isArray(req.body.int_number)) {
                 for (let i = 0; i < req.body.int_number.length; i++) {
                     interchanges.push(req.body.int_number[i]);
                 }
@@ -787,7 +819,7 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
     }
 })
 
-app.use("/names", async(req, res, next)=>{
+app.use("/names", async (req, res, next) => {
     for (let [key, value] of Object.entries(req.query)) {
         req.query[key] = makeNullIfAny(value);
     }
@@ -839,22 +871,23 @@ app.get("/names/engine", async (req, res) => {
 
 app.get("/cart", async (req, res) => {
     let cart = [];
-    console.log("before", req.session.cart);
+    // console.log("before", req.session.cart);
     req.session.cart = req.session.cart || {};
-    console.log("after", req.session.cart);
+    // console.log("after", req.session.cart);
 
     for (let part of Object.values(req.session.cart)) {
         cart.push(part);
     }
 
-    cart.sort((a, b)=>{
-        if(a.description > b.description){
-           return 1; 
+    //sort products alphabetically
+    cart.sort((a, b) => {
+        if (a.description > b.description) {
+            return 1;
         }
-        else if(a.description == b.description){
-            return 0; 
+        else if (a.description == b.description) {
+            return 0;
         }
-        else{
+        else {
             return -1;
         }
     });
@@ -866,50 +899,72 @@ app.get("/cart", async (req, res) => {
         // parts: parts
     });
 });
+//for cart updates on the cart page
 app.post("/cart", async (req, res) => {
-    let { updates } = req.body;
-    // debugLog(updates);
-    req.session.cart = req.session.cart || {};
-    updates.forEach(part => {
-        if (part.id && part.quantity) {
-            req.session.cart[part.id].quantity = part.quantity;
-        }
-        if (part.quantity == 0) {
-            delete req.session.cart[part.id];
-        }
-    });
-    res.sendStatus(200);
+    try {
+        let { updates } = req.body;
+        // debugLog(updates);
+        req.session.cart = req.session.cart || {};
+        updates.forEach(part => {
+            if (part.id && part.quantity) {
+                if (part.quantity == 0) {
+                    delete req.session.cart[part.id];
+                } else {
+                    req.session.cart[part.id].quantity = part.quantity;
+                }
+            } else {
+                res.sendStatus(403);
+            }
+        });
+        res.sendStatus(200);
+    } catch (err) {
+        res.sendStatus(500);
+    }
 });
 
+//for add to cart
 app.post("/cart/part", async (req, res) => {
-    let { part } = req.body;
-    // debugLog(part);
-    req.session.cart = req.session.cart || {};
+    try {
+        let { part } = req.body;
+        console.log(part);
+        // debugLog(part);
+        req.session.cart = req.session.cart || {};
 
-    //check if the part is already in the cart
-    if (!part.id) {
-        res.sendStatus(403);
-        return;
-    }
-    //part already is in the cart
-    if (req.session.cart[part.id]) {
-        req.session.cart[part.id].quantity += part.quantity;
-    } else { //part is not in the cart
-        req.session.cart[part.id] = part;
-    }
+        //check if the part is already in the cart
+        if (!part.id || !part.quantity) {
+            res.sendStatus(403);
+            return;
+        }
+        //part already is in the cart
+        if (req.session.cart[part.id]) {
+            req.session.cart[part.id].quantity += part.quantity;
+        } else { //part is not in the cart
+            req.session.cart[part.id] = part;
+        }
 
-    debugLog(req.session.cart);
-    res.sendStatus(200);
+        console.log("@@@@@@@@@@@current cart", Object.req.session.cart);
+        res.sendStatus(200);
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(500);
+    }
 });
 
 app.delete("/cart/part", async (req, res) => {
-    let { part } = req.body;
-    req.session.cart = req.session.cart || {};
-    if (req.session.cart[part.id]) {
-        delete req.session.cart[part.id];
+    try {
+
+        let { part } = req.body;
+        req.session.cart = req.session.cart || {};
+        if (req.session.cart[part.id]) {
+            delete req.session.cart[part.id];
+        }
+        res.sendStatus(200);
+    }catch(err){
+        console.log(err);
+        res.sendStatus(500);
     }
-    res.sendStatus(200);
 });
+
 //remove 1 or whole thing
 app.delete("/cart", async (req, res) => {
     req.session.cart = {};
@@ -1025,8 +1080,8 @@ app.post("/user/approve", async (req, res) => {
     try {
         let user = await db.approveUser(id, status);
         if (user.length > 0) {
-            transporter.sendMail({
-                from: process.env.EMAIL_USER,
+            registerEmail.sendMail({
+                from: process.env.REGISTRATION,
                 to: user[0].email,
                 subject: "Aceway Auto Account Approval",
                 text: "Your Aceway Auto account has been approved! You may now log in."

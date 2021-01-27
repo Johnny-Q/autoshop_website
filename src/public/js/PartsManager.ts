@@ -235,7 +235,7 @@ class PartsManager {
         }
 
         //applicatoins
-        let applications_td = row.insertCell();
+        let applications_td = row.insertCell(2);
         applications_td.classList.add("application");
         let view = document.createElement("button");
         view.innerText = "View";
@@ -269,10 +269,10 @@ class PartsManager {
                 popup.classList.add("application_popup");
 
                 let col1 = document.createElement("col");
-                col1.width = "50%";
+                col1.width = "70%";
 
                 let col2 = document.createElement("col");
-                col2.width = "50%";
+                col2.width = "30%";
 
                 let popup_thead = document.createElement("thead");
                 let popup_tbody = document.createElement("tbody");

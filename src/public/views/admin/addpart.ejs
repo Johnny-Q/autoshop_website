@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang=en>
 <%- include('../partials/header.ejs', {stylesheets: ['register'], scripts: [{name: 'import_excel' , defer: true}], page_name: "Add Parts" }) %>
-
     <body>
         <%- include('../partials/navbar.ejs', {logged_in}) %>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
@@ -14,5 +13,4 @@
 
         <%- include('../partials/footer.ejs') %>
     </body>
-
 </html>

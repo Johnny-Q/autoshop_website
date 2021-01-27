@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx nodemon build/server",
     "sass": "sass --watch src/public/css:build/public/css",
-    "copyToSrc": "cp -r build/public/views src/public/",
-    "copyFromSrc": "cp -r src/public/views build/public/views"
+    "copyToSrc": "cp -r build/public/views src/public",
+    "copyFromSrc": "cp -r src/public/views build/public"
   },
   "keywords": [],
   "author": "",

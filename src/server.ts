@@ -389,11 +389,13 @@ app.post('/register', async (req, res) => {
             text: `Verify your Aceway Auto account by following the link: ${process.env.DOMAIN}/email?token=` + register.email_token,
             html: `<a href=${process.env.DOMAIN}/email?token=${register.email_token}>Verify your email </a>`
         });
+        let emailcontent = `<p>Please login to your admin account on Aceway Auto to view the registration.</p> <a href = http://${process.env.DOMAIN}/admin/account_requests> View Registrations </a>`
+        // console.log(emailcontent)
         registerEmail.sendMail({
             from: process.env.REGISTRATION,
             to: process.env.REGISTRATION,
             subject: "A User Has Created an Aceway Account",
-            html: `<p>Please login to your admin account on Aceway Auto to view the registration.</p> <a href=${process.env.DOMAIN}/email?token=${register.email_token}>Email Verification Link</a>`
+            html: emailcontent
         })
         res.render('message', { page_name: "Register", message: "Thank you for registering! An email has been sent to your email to verify your email." })
     }

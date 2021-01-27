@@ -1081,12 +1081,19 @@ app.post("/user/approve", async (req, res) => {
     try {
         let user = await db.approveUser(id, status);
         console.log(user);
-        if (user.length > 0) {
+        if (user.length > 0 && status == 1) {
             registerEmail.sendMail({
                 from: process.env.REGISTRATION,
                 to: user[0].email,
                 subject: "Aceway Auto Account Approval",
-                text: "Your Aceway Auto account has been approved! You may now log in."
+                text: "Your Aceway Auto account has been approved! You may now log in.",
+                html: `<p>Your Aceway Auto account has been approved! You may now log in.</p> <a href=${process.env.DOMAIN}/login> Login </a>`
+            })
+            registerEmail.sendMail({
+                from: process.env.REGISTRATION,
+                to: process.env.REGISTRATION,
+                subject: "Aceway Auto Account Approval",
+                text: `User ${user[0].email} has been approved`
             })
         }
         res.sendStatus(200);

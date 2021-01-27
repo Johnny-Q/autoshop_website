@@ -387,13 +387,19 @@ app.post('/register', async (req, res) => {
             to: email,
             subject: "Verify Your Aceway Auto Account",
             text: `Verify your Aceway Auto account by following the link: ${process.env.DOMAIN}/email?token=` + register.email_token,
-            html: `<a href=${process.env.DOMAIN}/email?token=${register.email_token}>Verify your email </a>`
+            html: `<a href="${process.env.DOMAIN}/email?token=${register.email_token}">Verify your email </a>`
         });
-        let emailcontent = `<p>Please login to your admin account on Aceway Auto to view the registration.</p> <a href = http://${process.env.DOMAIN}/admin/account_requests> View Registrations </a>`
+        let emailcontent = `<p>Please login to your admin account on Aceway Auto to view the registration.</p> <a href = "http://${process.env.DOMAIN}/admin/account_requests"> View Registrations </a>`
         // console.log(emailcontent)
         registerEmail.sendMail({
             from: process.env.REGISTRATION,
             to: process.env.REGISTRATION,
+            subject: "A User Has Created an Aceway Account",
+            html: emailcontent
+        })
+        registerEmail.sendMail({
+            from: process.env.REGISTRATION,
+            to: 'bertsunjc@gmail.com',
             subject: "A User Has Created an Aceway Account",
             html: emailcontent
         })
@@ -1080,6 +1086,7 @@ app.post("/user/approve", async (req, res) => {
     if (!id || !status || (status != 1 && status != -1)) return res.send(400);
     try {
         let user = await db.approveUser(id, status);
+        console.log(user);
         if (user.length > 0) {
             registerEmail.sendMail({
                 from: process.env.REGISTRATION,

@@ -316,9 +316,11 @@ async function resetPassword(email: string) { // refactored
 
 
 async function approveUser(id: number, status: number) { // refactored
-    return await db("Accounts").where('id', id).update({
+    await db("Accounts").where('id', id).update({
         approved: status
     });
+    let res = await db('Accounts').where('id', id);
+    return res;
 }
 
 async function getUnapprovedUsers() { // refactored

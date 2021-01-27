@@ -224,7 +224,6 @@ app.post('/reset_password', async (req, res) => {
                 from: process.env.REGISTRATION,
                 to: process.env.REGISTRATION,
                 subject: `Aceway Auto Password Reset for user ${email}`,
-                text: `Reset your Aceway Auto account password by following the link: ${process.env.DOMAIN}/reset?token=` + data.pass_token,
                 html: `<a href=${process.env.DOMAIN}/reset?token=${data.pass_token}> Reset your password </a>`
             });
         }
@@ -394,7 +393,7 @@ app.post('/register', async (req, res) => {
             from: process.env.REGISTRATION,
             to: process.env.REGISTRATION,
             subject: "A User Has Created an Aceway Account",
-            html: "<p>Please login to your admin account on Aceway Auto to view the registration.</p> <a href=${process.env.DOMAIN}/email?token=${register.email_token}>Email Verification Link</a>"
+            html: `<p>Please login to your admin account on Aceway Auto to view the registration.</p> <a href=${process.env.DOMAIN}/email?token=${register.email_token}>Email Verification Link</a>`
         })
         res.render('message', { page_name: "Register", message: "Thank you for registering! An email has been sent to your email to verify your email." })
     }

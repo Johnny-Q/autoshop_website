@@ -397,12 +397,6 @@ app.post('/register', async (req, res) => {
             subject: "A User Has Created an Aceway Account",
             html: emailcontent
         })
-        registerEmail.sendMail({
-            from: process.env.REGISTRATION,
-            to: 'bertsunjc@gmail.com',
-            subject: "A User Has Created an Aceway Account",
-            html: emailcontent
-        })
         res.render('message', { page_name: "Register", message: "Thank you for registering! An email has been sent to your email to verify your email." })
     }
 })

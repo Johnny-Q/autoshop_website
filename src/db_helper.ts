@@ -338,9 +338,13 @@ function randString(length) {
 }
 
 async function searchCategories(category: string, logged_in=false) {
-    category = '%' + category + '%';
     let columns = ['Parts.id', 'Parts.make', 'oe_number', 'description', 'frey_number'];
     if (logged_in) columns.push("price");
+
+    if(category == ""){
+        return db('Parts').distinct(...columns).orderBy('description', 'asc');
+    }
+    category = '%' + category + '%';
 
     return db('Parts').distinct(...columns).whereRaw('description like ?', category).orderBy('description', 'asc');
 }

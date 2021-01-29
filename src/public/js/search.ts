@@ -93,12 +93,22 @@ filter_bar.custom_selects[3].getOptions = async (filter): Promise<string[]> => {
     }
 }
 filter_bar.custom_selects[4].getOptions = (filter) => {
-    return [
-        "Alternators and Starter",
+    return [[
+        "Alternators",
+        "Starters",
+        "Brake Sensors",
+        "ABS Sensors",
+        "Crankshaft Sensors",
+        "Camshaft Sensors"
+    ],
+    [
+        "Alternator",
+        "Starter",
         "Brake Sensor",
         "ABS Sensor",
-        "Crankshaft and Camshaft Sensor"
-    ];
+        "Crankshaft",
+        "Camshaft"
+    ]];
 }
 
 let oe_input = document.querySelector("div.smaller_search_bar > input") as HTMLInputElement;

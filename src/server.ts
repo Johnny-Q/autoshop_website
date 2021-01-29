@@ -610,6 +610,7 @@ app.post("/search/full", async (req, res) => {
 app.post("/search/category", async (req, res) => {
     let { category } = req.body;
     let { admin } = req.body;
+    if(!category) category = "";
     try {
         let parts = await db.searchCategories(category, req.session.logged_in);
         res.json({ parts, admin });

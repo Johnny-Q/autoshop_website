@@ -50,8 +50,8 @@ for (let i = 0; i < custom_select_nodes.length - 1; i++) {
     let temp = new CustomSelect(custom_select_nodes[i] as HTMLElement, filter_options, default_texts[i], names[i]);
     custom_selects.push(temp);
 }
-for(let i = 0; i < custom_selects.length-1; i++){
-    custom_selects[i].next_select = custom_selects[i+1];
+for (let i = 0; i < custom_selects.length - 1; i++) {
+    custom_selects[i].next_select = custom_selects[i + 1];
 }
 custom_selects.push(new CustomSelect(custom_select_nodes[custom_select_nodes.length - 1] as HTMLElement, category_options, "Select Type", "category"));
 let filter_bar = new FilterBar(custom_selects);
@@ -126,12 +126,22 @@ filter_bar.custom_selects[3].getOptions = async (filter): Promise<string[]> => {
     }
 }
 filter_bar.custom_selects[4].getOptions = (filter) => {
-    return [
-        "Alternators and Starter",
+    return [[
+        "Alternators",
+        "Starters",
+        "Brake Sensors",
+        "ABS Sensors",
+        "Crankshaft Sensors",
+        "Camshaft Sensors"
+    ],
+    [
+        "Alternator",
+        "Starter",
         "Brake Sensor",
         "ABS Sensor",
-        "Crankshaft and Camshaft Sensor"
-    ];
+        "Crankshaft",
+        "Camshaft"
+    ]];
 }
 
 let oe_input = document.querySelector("div.smaller_search_bar > input") as HTMLInputElement;

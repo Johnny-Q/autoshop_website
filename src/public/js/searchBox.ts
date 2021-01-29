@@ -18,6 +18,7 @@ class CustomSelect {
     showing = false;
 
     options = [];
+    values = [];
     getOptions = (filter: Object): any => {
         return [this.default_text];
     }
@@ -84,6 +85,7 @@ class CustomSelect {
         this.select_div.innerText = this.default_text;
         this.input_element.value = "";
         this.options = [];
+        this.values = [];
         this.disable();
         if (this.next_select) {
             this.next_select.reset();
@@ -104,52 +106,77 @@ class CustomSelect {
     }
 
     async populateOptions(filter) {
-        let values = await this.getOptions(filter);
-        this.options = values;
-        console.log(values);
+        let options = await this.getOptions(filter);
+        let text;
+        if(options.length == 2){
+            text = options[0];
+            options[1].unshift("ANY");
+        }else{
+            text = options;
+        }
+
+        this.options = text;
+        
+        console.log(text);
         // console.log(this.getOptions.toString());
         // console.log(values);
-        values.unshift("ANY");
+        text.unshift("ANY");
 
         //remove the old options
         while (this.options_div.firstChild) {
             this.options_div.removeChild(this.options_div.lastChild);
         }
 
+
+        let htmlOptionObjects = [];
+        for(let i = 0; i < text.length;i++){
+            // let value = text[i]
+            if(options.length == 2){
+                htmlOptionObjects.push(this.createOption(text[i], options[1][i]));
+            }else{
+                htmlOptionObjects.push(this.createOption(text[i]));
+            }
+            // console.log(value);
+            // htmlOptionObjects.push(this.createOption(value));
+        };
+
         //order in columns
         //will always have 4 columns
-        if (values.length > 4) {
+        if (htmlOptionObjects.length > 4) {
             //@ts-expect-error 
-            let one_column = parseInt(values.length / 4);
-            let extras = values.length % 4; //1 add one more option to the first column, 2 is for second...
+            let one_column = parseInt(htmlOptionObjects.length / 4);
+            let extras = htmlOptionObjects.length % 4; //1 add one more option to the first column, 2 is for second...
             let first_break = extras >= 1 ? one_column + 1 : one_column;
             let second_break = extras >= 2 ? first_break + + one_column + 1 : first_break + one_column;
             let third_break = extras >= 3 ? second_break + one_column + 1 : second_break + one_column;;
-            let temp_values = [[...values.slice(0, first_break)], [...values.slice(first_break, second_break)], [...values.slice(second_break, third_break)], [...values.slice(third_break, values.length)]];
-            console.log(temp_values);
+            let temp_objects = [[...htmlOptionObjects.slice(0, first_break)], [...htmlOptionObjects.slice(first_break, second_break)], [...htmlOptionObjects.slice(second_break, third_break)], [...htmlOptionObjects.slice(third_break, htmlOptionObjects.length)]];
+            console.log(temp_objects);
 
             for (let j = 0; j < one_column; j++) {
                 for (let i = 0; i < 4; i++) {
-                    let value = temp_values[i][j];
-                    this.createOption(value);
+                    let option = temp_objects[i][j];
+                    this.options_div.append(option);
+                    // this.createOption(value);
                 }
             }
             for (let i = 0; i < extras; i++) {
-                let value = temp_values[i][temp_values[i].length - 1];
-                this.createOption(value);
+                let option = temp_objects[i][temp_objects[i].length - 1];
+                this.options_div.append(option);
+                // this.createOption(option);
             }
         } else {
             //add children
-            values.forEach(value => {
-                this.createOption(value);
+            htmlOptionObjects.forEach(option => {
+                this.options_div.append(option);
+                // this.createOption(value);
             });
         }
     }
-    createOption(value) {
+    createOption(text, value = "") {
         // if (!value) return;
-        value = value.toString().toUpperCase();
+        text = text.toString().toUpperCase();
         let option = document.createElement("div");
-        option.innerText = value;
+        option.innerText = text;
 
         //have to add listeners to them;
         option.onclick = (event) => {
@@ -163,14 +190,14 @@ class CustomSelect {
 
             //set the value and update visually
             //@ts-expect-error
-            this.input_element.value = target.innerText; //== "Any" ? "null" : target.innerText;
+            //assign value if exists, else use text
+            this.input_element.value = value ? value : text; //target.innerText; //== "Any" ? "null" : target.innerText;
             this.input_element.dispatchEvent(new Event("change"));
             //@ts-expect-error
             this.select_div.innerText = target.innerText;
         }
-
-        this.options_div.append(option);
-
+        return option;
+        // this.options_div.append(option);
     }
     getValue() {
         return this.input_element.value;

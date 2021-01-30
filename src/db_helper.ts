@@ -106,7 +106,7 @@ async function getModels(make: string, year: number): Promise<Array<string>> { /
  * @param {number} year the year to query valid models for, null if match all
  */
 async function getEngines(make: string, year: number, model: string): Promise<Array<string>> { // refactored
-    return db('Engines').distinct('engine').leftJoin('Applications', "Engines.parts_id", "Applications.parts_id")s
+    return db('Engines').distinct('engine').leftJoin('Applications', "Engines.parts_id", "Applications.parts_id")
         .whereRaw('IFNULL(? ,make) like make', make)
         .andWhereRaw('IFNULL(?, begin_year) between begin_year and end_year', year)
         .andWhereRaw('IFNULL(?, model) like model', model)

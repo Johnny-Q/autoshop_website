@@ -626,6 +626,7 @@ app.post("/search/id_number", async (req, res) => {
     let { admin } = req.session;
     admin = admin || false;
     try {
+        if(id_number) id_number = id_number.trim();
         let parts = await db.getPartByIdNumber(id_number, req.session.logged_in);
         res.json({ parts, admin });
     } catch (err) {

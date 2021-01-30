@@ -106,7 +106,7 @@ async function getModels(make: string, year: number): Promise<Array<string>> { /
  * @param {number} year the year to query valid models for, null if match all
  */
 async function getEngines(make: string, year: number, model: string): Promise<Array<string>> { // refactored
-    return db('Engines').distinct('engine').leftJoin('Applications', "Engines.app_id", "Applications.id")
+    return db('Engines').distinct('engine').leftJoin('Applications', "Engines.parts_id", "Applications.parts_id")s
         .whereRaw('IFNULL(? ,make) like make', make)
         .andWhereRaw('IFNULL(?, begin_year) between begin_year and end_year', year)
         .andWhereRaw('IFNULL(?, model) like model', model)
@@ -337,11 +337,11 @@ function randString(length) {
     return result;
 }
 
-async function searchCategories(category: string, logged_in=false) {
+async function searchCategories(category: string, logged_in = false) {
     let columns = ['Parts.id', 'Parts.make', 'oe_number', 'description', 'frey_number'];
     if (logged_in) columns.push("price");
 
-    if(category == ""){
+    if (category == "") {
         return db('Parts').distinct(...columns).orderBy('description', 'asc');
     }
     category = '%' + category + '%';

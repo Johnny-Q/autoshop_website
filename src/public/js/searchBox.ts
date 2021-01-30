@@ -108,19 +108,22 @@ class CustomSelect {
     async populateOptions(filter) {
         let options = await this.getOptions(filter);
         let text;
-        if(options.length == 2){
+        if(Array.isArray(options[0])){
+        // if(options.length == 2){
             text = options[0];
             options[1].unshift("ANY");
         }else{
             text = options;
         }
 
-        this.options = text;
         
-        console.log(text);
         // console.log(this.getOptions.toString());
         // console.log(values);
+
         text.unshift("ANY");
+        console.log("test", text);
+        this.options = text;
+        
 
         //remove the old options
         while (this.options_div.firstChild) {
@@ -131,9 +134,11 @@ class CustomSelect {
         let htmlOptionObjects = [];
         for(let i = 0; i < text.length;i++){
             // let value = text[i]
-            if(options.length == 2){
+            if(Array.isArray(options[0])){
+            // if(options.length == 2){
                 htmlOptionObjects.push(this.createOption(text[i], options[1][i]));
             }else{
+                console.log("options length 1", text, text[i]);
                 htmlOptionObjects.push(this.createOption(text[i]));
             }
             // console.log(value);
@@ -173,6 +178,7 @@ class CustomSelect {
         }
     }
     createOption(text, value = "") {
+        console.log("createing option", text, value);
         // if (!value) return;
         text = text.toString().toUpperCase();
         let option = document.createElement("div");
@@ -227,6 +233,7 @@ class FilterBar {
                 }
             }
             custom_selects[i].input_element.onchange = async () => {
+
                 this.hideAllOptions();
                 this.filter[custom_selects[i].name] = custom_selects[i].getValue();
                 if (custom_selects[i].next_select) {
@@ -269,113 +276,5 @@ class FilterBar {
             window.location.assign(url);
         }
 
-    }
-}
-/**
- * @param custom_select the array of div.custom_select
- * @param default_text the default texts of each custom select respectively
- * @param name name of each custom select respectively , for key value in filter
- * @description the functionality for a collection of custom selects to form a search filter
- */
-//submit selector
-class SearchBar {
-    selects: Array<CustomSelect> = [];
-    last_filled = -1;
-    filter = {};
-    names: string[];
-    parts_manager: PartsManager;
-    constructor(custom_selects: Array<CustomSelect>, default_texts: string[], names: string[], parts_manager: PartsManager = null) {
-        this.names = names;
-        this.parts_manager = parts_manager;
-        // let options_container = document.querySelector(".options_container");
-
-        custom_selects[0].enable();
-        //create the CustomSelect Object
-        for (let i = 0; i < custom_selects.length; i++) {
-            // let temp = new CustomSelect(custom_selects[i], options_container, default_texts[i])
-
-            //add listeners to select divs
-            custom_selects[i].select_div.onclick = () => {
-                if (custom_selects[i].options_div.classList.contains("active")) {
-                    custom_selects[i].hideOptions();
-                } else {
-                    this.requestShow(i);
-                }
-            }
-
-            //autofocus the next one when the current one gets a value
-            custom_selects[i].input_element.addEventListener("change", (event) => {
-                // console.log(event);
-
-                //update the filter so we get the new options
-                let key = this.names[i];
-                this.filter[key] = custom_selects[i].getValue();
-
-                //show the next element if there is one
-                if (i + 1 < custom_selects.length) {
-                    this.last_filled = i;
-
-                    this.resetSelects();
-                    this.selects[i + 1].enable();
-                    this.selects[i + 1].populateOptions(this.filter);
-                    this.requestShow(i + 1);
-                } else {
-                    custom_selects[i].hideOptions();
-                    //perform the search
-
-                    //get the data
-                    let query_params = [];
-                    this.selects.forEach(select => {
-                        query_params.push(select.getValue());
-                    });
-
-                    //this has to be overwritten
-                    if (window.location.href.indexOf("/search") != -1) {
-                        //do the api call
-                        // console.log(query_params);
-                        // console.log("Searching");
-                        this.parts_manager.searchAndRender(this.filter);
-                    } else {
-                        /**
-                         * @todo see if I can abstract this part somehow
-                         */
-                        //redirect to the search page
-                        let { make, year, model, engine, category } = this.filter;
-                        window.location.assign(`/search?make=${make || "ANY"}&year=${year || "ANY"}&model=${model || "ANY"}&engine=${engine || "ANY"}&category=${category || "ANY"}`);
-                    }
-                }
-            })
-
-            this.selects.push(custom_selects[i]);
-        }
-
-        //init the buttons
-        this.resetSelects();
-    }
-    hideAllOptions() {
-        this.selects.forEach(select => {
-            select.hideOptions();
-        });
-    }
-    requestShow(index) {
-        this.hideAllOptions();
-        if (this.selects[index].enabled /*index<= this.last_filled + 1*/) {
-            this.selects[index].showOptions();
-        }
-    }
-    resetSelects() {
-        for (let i = this.last_filled + 1; i < this.selects.length - 1; i++) {
-            this.selects[i].reset();
-            if (i != this.last_filled + 1) {
-                this.selects[i].disable();
-            }
-        }
-    }
-    getQuery() {
-        let data = [];
-        this.selects.forEach(select => {
-            data.push(select.getValue());
-        });
-        return data;
     }
 }

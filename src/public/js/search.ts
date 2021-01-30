@@ -87,6 +87,7 @@ filter_bar.custom_selects[3].getOptions = async (filter): Promise<string[]> => {
         json.forEach((object: any) => {
             data.push(object.engine);
         });
+        console.log(data);
         return data;
     } catch (err) {
         return [];

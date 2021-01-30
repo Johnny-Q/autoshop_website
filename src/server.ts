@@ -945,7 +945,7 @@ app.post("/cart/part", async (req, res) => {
             req.session.cart[part.id] = part;
         }
 
-        console.log("@@@@@@@@@@@current cart", Object.req.session.cart);
+        // console.log("@@@@@@@@@@@current cart", Object.req.session.cart);
         res.sendStatus(200);
     } catch (err) {
         console.log(err);

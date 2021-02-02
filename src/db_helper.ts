@@ -271,6 +271,8 @@ async function queryPassToken(token: string) { // refactored
 async function changePass(user: string, pass: string) { // refactored
     try{
         user = user.toLowerCase();
+    } catch(err){
+        console.log(err);
     }
     bcrypt.hash(pass, 12).then(async hash => {
         await db('Accounts').where('email', user).update({
@@ -301,6 +303,8 @@ async function verifyEmail(token: string) { // refactored
 async function resetPassword(email: string) { // refactored
     try{
         email = email.toLowerCase();
+    } catch(err){
+        console.log(err);
     }
     let res = {
         user: null,

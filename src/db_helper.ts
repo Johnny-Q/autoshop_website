@@ -199,6 +199,8 @@ async function deletePart(part_id: string) { // refactored
  * @return {Promise<Array<string>>} array of error messages, if exists
  */
 async function register(email, username, pass, additional_info) { // refactored
+    username = username || username.trim()
+    email = email || email.trim().toLowerCase();
     let res = {
         email_token: null,
         errmsgs: []
@@ -215,7 +217,7 @@ async function register(email, username, pass, additional_info) { // refactored
     // check if username already exists
     if (username) {
         user_count = await db('Accounts')
-            .where('email', username)
+            .where('email', username.toLowerCase())
             .orWhere('username', username)
             .count('username', { as: 'count' });
         if (user_count[0].count > 0) {
@@ -232,7 +234,7 @@ async function register(email, username, pass, additional_info) { // refactored
         res.email_token = email_token;
         bcrypt.hash(pass, 12).then(async hash => {
             let expiry_time = Date.now() + 7 * 24 * 60 * 60 * 1000;
-            await db('Accounts').insert({
+            let id = await db('Accounts').insert({
                 email: email,
                 username: username,
                 hash: hash,
@@ -249,8 +251,9 @@ async function login(user, pass) { // refactored
     let errmsgs = [];
     let match = false;
     let user_entry = await db('Accounts').leftJoin('Admins', "Admins.account_id", "Accounts.id").select()
-        .where("email", user)
+        .where("email", user.toLowerCase())
         .orWhere('username', user);
+    console.log(user_entry)
     if (user_entry.length == 0) {
         errmsgs.push('Username or password incorrect.');
     } else {
@@ -266,6 +269,9 @@ async function queryPassToken(token: string) { // refactored
 }
 
 async function changePass(user: string, pass: string) { // refactored
+    try{
+        user = user.toLowerCase();
+    }
     bcrypt.hash(pass, 12).then(async hash => {
         await db('Accounts').where('email', user).update({
             hash: hash,
@@ -293,23 +299,32 @@ async function verifyEmail(token: string) { // refactored
 }
 
 async function resetPassword(email: string) { // refactored
+    try{
+        email = email.toLowerCase();
+    }
     let res = {
         user: null,
         pass_token: null,
-        msg: 'A password recovery email has been sent!'
+        success: false,
+        msg: null
     };
     let user = await db('Accounts').where('email', email);
     if (user.length > 0) {
-        // don't say that no email found if no users found
+        // don't say that no email found if no users found <- relax security and tell client if type (requested by client)
         res.user = user[0];
         let email_hashed = crypto.createHash('md5').update(email).digest("hex");
         let pass_token = email_hashed + randString(30);
         res.pass_token = pass_token;
+        res.msg = `A password reset email has been sent to ${email}`
+        res.success = true;
         let expiry_time = Date.now() + 24 * 60 * 60 * 1000;
         await db('Accounts').where('email', email).update({
             pass_token: pass_token,
             pass_expiry: expiry_time
         })
+    } else {
+        res.success = false;
+        res.msg =  `The email ${email} was not found in our records. Please try again.`
     }
     return res;
 }

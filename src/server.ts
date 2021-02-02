@@ -148,7 +148,7 @@ app.get('/reset', async (req, res) => {
     for (let [key, value] of Object.entries(properties)) {
         properties[key] = req.session[key];
     }
-    if (properties.logged_in) res.redirect('/')
+    if (properties.logged_in) return res.redirect('/')
     let token = req.query.token;
     token = token || '';
     res.render('reset', { ...properties, token: token });
@@ -176,10 +176,10 @@ app.post('/reset', async (req, res) => {
             await db.changePass(user.email, pass);
         }
     }
-    res.render('reset', {
+    res.render('message', {
         ...properties,
-        token,
-        errors: [{ msg: 'Your password has been reset. You may log in now.' }]
+        page_name: 'Change Password',
+        message: 'Your password has been reset. You may log in now.'
     })
 })
 
@@ -210,9 +210,8 @@ app.post('/reset_password', async (req, res) => {
         const { email } = req.body;
         console.log(email);
         let data = await db.resetPassword(email);
-        res.render('reset_password', { ...properties, errors: [{ msg: data.msg }] });
         console.log(data);
-        if (data.pass_token) {
+        if (data.success) {
             registerEmail.sendMail({
                 from: process.env.REGISTRATION,
                 to: email,
@@ -226,6 +225,9 @@ app.post('/reset_password', async (req, res) => {
                 subject: `Aceway Auto Password Reset for user ${email}`,
                 html: `<a href=${process.env.DOMAIN}/reset?token=${data.pass_token}> Reset your password </a>`
             });
+            res.render('message', {...properties, message: data.msg, page_name: 'Reset Password'})
+        } else{ // display error message
+            res.render('reset_password', { ...properties, errors: [{ msg: data.msg }] });
         }
     }
 })
@@ -274,6 +276,18 @@ app.post('/change_password', async (req, res) => {
             req.session.logged_in = true;
             delete req.session.temp_pass;
             res.render('message', { logged_in: true, page_name: "Change Password", message: "Password has been changed" });
+            registerEmail.sendMail({
+                from: process.env.REGISTRATION,
+                to: process.env.REGISTRATION,
+                subject: `Aceway Auto Password Has Been Changed for user ${login.user.email}`,
+                text: `Aceway Auto Password Has Been Changed for user ${login.user.email}`
+            })
+            registerEmail.sendMail({
+                from: process.env.REGISTRATION,
+                to: login.user.email,
+                subject: `Your Aceway Auto Password Has Been Changed`,
+                text: `If you did not issue this request, or believe that this is an error, please contact us as soon as possible.`
+            })
         }
     }
 })
@@ -428,7 +442,7 @@ app.post('/admin/adduser', async (req, res) => {
         contact_last
     } = req.body;
     let phone = '', postalStrip = '';
-    let username = user || null;
+    let username = user || "";
     if (telephone) {
         phone = telephone.replace(/[^0-9]/g, "");
     }
@@ -483,6 +497,7 @@ app.post('/admin/adduser', async (req, res) => {
         res.render('admin/adduser', {
             errors: errmsgs,
             email,
+            username,
             company,
             business,
             purchase,

@@ -11,12 +11,12 @@
                         <%= error.msg %>
                     </p>
                     <% }) } %>
-                <form onsubmit="form_submit()" action="/register" id="regform" method="POST">
+                <form action="/register" id="regform" method="POST">
                     <p> Company Info </p>
                     <div class="rounded_input">
                         <input type="text" name="company" placeholder="Company Name" required
                         value="<%= typeof company != 'undefined' ? company : ''%>">
-                        <label for=company><span>Name</span></label>
+                        <label for=company><span>Company Name</span></label>
                     </div>
                     <div class="rounded_input">
                         <input type="text" name="email" placeholder="Email Address" required

@@ -1,0 +1,26 @@
+main {
+    padding: 50px 0;
+    table {
+        width: 90%;
+        max-width: 1300px;
+        text-align: left;
+        border-collapse: collapse;
+        thead {
+            tr {
+                th {
+                    padding: 5px 0;
+                }
+            }
+        }
+        tbody {
+            tr {
+                td {
+                    padding-top: 5px;
+                }
+            }
+            tr:nth-child(even){
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+        }
+    }
+}

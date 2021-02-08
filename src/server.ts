@@ -117,6 +117,32 @@ HTMLpages.forEach(page => {
     });
 });
 
+app.get('/admin/edit_user', async (req, res) => {
+    let properties = { 'logged_in': false, 'user': null, 'user_id': null, 'admin': false, "cart": {} };
+    for (let [key, value] of Object.entries(properties)) {
+        if (req.session[key]) {
+            properties[key] = req.session[key];
+        }
+    }
+    if (!properties.logged_in) return res.sendStatus(401);
+    if (!properties.admin) return res.sendStatus(403);
+
+    let { id } = req.query;
+    if(!id) {
+        return res.sendStatus(404);
+    }
+    console.log(id);
+    let user = await db.getUserById(id);
+    if (Array.isArray(user)) {
+        if (user.length == 0) {
+            return res.render('message', { page_name: 'Edit User', message: 'That user is not found. If you experience this error, please copy the current url and contact us.', ...properties })
+        } else {
+            user = user[0];
+        }
+    }
+    res.render('admin/edit_user', { ...user, ...properties });
+})
+
 //serve web pages
 app.get("/", (req, res) => {
     let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
@@ -126,9 +152,9 @@ app.get("/", (req, res) => {
     res.render("home", properties);
 });
 
-app.get('/message', async(req, res) => {
-    let {message} = req.query;
-    res.render('message', {message: message, page_name: 'Message'})
+app.get('/message', async (req, res) => {
+    let { message } = req.query;
+    res.render('message', { message: message, page_name: 'Message' })
 })
 
 app.get('/email', async (req, res) => {
@@ -225,8 +251,8 @@ app.post('/reset_password', async (req, res) => {
                 subject: `Aceway Auto Password Reset for user ${email}`,
                 html: `<a href=${process.env.DOMAIN}/reset?token=${data.pass_token}> Reset your password </a>`
             });
-            res.render('message', {...properties, message: data.msg, page_name: 'Reset Password'})
-        } else{ // display error message
+            res.render('message', { ...properties, message: data.msg, page_name: 'Reset Password' })
+        } else { // display error message
             res.render('reset_password', { ...properties, errors: [{ msg: data.msg }] });
         }
     }
@@ -242,6 +268,21 @@ app.get('/get_users', async (req, res) => {
     if (!properties.admin) return res.sendStatus(403);
 
     res.json(await db.getUnapprovedUsers());
+})
+
+app.get('/get_all_users', async (req, res) => {
+    let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
+    for (let [key, value] of Object.entries(properties)) {
+        properties[key] = req.session[key];
+    }
+    if (!properties.logged_in) return res.sendStatus(401);
+    if (!properties.admin) return res.sendStatus(403);
+    try{
+        res.json(await db.getUsers());
+    }catch(err){
+        res.sendStatus(500);
+        console.log(err);
+    }
 })
 
 app.post('/change_password', async (req, res) => {
@@ -412,6 +453,125 @@ app.post('/register', async (req, res) => {
             html: emailcontent
         })
         res.render('message', { page_name: "Register", message: "Thank you for registering! An email has been sent to your email to verify your email." })
+    }
+})
+
+app.post('/admin/edit_user', async (req, res) => {
+    let properties = { 'logged_in': null, 'user': null, 'user_id': null, 'admin': null };
+    for (let [key, value] of Object.entries(properties)) {
+        properties[key] = req.session[key];
+    }
+    if (!properties.logged_in || !properties.admin) {
+        return res.redirect('/');
+    }
+    let errmsgs = [];
+    const {
+        id,
+        company,
+        email,
+        user,
+        business,
+        purchase,
+        telephone,
+        fax,
+        address1,
+        address2,
+        city,
+        province,
+        postal,
+        contact_first,
+        contact_last
+    } = req.body;
+    let phone = '', postalStrip = '';
+    let username = user || "";
+    if (telephone) {
+        phone = telephone.replace(/[^0-9]/g, "");
+    }
+    postalStrip = postal.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+    if (anyFalse([
+        company,
+        email,
+        business,
+        purchase,
+        telephone,
+        address1,
+        city,
+        province,
+        postal,
+        contact_first,
+        contact_last])) errmsgs.push({ msg: "Please fill out all fields" });
+    if (!isValidEmail(email)) errmsgs.push({ msg: "Please enter a valid email address" })
+    if (phone.length != 10) errmsgs.push({ msg: "Please enter a valid phone number" })
+    if (!isValidPostal(postalStrip)) errmsgs.push({ msg: "Please enter a valid postal code" })
+    if ((username && username.indexOf('@') > 0)) errmsgs.push({ msg: "Username cannot contain @ character" })
+    if (!(purchase == '<$1000' || purchase == '$1000-$5000' || purchase == '$5000-$10000' || purchase == '>$10000')) {
+        errmsgs.push({ msg: "Please fill out all fields" })
+    }
+    let additional_info = {
+        company,
+        business,
+        purchase,
+        telephone: phone,
+        fax: fax ? fax : null,
+        address1,
+        address2: address2 ? address2 : null,
+        city,
+        province,
+        postal: postalStrip,
+        contact_first,
+        contact_last,
+        verified_email: 0,
+        approved: 1,
+        temp_pass: 1,
+    };
+    if (errmsgs.length == 0) {
+        let edit = await db.editUser(id, email, username, additional_info);
+        edit.errmsgs.forEach(msg => {
+            errmsgs.push({ msg });
+        })
+    }
+    if (errmsgs.length > 0) {
+        //res.status(400).send(errmsgs);
+        res.render('admin/edit_user', {
+            errors: errmsgs,
+            id,
+            email,
+            username,
+            company,
+            business,
+            purchase,
+            telephone: phone,
+            fax,
+            address1,
+            address2,
+            city,
+            province,
+            postal: postalStrip.toUpperCase(),
+            contact_first,
+            contact_last,
+            ...properties
+        })
+    } else {
+        errmsgs.push({msg: 'edit successful'})
+        res.render('admin/edit_user', {
+            errors: errmsgs,
+            id,
+            email,
+            username,
+            company,
+            business,
+            purchase,
+            telephone: phone,
+            fax,
+            address1,
+            address2,
+            city,
+            province,
+            postal: postalStrip.toUpperCase(),
+            contact_first,
+            contact_last,
+            ...properties
+        })
     }
 })
 
@@ -625,7 +785,7 @@ app.post("/search/full", async (req, res) => {
 app.post("/search/category", async (req, res) => {
     let { category } = req.body;
     let { admin } = req.body;
-    if(!category) category = "";
+    if (!category) category = "";
     try {
         let parts = await db.searchCategories(category, req.session.logged_in);
         res.json({ parts, admin });
@@ -641,7 +801,7 @@ app.post("/search/id_number", async (req, res) => {
     let { admin } = req.session;
     admin = admin || false;
     try {
-        if(id_number) id_number = id_number.trim();
+        if (id_number) id_number = id_number.trim();
         let parts = await db.getPartByIdNumber(id_number, req.session.logged_in);
         res.json({ parts, admin });
     } catch (err) {
@@ -676,7 +836,7 @@ app.use("/admin", async (req, res, next) => {
         next();
     }
 });
-const adminPages = ['', 'adduser', 'addpart', "account_requests"];
+const adminPages = ['', 'adduser', 'addpart', "account_requests", "search_users"];
 
 adminPages.forEach(page => {
     app.get(`/admin/${page}`, (req, res) => {
@@ -977,7 +1137,7 @@ app.delete("/cart/part", async (req, res) => {
             delete req.session.cart[part.id];
         }
         res.sendStatus(200);
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.sendStatus(500);
     }

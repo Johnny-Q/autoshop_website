@@ -247,6 +247,8 @@ async function register(email, username, pass, additional_info) { // refactored
     return res;
 }
 
+
+
 async function login(user, pass) { // refactored
     let errmsgs = [];
     let match = false;
@@ -372,6 +374,78 @@ async function getInts(part_id: number) {
     return db('Interchange').where('parts_id', part_id);
 }
 
+async function getUserById(id: number) {
+    let columns = ['id', 'email', 'company', 'business', 'purchase', 'telephone', 'fax', 'address1', 'address2', 'city', 'province', 'postal', 'contact_first', 'contact_last', 'username']
+    return db('Accounts').select(...columns).where('id', id);
+}
+
+async function getUsers() {
+    let columns = ['id', 'email', "contact_first", "contact_last"]
+    return db('Accounts').select(...columns);
+}
+
+async function editUser(id, email, username, additional_info) {
+    username = username || username.trim()
+    email = email || email.trim().toLowerCase();
+    let res = {
+        email_token: null,
+        errmsgs: []
+    };
+    let old_user; let rem = false;
+    try{
+        // get old user data
+        old_user = await db('Accounts').where('id', id)
+        const keys = ['hash', 'verified_email', 'approved', 'temp_pass', 'email_token', 'email_expiry', 'pass_token', 'pass_expiry']
+        // throw('stop')
+
+        keys.forEach(key => {
+            additional_info[key] = old_user[0][key];
+        })
+
+        // remove account entry for old user
+        await db('Accounts').where('id', id).del()
+        rem = true;
+
+        // check if email already exists
+        let user_count = await db('Accounts')
+            .where('email', email)
+            .orWhere('username', email)
+            .count('email', { as: 'count' });
+        if (user_count[0].count > 0) {
+            res.errmsgs.push('That email already exists');
+        }
+
+        // check if username already exists
+        if (username) {
+            user_count = await db('Accounts')
+                .where('email', username.toLowerCase())
+                .orWhere('username', username)
+                .count('username', { as: 'count' });
+            if (user_count[0].count > 0) {
+                res.errmsgs.push('That username already exists');
+            }
+        }
+        // check if there has been error pushed already
+        if (res.errmsgs.length > 0) {
+            // on error logic here
+        }
+        else { // no errors up until this point re-insert user
+            await db('Accounts').insert({
+                id: id,
+                email: email,
+                username: username,
+                ...additional_info
+            });
+        }
+    }
+    catch(err){
+        res.errmsgs.push(err);
+        // re insert the old user, if any errors have occurred the old user may be deleted and new not inserted
+        if(rem) await db('Accounts').insert(old_user[0])
+    }
+    return res;
+}
+
 module.exports = {
     getPartByIdNumber,
     getPartByDbId,
@@ -391,5 +465,8 @@ module.exports = {
     queryPassToken,
     approveUser,
     searchCategories,
-    getInts
+    getInts,
+    getUserById,
+    editUser,
+    getUsers
 }

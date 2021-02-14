@@ -6,4 +6,4 @@ function logout() {
   
     document.body.appendChild(form);
     form.submit();
-  }
+}

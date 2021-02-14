@@ -11,12 +11,14 @@ const nodemailer = require('nodemailer');
 const session = require("express-session");
 const SQLiteStore = require('connect-sqlite3')(session);
 let session_store = new SQLiteStore;
+
 let transporter = {
     sendMail: function (obj) { console.log('sent mail') }
 };
 let registerEmail = {
     sendMail: function (obj) { console.log(obj) }
 }
+
 if (process.env.SEND_MAIL) {
     transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -25,6 +27,7 @@ if (process.env.SEND_MAIL) {
             pass: process.env.EMAIL_PASS
         }
     });
+
     registerEmail = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -49,8 +52,11 @@ const upload = multer({
 
 //to render pure html and css files
 app.engine("html", require("ejs").renderFile);
+
 app.use(express.static('build/public'));
+
 app.set("views", "build/public/views");
+
 app.set("view engine", "ejs");
 
 //accept json data

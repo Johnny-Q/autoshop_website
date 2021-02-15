@@ -44,6 +44,14 @@
             <a href="/about">About Us</a>
             <a href="/search">Search Products</a>
             <a href="/contact">Contact</a>
+            <% if (typeof logged_in != undefined && logged_in){ %>
+            <a href="/cart"> View Cart </a>
+            <a href="/dashboard"> Dashboard </a>
+            <a href="#" onclick="logout(); return false;"> Log Out </a>
+            <% } else{ %>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+            <% } %>
         </div>
     </div>
 </nav>

@@ -127,20 +127,20 @@ filter_bar.custom_selects[3].getOptions = async (filter): Promise<string[]> => {
 }
 filter_bar.custom_selects[4].getOptions = (filter) => {
     return [[
-        "Alternators",
-        "Starters",
-        "Brake Sensors",
         "ABS Sensors",
+        "Alternators",
+        "Brake Sensors",
+        "Camshaft Sensors",
         "Crankshaft Sensors",
-        "Camshaft Sensors"
+        "Starters"
     ],
     [
-        "Alternator",
-        "Starter",
-        "Brake Sensor",
         "ABS Sensor",
+        "Alternator",
+        "Brake Sensor",
+        "Camshaft",
         "Crankshaft",
-        "Camshaft"
+        "Starter"
     ]];
 }
 

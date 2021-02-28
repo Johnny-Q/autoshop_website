@@ -190,7 +190,8 @@ async function deletePart(part_id: string) { // refactored
     // delete all YearModel, Interchange, Engine entries
     await db("Applications").where('parts_id', part_id).del()
     await db("Interchange").where('parts_id', part_id).del()
-    return db("Engines").where('parts_id', part_id).del()
+    await db("Engines").where('parts_id', part_id).del()
+    return
 }
 
 /**
@@ -374,9 +375,17 @@ async function getInts(part_id: number) {
     return db('Interchange').where('parts_id', part_id);
 }
 
+async function getEnginesByApp(app_id: number){
+    return db('Engines').where('app_id', app_id);
+}
+
 async function getUserById(id: number) {
     let columns = ['id', 'email', 'company', 'business', 'purchase', 'telephone', 'fax', 'address1', 'address2', 'city', 'province', 'postal', 'contact_first', 'contact_last', 'username']
     return db('Accounts').select(...columns).where('id', id);
+}
+
+async function deleteUser(id: number){
+    return db('Accounts').where("id", id).del();
 }
 
 async function getUsers() {
@@ -468,5 +477,7 @@ module.exports = {
     getInts,
     getUserById,
     editUser,
-    getUsers
+    getUsers,
+    deleteUser,
+    getEnginesByApp
 }

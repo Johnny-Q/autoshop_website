@@ -37,10 +37,7 @@ let tbody = document.querySelector("tbody");
             </svg>`;
 
 
-            /*
-                CHANGE HERE WHEN READY
-            */
-            // icon.append(editIcon, trashIcon);
+            icon.append(editIcon, trashIcon);
             icon.append(editIcon);
 
             editIcon.querySelector("svg").onclick = (e) => {
@@ -49,7 +46,7 @@ let tbody = document.querySelector("tbody");
 
             trashIcon.querySelector("svg").onclick = (e) => {
                 // window.location.assign(`/admin/delete_user?id=${user.id}`);
-                fetch(`/admin/delete_user?=${user.id}`).then((res) => {
+                fetch(`/admin/delete_user?id=${user.id}`).then((res) => {
                     if (res.status == 200) {
                         row.remove();
                     }

@@ -65,7 +65,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(session({
     "secret": SESSION_SECRET,
     "cookie": {
-        maxAge: 60 * 60 * 1000, //1 hour
+        maxAge: 7 * 24 * 60 * 60 * 1000, //1 hour -> extended to one week upon client request, no sensitive information can be accessed anyways, and all orders are human verified
         httpOnly: true,
     },
     // secure: true, //when we get SSL #brokemans
@@ -147,6 +147,22 @@ app.get('/admin/edit_user', async (req, res) => {
         }
     }
     res.render('admin/edit_user', { ...user, ...properties });
+})
+
+app.get('/admin/delete_user', async(req, res)=>{
+    let properties = { 'logged_in': false, 'user': null, 'user_id': null, 'admin': false, "cart": {} };
+    for (let [key, value] of Object.entries(properties)) {
+        if (req.session[key]) {
+            properties[key] = req.session[key];
+        }
+    }
+    if (!properties.logged_in) return res.sendStatus(401);
+    if (!properties.admin) return res.sendStatus(403);
+    let {id} = req.query;
+    if(!id) return res.sendStatus(404);
+    console.log(id);
+    db.deleteUser(id);
+    res.send('ok');
 })
 
 //serve web pages
@@ -876,8 +892,14 @@ app.get('/admin/editpart', async (req, res) => {
     const applications = await db.getApps(part_id);
     let apps = [];
     for (let i = 0; i < applications.length; i++) {
+        const engines = await db.getEnginesByApp(applications[i].id);
+        let engStr = engines[0]? engines[0].engine.toUpperCase() : '';
+        for(let j = 1; j < engines.length; j++){
+            engStr += ','+engines[j].engine.toUpperCase();
+        }
         apps.push({
             ...applications[i],
+            engine_string: engStr
         })
     }
     const ints = await db.getInts(part_id);
@@ -924,8 +946,15 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
     let part: PartDBEntry = null, applications: Array<Application> = null;
     let interchanges = null;
     try {
-        let { make, oe_number, frey_number, price, description, enabled, in_stock, brand } = req.body;
+        let { make, oe_number, frey_number, price, description, enabled, in_stock, brand, engines } = req.body;
         if (!brand) brand = null;
+        if (!engines) engines = '';
+        try{
+            engines = engines.toLowerCase()
+        } catch(e){
+            // bad engine, remove
+            engines = '';
+        }
         make = make || make.toLowerCase();
         price = price.split('.');
         if (price.length > 1) {
@@ -962,7 +991,7 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
                     'model': req.body.model[i],
                     'begin_year': req.body.begin_year[i],
                     'end_year': req.body.end_year[i],
-                    'engines': []
+                    'engines': engines[i].split(',')
                 });
             }
         } else {
@@ -970,9 +999,10 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
                 'model': req.body.model,
                 'begin_year': req.body.begin_year,
                 'end_year': req.body.end_year,
-                'engines': []
+                'engines': engines.split(',')
             });
         }
+        console.log(applications)
 
         // construct interchange numbers array
         interchanges = []
@@ -1048,7 +1078,7 @@ app.get("/names/models", async (req, res) => {
 app.get("/names/engine", async (req, res) => {
     let { make, year, model } = req.query;
     let engines = await db.getEngines(make, year, model);
-    // debugLog(engines);
+    debugLog(engines);
     res.json(engines);
     // res.sendStatus(200);
 });

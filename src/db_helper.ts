@@ -110,6 +110,7 @@ async function getEngines(make: string, year: number, model: string): Promise<Ar
         .whereRaw('IFNULL(? ,make) like make', make)
         .andWhereRaw('IFNULL(?, begin_year) between begin_year and end_year', year)
         .andWhereRaw('IFNULL(?, model) like model', model)
+        .orderBy('engine', 'asc')
     //.orderBy('engine');
 }
 

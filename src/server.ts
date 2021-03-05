@@ -987,22 +987,39 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
         applications = [];
         if (typeof req.body.model != 'string') {
             for (let i = 0; i < req.body.model.length; i++) {
-                applications.push({
-                    'model': req.body.model[i],
-                    'begin_year': req.body.begin_year[i],
-                    'end_year': req.body.end_year[i],
-                    'engines': engines[i].split(',')
-                });
+                let eng_arr = engines[i]
+                try{
+                    eng_arr = eng_arr.split(',')
+                }
+                catch{
+                    eng_arr = []
+                }
+                finally{
+                    applications.push({
+                        'model': req.body.model[i],
+                        'begin_year': req.body.begin_year[i],
+                        'end_year': req.body.end_year[i],
+                        'engines': eng_arr
+                    });
+                }
             }
         } else {
-            applications.push({
-                'model': req.body.model,
-                'begin_year': req.body.begin_year,
-                'end_year': req.body.end_year,
-                'engines': engines.split(',')
-            });
+            let eng_arr = engines
+                try{
+                    eng_arr = eng_arr.split(',')
+                }
+                catch{
+                    eng_arr = []
+                }
+                finally{
+                    applications.push({
+                        'model': req.body.model,
+                        'begin_year': req.body.begin_year,
+                        'end_year': req.body.end_year,
+                        'engines': eng_arr
+                    });
+                }
         }
-        console.log(applications)
 
         // construct interchange numbers array
         interchanges = []

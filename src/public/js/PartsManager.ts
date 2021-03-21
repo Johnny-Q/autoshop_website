@@ -226,7 +226,7 @@ class PartsManager {
         //make
         //model
         //oenumber
-        let keys = ["make", "oe_number"];
+        let keys = ["make", "oe_number", "frey_number"];
         for (let i = 0; i < keys.length; i++) {
             let temp = row.insertCell();
             if (part[keys[i]]) {

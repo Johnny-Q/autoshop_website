@@ -46,6 +46,11 @@
                     <input type="text" name="description" placeholder="Description" required
                         value="<%=part.description%>">
                 </div>
+                <div class="labelled_input">
+                    <label for="description">In Stock</label>
+                    <input type="text" name="in_stock" placeholder="Stock" required
+                        value="<%=part.in_stock%>">
+                </div>
             </fieldset>
             <fieldset id="applications">
                 <legend>Applications</legend>
@@ -113,6 +118,7 @@
                 </div>
             </fieldset>
             <button type="submit">Save</button>
+            <button id="delete_part">Delete Part</button>
         </form>
     </div>
 </main>

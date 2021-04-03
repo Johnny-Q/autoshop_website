@@ -20,40 +20,6 @@ class PartsManager {
             this.img_modal.style.display = "none";
         }
     }
-    // async searchAndRender(data) {
-    //     try {
-    //         // if (message_h1.classList.contains("error")) message_h1.classList.remove("error");
-    //         //spawn the loader
-
-
-    //         //perform api request
-    //         let parts = await this.apiSearchFull(data);
-    //         // console.log(parts);
-    //         if (parts.length) {
-    //             //hide the loader after the request is done
-    //             this.clearParts();
-    //             parts.forEach(part => {
-    //                 this.renderPart(part);
-    //             });
-    //             this.table.style.display = "table";
-    //             this.feedback_div.style.display = "none";
-    //             this.feedback_div.querySelector("h1").classList.remove("error");
-    //         }
-
-    //     } catch (err) {
-    //         console.log(err);
-    //         this.clearParts();
-    //         //hide the results
-    //         this.table.style.display = "none";
-    //         this.feedback_div.style.display = "flex";
-
-    //         //show an error message on screen
-    //         let message_h1 = this.feedback_div.querySelector("h1");
-    //         message_h1.classList.add("error");
-    //         message_h1.innerText = "Please try again.";
-    //     }
-    //     this.hideLoader();
-    // }
     /**
      * 
      * @param data {make, year, model, engine}
@@ -61,17 +27,6 @@ class PartsManager {
     async apiSearchFull(data: Object) {
         this.showLoader();
         try {
-            //make request to server
-            //@ts-expect-error
-            // let query_string = `/search?make=${data.make}&year=${data.year}&model=${data.model}&engine=${data.engine}`;
-            // window.location.href = query_string;
-            // let resp = await fetch(query_string, {
-            //     "method": "GET",
-            //     "headers": {
-            //         "Content-Type": "application/json",
-            //     },
-            //     "body": JSON.stringify(data)
-            // });
             let resp = await fetch("/search/full", {
                 "method": "POST",
                 "headers": {
@@ -129,56 +84,11 @@ class PartsManager {
 
     renderPart(part: Part) {
         console.log(part);
-        // //add the elements
-        // let img = document.createElement("img");
-        // //render the right image
-        // // img.src = `${part.image_url || "/image1.jpeg"}`;
-        // img.src = '../img/parts/' + (part.image_url || "image1.jpeg");
 
-        // let name = document.createElement("p");
-        // name.innerText = part.frey_number;
-
-        // let make = document.createElement("p");
-        // make.innerText = part.make;
-
-        // let oe_number = document.createElement("p");
-        // oe_number.innerText = part.oe_number;
-
-        // let price = document.createElement("p");
-        // let price_text = part.price.toString(); //get the decimal format
-        // price.innerText = `${price_text.substr(0, price_text.length - 2)}.${price_text.substr(2)}`;
-
-        // let instock = document.createElement("div");
-        // instock.classList.add("stock_status");
-        // instock.innerHTML = Math.round(Math.random()) ? check : cross;
-
-        // let line = document.createElement("div");
-        // line.classList.add("seperator");
-
-        // parts_grid.append(line, img, name, make, oe_number, price, instock);
-
-        // part.image_url = "image1.jpeg";
+        //create the row
         let tbody = this.table.querySelector("tbody");
         let row = tbody.insertRow();
         row.classList.add("part");
-        //checkbox
-        // let checkbox_cell = row.insertCell();
-        // let checkout_input = document.createElement("input");
-        // checkout_input.type = "checkbox";
-        // checkbox_cell.append(checkout_input);
-
-        //image and type
-        // let type_td = row.insertCell();
-        // type_td.classList.add("type");
-        // let div = document.createElement("div");
-        // let img = document.createElement("img");
-        // img.src = `../img/parts/${part.image_url}`;
-        // let type = document.createElement("h3");
-        // type.innerText = part.description;
-        // div.append(img, type)
-        // type_td.append(div);
-
-        // add edit part button
 
         //add image
         let image_td = row.insertCell();
@@ -199,10 +109,7 @@ class PartsManager {
             bigger_img.onerror = null;
         }
         image_td.append(img, bigger_img);
-
-
-        //spawn the onclick
-
+        //on hover show a bigger image
         img.addEventListener("mouseenter", () => {
             bigger_img.style.display = "block";
         });
@@ -212,16 +119,11 @@ class PartsManager {
         });
 
 
+        //add description
         let type_td = row.insertCell();
-        // type_td.classList.add("type");
-        // let div = document.createElement("div");
-        // let img = document.createElement("img");
-        // img.src = `../img/parts/${part.image_url}`;
         let type = document.createElement("h3");
         type.innerText = part.description;
         type_td.append(type);
-
-
 
         //make
         //model
@@ -300,6 +202,7 @@ class PartsManager {
                 view.innerHTML = "Close";
             }
         };
+        
         /*async ()=>{
             try{
                 fetch("/get_apps", {
@@ -347,15 +250,31 @@ class PartsManager {
                         "body": JSON.stringify({ "part": part })
                     }).then(resp => {
                         if (resp.status == 200) {
-                            if (this.toast_hide_func) {
-                                clearTimeout(this.toast_hide_func);
-                                this.toast.classList.remove("show");
-                            }
-                            this.toast.classList.add("show");
-                            this.toast_hide_func = setTimeout(() => {
-                                this.toast.classList.remove("show");
-                                this.toast_hide_func = null;
-                            }, 1000);
+                            console.log("here");
+                            resp.json().then((json)=>{
+                                console.log(json);
+                                if(json.out_of_stock){
+                                    if(json.in_stock == 0){
+                                        alert("We are currently out of this part. Please check again later or contact us.");
+                                    }else{
+                                        let msg = `There are only ${json.in_stock} amount of parts left. `;
+                                        if(json.in_cart){
+                                            msg += `You currently have ${json.in_cart} in cart. `;
+                                        }
+                                        alert(msg += "Please adjust your quantity.");
+                                    }
+                                }else{
+                                    if (this.toast_hide_func) {
+                                        clearTimeout(this.toast_hide_func);
+                                        this.toast.classList.remove("show");
+                                    }
+                                    this.toast.classList.add("show");
+                                    this.toast_hide_func = setTimeout(() => {
+                                        this.toast.classList.remove("show");
+                                        this.toast_hide_func = null;
+                                    }, 1000);
+                                }                                
+                            })
                         }
                     });
                 }

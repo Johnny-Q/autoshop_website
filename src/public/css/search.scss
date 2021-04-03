@@ -253,6 +253,8 @@ div.toast {
     background-color: rgb(129, 211, 129);
     z-index: 1000;
     padding: 10px;
+    max-width: 400px;
+    word-wrap: break-word;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease-in-out;
@@ -263,6 +265,10 @@ div.toast.show {
     opacity: 1;
     visibility: visible;
     top: 30px;
+}
+
+div.toast.error{
+    background-color: rgb(253, 88, 88);
 }
 
 div.image_modal{

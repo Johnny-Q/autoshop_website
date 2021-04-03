@@ -456,6 +456,12 @@ async function editUser(id, email, username, additional_info) {
     return res;
 }
 
+async function updateStock( updates ){
+    for(let i = 0; i < updates.length; i++){
+        await db('Parts').where('oe_number', updates[i].oe_number).update('in_stock', updates[i].stock);
+    }
+}
+
 module.exports = {
     getPartByIdNumber,
     getPartByDbId,
@@ -480,5 +486,7 @@ module.exports = {
     editUser,
     getUsers,
     deleteUser,
-    getEnginesByApp
+    getEnginesByApp,
+    updateStock,
+    deletePart
 }

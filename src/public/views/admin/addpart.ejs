@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang=en>
-<%- include('../partials/header.ejs', {stylesheets: ['register'], scripts: [{name: 'import_excel' , defer: true}], page_name: "Add Parts" }) %>
+<%- include('../partials/header.ejs', {stylesheets: ['register'], scripts: [{name: 'import_excel' , defer: true}, {name: 'upload_stock' , defer: true}], page_name: "Add Parts" }) %>
     <body>
         <%- include('../partials/navbar.ejs', {logged_in}) %>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
         <main>
+            <h3> upload parts </h3>
             <input type="file" name="" id="file_selector">
+            <h3> upload stock </h3>
+            <input type="file" name="" id="upload_stock">
             <img src="/img/loader.gif" alt="" id="loader" style="display: none;">
             <p class="error_message"></p>
         </main>

@@ -31,7 +31,7 @@
                                 <%= part.description %> 
                             </td>
                             <td><%= part.make.toUpperCase() %> </td>
-                            <td><%= part.oe_number %> </td>
+                            <td><p id="oe_<%=part.id%>"><%= part.oe_number %></p></td>
                             <td class="unit_price"><%= `$${price_string}`;%> </td>
                             <td>
                                 <input type="number" name="<%=part.id%>" id="" min="1" value="<%= part.quantity %>">

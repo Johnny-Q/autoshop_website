@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("partials/header.ejs", {stylesheets: ["register", "form_elements"], scripts: [{name: "form" , defer: true}], page_name: "Edit User" } ) %>
+
+    <body>
+        <%- include('partials/navbar.ejs', {logged_in}) %>
+            <main>
+                <form action="edit_info" id="regform" method="POST">
+                    <input type="hidden" name='id' value="<%= typeof id != 'undefined' ? id : '' %>">
+                    <p> Company Info </p>
+                    <div class="rounded_input">
+                        <input type="text" name="company" placeholder="Company Name" required
+                        value="<%= typeof company != 'undefined' ? company : ''%>">
+                        <label for=company><span>Company Name</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="email" placeholder="Email Address" required
+                        value="<%= typeof email != 'undefined' ? email : ''%>">
+                        <label for=email><span>Email Address</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="user" placeholder="Username"
+                        value="<%= typeof username != 'undefined' ? username : ''%>">
+                        <label for=user><span>Username</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="business" placeholder="Business Type" required
+                        value="<%= typeof business != 'undefined' ? business : ''%>">
+                        <label for=business><span>Business Type</span></label>
+                    </div>
+                    <div>
+                        <label for=purchase> How much do you plan to spend monthly? </label>
+                        <select name="purchase"  required>
+                            <% if(typeof purchase != 'undefined'){ %>
+                                <option value="<%=purchase%>"> <%=purchase%> </option>
+                            <% } %> 
+                            <option value="<$1000"><$1000</option>
+                            <option value="$1000-$5000">$1000-$5000</option>
+                            <option value="$5000-$10000">$5000-$10000</option>
+                            <option value=">$10000">>$10000</option>
+                        </select>
+                    </div>
+
+                    <div class="rounded_input">
+                        <input type="text" name="telephone" placeholder="Telephone" required
+                        value="<%= typeof telephone != 'undefined' ? telephone : ''%>">
+                        <label for=telephone><span>Telephone</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="fax" placeholder="Fax"
+                        value="<%= typeof fax != 'undefined' ? fax : ''%>">
+                        <label for=fax><span>Fax</span></label>
+                    </div>
+                    <p> Address </p>
+                    <div class="rounded_input">
+                        <input type="text" name="address1" placeholder="Address Line 1" required
+                        value="<%= typeof address1 != 'undefined' ? address1 : ''%>">
+                        <label for=address1><span>Address Line 1</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="address2" placeholder="Address Line 2"
+                        value="<%= typeof address2 != 'undefined' ? address2 : ''%>">
+                        <label for=address2><span>Address Line 2</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="city" placeholder="City" required
+                        value="<%= typeof city != 'undefined' ? city : ''%>">
+                        <label for=city><span>City</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="province" placeholder="Province" required
+                        value="<%= typeof province != 'undefined' ? province : ''%>">
+                        <label for=province><span>Province</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="postal" placeholder="Postal Code" required
+                        value="<%= typeof postal != 'undefined' ? postal : ''%>">
+                        <label for=postal><span>Postal Code</span></label>
+                    </div>
+                    <p> Contact Person </p>
+                    <div class="rounded_input">
+                        <input type="text" name="contact_first" placeholder="First Name" required
+                        value="<%= typeof contact_first != 'undefined' ? contact_first : ''%>">
+                        <label for=contact_first><span>First Name</span></label>
+                    </div>
+                    <div class="rounded_input">
+                        <input type="text" name="contact_last" placeholder="Last Name" required
+                        value="<%= typeof contact_last != 'undefined' ? contact_last : ''%>">
+                        <label for=contact_last><span>Last Name</span></label>
+                    </div>
+                    <button type="submit"> Save Edit </button>
+                </form>
+
+                <% if(typeof errors!='undefined' ) { errors.forEach(function(error){ %>
+                    <p class='error_message'>
+                        <%= error.msg %>
+                    </p>
+                    <% }) } %>
+            </main>
+            <%- include('partials/footer.ejs') %>
+    </body>
+
+</html>

@@ -1774,6 +1774,6 @@ async function validateCart(cart){
             // log part id, max amount
             updates.push({part_id: part.id, in_stock: addAmount})
         }
-    })
+    }
     return updates;
 }

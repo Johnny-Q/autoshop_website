@@ -3,7 +3,7 @@ const input = document.getElementById('file_selector') as HTMLInputElement;
 const loader = document.querySelector("#loader");
 const error_message = document.querySelector(".error_message");
 
-function parseExcel(file) {
+function parseExcelParts(file) {
     var reader = new FileReader();
 
     reader.onload = function (e) {
@@ -238,5 +238,5 @@ function standardizeYear(year: number): number {
 input.addEventListener('change', function () {
     loader.style.display = "block";
     console.log("ree");
-    parseExcel(this.files[0]);
+    parseExcelParts(this.files[0]);
 })

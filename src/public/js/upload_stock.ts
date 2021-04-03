@@ -3,7 +3,7 @@ const stock_input = document.getElementById('upload_stock') as HTMLInputElement;
 // const loader = document.querySelector("#loader");
 // const error_message = document.querySelector(".error_message");
 
-function parseExcel(file) {
+function parseExcelStock(file) {
     var reader = new FileReader();
 
     reader.onload = function (e) {
@@ -22,7 +22,7 @@ function parseExcel(file) {
             let errors = [];
             for (let i = 0; i < XL_row_object.length; i++) {
                 try {
-                    let update = parseRow(XL_row_object[i]);
+                    let update = parseRowStock(XL_row_object[i]);
                     console.log(update);
                     updates.push(update);
                 }
@@ -54,7 +54,7 @@ function parseExcel(file) {
 };
 
 
-function parseRow(row) {
+function parseRowStock(row) {
     //check all column names exist and have vlaue, 
     let must_have = ["OE No.", "Stock"];
     for (let i = 0; i < must_have.length; i++) {
@@ -101,5 +101,5 @@ function standardizeYear(year: number): number {
 stock_input.addEventListener('change', function () {
     loader.style.display = "block";
     console.log("ree");
-    parseExcel(this.files[0]);
+    parseExcelStock(this.files[0]);
 })

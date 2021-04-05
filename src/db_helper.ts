@@ -1,3 +1,5 @@
+import Knex from "../node_modules/knex/types/index";
+
 //@ts-expect-error
 const db = require('knex')({
     client: 'sqlite3',
@@ -462,6 +464,12 @@ async function updateStock( updates ){
     }
 }
 
+async function reduceStock(id, reduction){
+    await db('Parts').where('id', id).update({
+        in_stock: db.raw('?? - ' + reduction, ['in_stock'])
+    })
+}
+
 module.exports = {
     getPartByIdNumber,
     getPartByDbId,
@@ -488,5 +496,6 @@ module.exports = {
     deleteUser,
     getEnginesByApp,
     updateStock,
-    deletePart
+    deletePart,
+    reduceStock
 }

@@ -1652,6 +1652,7 @@ app.post("/cart/place_order", async (req, res) => {
         subject: "An order has been placed",
         html: emailHTML,
     });
+    reduceStock(req.session.cart)
     req.session.cart = {};
     res.render("message", {
         page_name: "Cart",
@@ -1776,4 +1777,15 @@ async function validateCart(cart){
         }
     }
     return updates;
+}
+
+async function reduceStock(cart){
+    for(let [key, part] of Object.entries(cart)){
+        // check part.quantity is number
+        if(!isFinite(part.quantity)){
+            delete cart[key];
+            continue
+        }
+        db.reduceStock(part.id, part.quantity)
+    }
 }

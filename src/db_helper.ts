@@ -1,5 +1,3 @@
-import Knex from "../node_modules/knex/types/index";
-
 //@ts-expect-error
 const db = require('knex')({
     client: 'sqlite3',

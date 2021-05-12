@@ -1583,7 +1583,7 @@ app.post("/cart/place_order", async (req, res) => {
         let subtotal = part.price * part.quantity; // / 100;
         let html = `
         <tr>
-            <td>${part.oe_number}</td>
+            <td>${part.oe_number.toUpperCase()}</td>
             <td>${part.description}</td>
             <td>${part.quantity}</td>
             <td>$${part.price / 100}</td>

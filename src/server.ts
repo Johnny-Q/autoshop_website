@@ -1221,11 +1221,19 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
         } = req.body;
         if (!brand) brand = null;
         if (!engines) engines = "";
-        try {
-            engines = engines.toLowerCase();
-        } catch (e) {
-            // bad engine, remove
-            engines = "";
+        if(Array.isArray(engines)){
+            for(var i = 0; i < engines.length; i++){
+                try{
+                    engines[i] = engines[i].toLowerCase();
+                }
+                catch(e){
+                    engines[i] = ""
+                }
+            }
+        }
+        else{
+            try{ engines = engines.toLowerCase() }
+            catch(e) { engines = "" }
         }
         make = make || make.toLowerCase();
         price = price.split(".");

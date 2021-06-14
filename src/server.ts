@@ -1154,6 +1154,7 @@ app.get("/admin/editpart", async (req, res) => {
             page_name: "Edit Part",
         });
     }
+    console.log(part)
     res.render("admin/editpart", {
         ...properties,
         part: part,
@@ -1219,6 +1220,7 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
             brand,
             engines,
         } = req.body;
+        console.log(")(#*Q@)(%*)(#*)(@%*" + in_stock)
         if (!brand) brand = null;
         if (!engines) engines = "";
         if(Array.isArray(engines)){
@@ -1250,7 +1252,7 @@ app.post("/admin/editpart", upload.single("part_img"), async (req, res) => {
             frey_number,
             price,
             brand,
-            in_stock: in_stock ?? 0,
+            in_stock: in_stock ? in_stock : 0,
             description: description ? description : null,
             enabled: enabled ? enabled : 1,
         };

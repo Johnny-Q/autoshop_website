@@ -136,11 +136,6 @@ async function addPart(part: Part, applications: Array<Application>, interchange
     let part_id = null;
     let app_id = null;
 
-    // if there exists a previous part, take in_stock and add to current incoming change
-    if(parts.length > 0){
-        part.in_stock += parts[0].in_stock
-    }
-
     //clear every entry for the previous part if existed
     if (parts.length > 0) {
         part_id = parts[0].id;

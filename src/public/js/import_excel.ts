@@ -75,7 +75,7 @@ function parseRow(row) {
         }
     };
 
-    let { Application, "Brand": brand, "Description": description, "Frey No.": frey_number, "Interch. No.": int_numbers, "OE No.": oe_number, "Unit Price": price } = row;
+    let { Application, "Brand": brand, "Description": description, "Frey No.": frey_number, "Interch. No.": int_numbers, "OE No.": oe_number, "Unit Price": price} = row;
     let make;
 
     // price guaranteed is a not empty string at this point
@@ -210,7 +210,7 @@ function parseRow(row) {
         int_numbers = int_numbers.split(" ");
     }
 
-    let part: Part = { brand, description, frey_number, oe_number, price, make, "enabled": true };
+    let part: Part = { brand, description, frey_number, oe_number, price, make, "enabled": true, in_stock };
     return { part, applications, "interchange": int_numbers };
 }
 

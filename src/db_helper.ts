@@ -135,6 +135,12 @@ async function addPart(part: Part, applications: Array<Application>, interchange
     let parts = await db('Parts').select('id').where('oe_number', part.oe_number);
     let part_id = null;
     let app_id = null;
+
+    // if there exists a previous part, take in_stock and add to current incoming change
+    if(parts.length > 0){
+        part.in_stock += parts[0].in_stock
+    }
+
     //clear every entry for the previous part if existed
     if (parts.length > 0) {
         part_id = parts[0].id;
@@ -458,7 +464,9 @@ async function editUser(id, email, username, additional_info) {
 
 async function updateStock( updates ){
     for(let i = 0; i < updates.length; i++){
-        await db('Parts').where('oe_number', updates[i].oe_number).update('in_stock', updates[i].stock);
+        await db('Parts').where('oe_number', updates[i].oe_number).update({
+            "in_stock": db.raw('in_stock + ?', updates[i].stock)
+        });
     }
 }
 
@@ -466,6 +474,11 @@ async function reduceStock(id, reduction){
     await db('Parts').where('id', id).update({
         in_stock: db.raw('?? - ' + reduction, ['in_stock'])
     })
+}
+
+async function existsOE(oe_number){
+    let part = await db("Parts").where("oe_number", oe_number)
+    return part[0]
 }
 
 module.exports = {
@@ -495,5 +508,6 @@ module.exports = {
     getEnginesByApp,
     updateStock,
     deletePart,
-    reduceStock
+    reduceStock,
+    existsOE
 }

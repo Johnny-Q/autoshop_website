@@ -459,9 +459,20 @@ async function editUser(id, email, username, additional_info) {
 
 async function updateStock( updates ){
     for(let i = 0; i < updates.length; i++){
-        await db('Parts').where('oe_number', updates[i].oe_number).update({
-            "in_stock": db.raw('in_stock + ?', updates[i].stock)
-        });
+        let part = await db('Parts').where('oe_number', updates[i].oe_number)
+        console.log(part)
+        if(part.length > 0){
+            if(part[0].in_stock){
+                await db('Parts').where('oe_number', updates[i].oe_number).update({
+                    "in_stock": db.raw('in_stock + ?', updates[i].stock)
+                });
+            }
+            else{
+                await db('Parts').where('oe_number', updates[i].oe_number).update({
+                    "in_stock": updates[i].stock
+                });
+            }
+        }
     }
 }
 

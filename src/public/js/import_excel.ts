@@ -210,7 +210,7 @@ function parseRow(row) {
         int_numbers = int_numbers.split(" ");
     }
 
-    let part: Part = { brand, description, frey_number, oe_number, price, make, "enabled": true, in_stock };
+    let part: Part = { brand, description, frey_number, oe_number, price, make, "enabled": true};
     return { part, applications, "interchange": int_numbers };
 }
 

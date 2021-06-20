@@ -152,6 +152,156 @@ HTMLpages.forEach((page) => {
     });
 });
 
+app.get("/edit_info", async(req, res) => {
+    if(!req.session.logged_in) return res.sendStatus(401)
+    console.log(req.session.user_id)
+    if(req.session.user_db){
+        res.render('edit_user', {...req.session.user_db, logged_in: true})
+    } else{
+        res.sendStatus(500)
+    }
+    
+})
+
+app.post("/edit_info", async (req, res) => {
+    let properties = {
+        logged_in: null,
+        user: null,
+        user_id: null,
+    };
+    for (let [key, value] of Object.entries(properties)) {
+        properties[key] = req.session[key];
+    }
+    if (!properties.logged_in) {
+        return res.redirect("/");
+    }
+    let errmsgs = [];
+    const {
+        id,
+        company,
+        email,
+        user,
+        business,
+        purchase,
+        telephone,
+        fax,
+        address1,
+        address2,
+        city,
+        province,
+        postal,
+        contact_first,
+        contact_last,
+    } = req.body;
+    let phone = "",
+        postalStrip = "";
+    let username = user || "";
+    if (telephone) {
+        phone = telephone.replace(/[^0-9]/g, "");
+    }
+    postalStrip = postal.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+    if (
+        anyFalse([
+            company,
+            email,
+            business,
+            purchase,
+            telephone,
+            address1,
+            city,
+            province,
+            postal,
+            contact_first,
+            contact_last,
+        ])
+    )
+        errmsgs.push({ msg: "Please fill out all fields" });
+    if (!isValidEmail(email))
+        errmsgs.push({ msg: "Please enter a valid email address" });
+    if (phone.length != 10)
+        errmsgs.push({ msg: "Please enter a valid phone number" });
+    if (!isValidPostal(postalStrip))
+        errmsgs.push({ msg: "Please enter a valid postal code" });
+    if (username && username.indexOf("@") > 0)
+        errmsgs.push({ msg: "Username cannot contain @ character" });
+    if (
+        !(
+            purchase == "<$1000" ||
+            purchase == "$1000-$5000" ||
+            purchase == "$5000-$10000" ||
+            purchase == ">$10000"
+        )
+    ) {
+        errmsgs.push({ msg: "Please fill out all fields" });
+    }
+    let additional_info = {
+        company,
+        business,
+        purchase,
+        telephone: phone,
+        fax: fax ? fax : null,
+        address1,
+        address2: address2 ? address2 : null,
+        city,
+        province,
+        postal: postalStrip,
+        contact_first,
+        contact_last,
+        verified_email: 0,
+        approved: 1,
+        temp_pass: 1,
+    };
+    if (errmsgs.length == 0) {
+        let edit = await db.editUser(id, email, username, additional_info);
+        edit.errmsgs.forEach((msg) => {
+            errmsgs.push({ msg });
+        });
+    }
+    if (errmsgs.length > 0) {
+        //res.status(400).send(errmsgs);
+        res.render("edit_user", {
+            errors: errmsgs,
+            id,
+            email,
+            username,
+            company,
+            business,
+            purchase,
+            telephone: phone,
+            fax,
+            address1,
+            address2,
+            city,
+            province,
+            postal: postalStrip.toUpperCase(),
+            contact_first,
+            contact_last,
+            ...properties,
+        });
+    } else {
+        errmsgs.push({ msg: "edit successful" });
+        res.render("edit_user", {
+            errors: errmsgs,
+            id,
+            email,
+            username,
+            company,
+            business,
+            purchase,
+            telephone: phone,
+            fax,
+            address1,
+            address2,
+            city,
+            province,
+            postal: postalStrip.toUpperCase(),
+            contact_first,
+            contact_last,
+            ...properties,
+        });
+    }
+});
+
 app.get("/admin/edit_user", async (req, res) => {
     let properties = {
         logged_in: false,

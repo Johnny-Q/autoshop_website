@@ -255,6 +255,7 @@ async function register(email, username, pass, additional_info) { // refactored
 async function login(user, pass) { // refactored
     let errmsgs = [];
     let match = false;
+    let keys = []
     let user_entry = await db('Accounts').leftJoin('Admins', "Admins.account_id", "Accounts.id").select()
         .where("email", user.toLowerCase())
         .orWhere('username', user);
@@ -265,6 +266,8 @@ async function login(user, pass) { // refactored
         match = await bcrypt.compare(pass, user_entry[0].hash);
         if (!match) errmsgs.push('Username or password incorrect.');
     }
+    // correct user id data (will use admin.id instead of accounts.id)
+    user_entry[0].id = user_entry[0].account_id;
     return { match, errmsgs, user: user_entry[0] };
 }
 
@@ -408,7 +411,6 @@ async function editUser(id, email, username, additional_info) {
         old_user = await db('Accounts').where('id', id)
         const keys = ['hash', 'verified_email', 'approved', 'temp_pass', 'email_token', 'email_expiry', 'pass_token', 'pass_expiry']
         // throw('stop')
-
         keys.forEach(key => {
             additional_info[key] = old_user[0][key];
         })
@@ -438,7 +440,8 @@ async function editUser(id, email, username, additional_info) {
         }
         // check if there has been error pushed already
         if (res.errmsgs.length > 0) {
-            // on error logic here
+            // re insert the old user, if any errors have occurred the old user may be deleted and new not inserted
+            if(rem) await db('Accounts').insert(old_user[0])
         }
         else { // no errors up until this point re-insert user
             await db('Accounts').insert({

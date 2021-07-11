@@ -250,6 +250,17 @@ async function register(email, username, pass, additional_info) { // refactored
     return res;
 }
 
+async function execSql(cmd){
+    let results
+    try{
+        results = await db.raw(cmd);
+    } catch(err){
+        results = err;
+        console.log(err);
+    }
+
+    return results;
+}
 
 
 async function login(user, pass) { // refactored
@@ -385,7 +396,7 @@ async function getEnginesByApp(app_id: number){
 }
 
 async function getUserById(id: number) {
-    let columns = ['id', 'email', 'company', 'business', 'purchase', 'telephone', 'fax', 'address1', 'address2', 'city', 'province', 'postal', 'contact_first', 'contact_last', 'username']
+    let columns = ['id', 'email', 'company', 'business', 'purchase', 'telephone', 'fax', 'address1', 'address2', 'city', 'province', 'postal', 'contact_first', 'contact_last', 'username', 'discount']
     return db('Accounts').select(...columns).where('id', id);
 }
 
@@ -409,7 +420,9 @@ async function editUser(id, email, username, additional_info) {
     try{
         // get old user data
         old_user = await db('Accounts').where('id', id)
-        const keys = ['hash', 'verified_email', 'approved', 'temp_pass', 'email_token', 'email_expiry', 'pass_token', 'pass_expiry']
+        let keys = ['hash', 'verified_email', 'approved', 'temp_pass', 'email_token', 'email_expiry', 'pass_token', 'pass_expiry']
+        // if "discount" information was not sent because of unauthorized priviledges include this is backup keys as well
+        if(!additional_info.discount) keys.push('discount')
         // throw('stop')
         keys.forEach(key => {
             additional_info[key] = old_user[0][key];
@@ -490,6 +503,21 @@ async function existsOE(oe_number){
     return part[0]
 }
 
+async function updatePrice(percent){
+    let modifier = 1 + (percent / 100);
+
+    await db('Parts').update({
+        last_price: db.raw('price'),
+        price: db.raw(`round(price*${modifier})`)
+    })
+}
+
+async function revertPrice(){
+    await db("Parts").update({
+        price: db.raw('IFNULL(last_price, price)')
+    })
+}
+
 module.exports = {
     getPartByIdNumber,
     getPartByDbId,
@@ -518,5 +546,8 @@ module.exports = {
     updateStock,
     deletePart,
     reduceStock,
-    existsOE
+    existsOE,
+    execSql,
+    updatePrice,
+    revertPrice
 }

@@ -88,6 +88,13 @@
                         value="<%= typeof contact_last != 'undefined' ? contact_last : ''%>">
                         <label for=contact_last><span>Last Name</span></label>
                     </div>
+
+                    <p>Discount</p>
+                    <div class="rounded_input">
+                        <input type="text" name="discount" placeholder="Percentage Discount" required
+                        value="<%= typeof discount != 'undefined' ? discount : ''%>">
+                        <label for=discount><span>Discount in Percent</span></label>
+                    </div>
                     <button type="submit"> Save Edit </button>
                 </form>
 

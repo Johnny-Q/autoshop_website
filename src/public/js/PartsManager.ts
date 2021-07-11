@@ -20,6 +20,23 @@ class PartsManager {
             this.img_modal.style.display = "none";
         }
     }
+
+    async applyDiscount(parts){
+        // grab account discount
+        let resp = await fetch("/account/discount", {
+            "method": "GET"
+        })
+        let discount = await resp.json();
+        console.log(discount.discount)
+        // apply part discount locally on shop display
+
+        for(let i = 0; i < parts.length; i++){
+            parts[i].price = Math.round(parts[i].price * (1 - discount.discount/100))
+        }
+
+        return parts
+    }
+
     /**
      * 
      * @param data {make, year, model, engine}
@@ -36,7 +53,10 @@ class PartsManager {
             });
             let json = await resp.json();
             this.admin = json.admin;
-            return json.parts;
+            
+            
+            
+            return this.applyDiscount(json.parts);
         } catch (err) {
             throw err;
         }
@@ -57,7 +77,7 @@ class PartsManager {
             });
             let json = await resp.json();
             this.admin = json.admin;
-            return json.parts;
+            return this.applyDiscount(json.parts);
         } catch (err) {
             throw err;
         }
@@ -76,7 +96,7 @@ class PartsManager {
             });
             let json = await resp.json();
             this.admin = json.admin;
-            return json.parts;
+            return this.applyDiscount(json.parts);
         } catch (err) {
             throw err;
         }

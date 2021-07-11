@@ -792,6 +792,7 @@ app.post("/admin/edit_user", async (req, res) => {
         postal,
         contact_first,
         contact_last,
+        discount
     } = req.body;
     let phone = "",
         postalStrip = "";
@@ -813,6 +814,7 @@ app.post("/admin/edit_user", async (req, res) => {
             postal,
             contact_first,
             contact_last,
+            discount
         ])
     )
         errmsgs.push({ msg: "Please fill out all fields" });
@@ -850,6 +852,7 @@ app.post("/admin/edit_user", async (req, res) => {
         verified_email: 0,
         approved: 1,
         temp_pass: 1,
+        discount
     };
     if (errmsgs.length == 0) {
         let edit = await db.editUser(id, email, username, additional_info);
@@ -876,6 +879,7 @@ app.post("/admin/edit_user", async (req, res) => {
             postal: postalStrip.toUpperCase(),
             contact_first,
             contact_last,
+            discount,
             ...properties,
         });
     } else {
@@ -897,6 +901,7 @@ app.post("/admin/edit_user", async (req, res) => {
             postal: postalStrip.toUpperCase(),
             contact_first,
             contact_last,
+            discount,
             ...properties,
         });
     }
@@ -1231,6 +1236,7 @@ const adminPages = [
     "addpart",
     "account_requests",
     "search_users",
+    "debug"
 ];
 
 adminPages.forEach((page) => {
@@ -1251,6 +1257,60 @@ adminPages.forEach((page) => {
         }
     });
 });
+
+app.post('/admin/debug/execsql', async (req, res) => {
+    if (!req.session.admin) return res.redirect('/');
+    console.log(req.session)
+    let {cmd} = req.body;
+    let exec = process.env.EXECSQL;
+    let execStatus = 'default';
+    if(exec == '0'){
+        // log who tried to exec command
+        console.log("COMMAND EXECUTION ATTEMPT:", cmd, req.session.user_db.email);
+        execStatus = "SQL Execution is disabled.";
+    }
+    else if(exec == '1'){
+        // log command executions
+        console.log("COMAND EXECUTION COMPLETION", cmd, req.session.user_db.email);
+        execStatus = await db.execSql(cmd);
+    }
+    res.send(JSON.stringify(execStatus));
+})
+
+app.post('/admin/change_price', async (req, res) => {
+    if (!req.session.admin) return res.redirect('/');
+    
+    let {percent} = req.body;
+
+    
+    try{
+        percent = parseFloat(percent);
+    } catch (e) {
+        return res.send('An error occurred. Please take note of the following error message. ' + e)
+    }
+
+    if (isNaN(percent)) return res.send('The inputted number is not a percent!');
+    console.log(percent)
+
+    try{
+        await db.updatePrice(percent);
+    } catch (e) {
+        return res.send('An error occurred. Please take note of the following error message. ' + e)
+    }
+    return res.send('All prices changed by ' + percent + '%')
+})
+
+app.post("/admin/revert_price", async (req, res) => {
+    if(!req.session.admin) return res.redirect('/');
+
+    let response = "default";
+    try{
+        await db.revertPrice();
+        response = "Prices reverted to last set price";
+    } catch(e){ response = e; }
+
+    res.send(response);
+})
 
 app.delete("/admin/editpart", async (req, res) => {
     let {part_id} = req.query
@@ -1630,6 +1690,7 @@ app.post("/cart/part", async (req, res) => {
         // debugLog(part);
         req.session.cart = req.session.cart || {};
 
+
         //check if the part is already in the cart
         if (
             !part?.id ||
@@ -1805,7 +1866,7 @@ app.post("/cart/place_order", async (req, res) => {
         subject: "An order has been placed",
         html: emailHTML,
     });
-    console.log(process.env.EMAIL_USER);
+    console.log(req.session.user);
     transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: req.session.user,
@@ -1819,10 +1880,6 @@ app.post("/cart/place_order", async (req, res) => {
         message:
             "Thank you for placing an order. An email will be sent to you to process your order.",
     });
-});
-
-app.post("/debug", upload.single("part_img"), async (req, res) => {
-    debugLog(req.body);
 });
 
 app.post("/user/approve", async (req, res) => {
@@ -1862,6 +1919,13 @@ app.post("/int", (req, res) => {
     debugLog(part_name);
     res.sendStatus(200);
 });
+
+app.get('/account/discount', async (req, res) => {
+    let user = await db.getUserById(req.session.user_db.id);
+    console.log(user)
+    req.session.user_db = user[0];
+    res.json({"discount": req.session.user_db.discount});
+})
 
 app.listen(PORT, () => {
     console.log("started on", PORT);

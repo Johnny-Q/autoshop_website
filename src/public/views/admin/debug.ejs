@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang=en>
+<%- include('../partials/header.ejs', {stylesheets: [], scripts: [], page_name: "Debug" }) %>
+    <body>
+        <%- include('../partials/navbar.ejs', {logged_in}) %>
+        <main>
+            <h1> IF YOU DONT KNOW WHAT YOURE DOING HERE DONT TOUCH</h1>
+            <h3> exec sql </h3>
+            <form action="/admin/debug/execsql" method="POST">
+                <input type="text" name="cmd">
+                <button type="submit"> exec </button>
+            </form>
+            <h3>notes</h3>
+            <p>
+                modify parts table to have last_price column:
+                alter table parts add column last_price text
+            </p>
+            <p>
+                set last_price equal to price:
+                update parts set last_price = price
+            </p>
+            <p>
+                add column for discount to user
+                alter table accounts add column discount default 0
+            </p>
+        </main>
+
+        <%- include('../partials/footer.ejs') %>
+    </body>
+</html>

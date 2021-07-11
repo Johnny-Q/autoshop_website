@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang=en>
-<%- include('../partials/header.ejs', {stylesheets: ['register'], scripts: [{name: 'import_excel' , defer: true}, {name: 'upload_stock' , defer: true}], page_name: "Add Parts" }) %>
+<%- include('../partials/header.ejs', {stylesheets: [], scripts: [{name: 'import_excel' , defer: true}, {name: 'upload_stock' , defer: true}], page_name: "Add Parts" }) %>
     <body>
         <%- include('../partials/navbar.ejs', {logged_in}) %>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
@@ -12,6 +12,14 @@
             <input type="file" name="" id="upload_stock">
             <img src="/img/loader.gif" alt="" id="loader" style="display: none;">
             <p class="error_message"></p>
+            <h3>Change price</h3>
+            <form action="/admin/change_price" method="POST">
+                <input type="text" name="percent">
+                <button type="submit">Submit</button>
+            </form>
+            <form action="/admin/revert_price" method="POST">
+                <button type="submit"> Revert to last listed price </button>
+            </form>
         </main>
 
         <%- include('../partials/footer.ejs') %>

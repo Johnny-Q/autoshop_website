@@ -1921,6 +1921,7 @@ app.post("/int", (req, res) => {
 });
 
 app.get('/account/discount', async (req, res) => {
+    console.log(req.session)
     let user = await db.getUserById(req.session.user_db.id);
     console.log(user)
     req.session.user_db = user[0];

@@ -267,18 +267,25 @@ async function login(user, pass) { // refactored
     let errmsgs = [];
     let match = false;
     let keys = []
-    let user_entry = await db('Accounts').leftJoin('Admins', "Admins.account_id", "Accounts.id").select()
+    let user_entry = await db('Accounts').leftJoin('Admins', 'Accounts.id', 'Admins.account_id').select(['Accounts.*', 'Admins.is_admin'])
         .where("email", user.toLowerCase())
         .orWhere('username', user);
+
     console.log(user_entry)
     if (user_entry.length == 0) {
         errmsgs.push('Username or password incorrect.');
     } else {
+        // let admin_entry = await db('Admins').select().where('account_id', user_entry[0].id)
+
+        // if(admin_entry.length > 0){
+        //     delete admin_entry[0].id
+        //     user_entry[0] = {...user_entry[0], ...admin_entry[0]}
+        // }
+            
         match = await bcrypt.compare(pass, user_entry[0].hash);
         if (!match) errmsgs.push('Username or password incorrect.');
     }
-    // correct user id data (will use admin.id instead of accounts.id)
-    user_entry[0].id = user_entry[0].account_id;
+    console.log(user_entry[0])
     return { match, errmsgs, user: user_entry[0] };
 }
 

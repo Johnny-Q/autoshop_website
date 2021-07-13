@@ -1930,6 +1930,8 @@ app.post("/int", (req, res) => {
 
 app.get('/account/discount', async (req, res) => {
     console.log(req.session)
+    // check if user is logged in
+    if(!req.session.logged_in) return res.json({"discount": '0'})
     let user = await db.getUserById(req.session.user_db.id);
     console.log(user)
     req.session.user_db = user[0];

@@ -10,7 +10,10 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 const session = require("express-session");
 const SQLiteStore = require("connect-sqlite3")(session);
+const errorHandler = require('errorhandler')
 let session_store = new SQLiteStore();
+
+app.use(errorHandler({dumpExceptions: true, showStack: true}))
 
 let transporter = {
     sendMail: function (obj) {
@@ -80,6 +83,11 @@ app.use(
         unset: "destroy",
     })
 );
+
+// error logging
+process.on('unhandledRejection', (err, p) => {
+    console.log(err, p);
+})
 
 function assertObject(obj, keys: string[]): boolean {
     if (typeof obj != "object") return false;

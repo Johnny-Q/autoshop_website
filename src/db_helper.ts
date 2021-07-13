@@ -272,6 +272,7 @@ async function login(user, pass) { // refactored
         .orWhere('username', user);
 
     console.log(user_entry)
+    throw('cum')
     if (user_entry.length == 0) {
         errmsgs.push('Username or password incorrect.');
     } else {

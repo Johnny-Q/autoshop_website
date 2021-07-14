@@ -945,6 +945,7 @@ app.post("/admin/adduser", async (req, res) => {
         postal,
         contact_first,
         contact_last,
+        discount
     } = req.body;
     let phone = "",
         postalStrip = "";
@@ -966,6 +967,7 @@ app.post("/admin/adduser", async (req, res) => {
             postal,
             contact_first,
             contact_last,
+            discount
         ])
     )
         errmsgs.push({ msg: "Please fill out all fields" });
@@ -1003,6 +1005,7 @@ app.post("/admin/adduser", async (req, res) => {
         verified_email: 0,
         approved: 1,
         temp_pass: 1,
+        discount
     };
     let password = "";
     if (errmsgs.length == 0) {
@@ -1036,6 +1039,7 @@ app.post("/admin/adduser", async (req, res) => {
             postal: postalStrip.toUpperCase(),
             contact_first,
             contact_last,
+            discount,
             ...properties,
         });
     } else {
@@ -1891,12 +1895,12 @@ app.post("/cart/place_order", async (req, res) => {
 });
 
 app.post("/user/approve", async (req, res) => {
-    const { id, status } = req.body;
+    const { id, status, discount } = req.body;
     if (!req.session.logged_in) return res.send(401);
     if (!req.session.admin) return res.send(403);
     if (!id || !status || (status != 1 && status != -1)) return res.send(400);
     try {
-        let user = await db.approveUser(id, status);
+        let user = await db.approveUser(id, status, discount);
         console.log(user);
         if (user.length > 0 && status == 1) {
             registerEmail.sendMail({

@@ -37,6 +37,16 @@ class PendingAccountsManager {
         card_header.append(name, btn_div);
 
         check.onclick = () => {
+            let box = document.querySelector('#discount'+account_details.id)
+            console.log(box.value);
+
+            // check if discount is a number
+            let discount = parseInt(box.value)
+            if(isNaN(discount)){
+                alert('Discount is not a number!');
+                return;
+            }
+
             fetch("/user/approve", {
                 "method": "POST",
                 "headers": {
@@ -44,7 +54,8 @@ class PendingAccountsManager {
                 },
                 "body": JSON.stringify({
                     "id": account_details.id,
-                    "status": 1
+                    "status": 1,
+                    'discount': discount
                 })
             }).then(resp => {
                 if (resp.status == 200) {
@@ -55,6 +66,7 @@ class PendingAccountsManager {
             console.log("allow", account_details.id);
         }
         cross.onclick = () => {
+            
             fetch("/user/approve", {
                 "method": "POST",
                 "headers": {
@@ -73,6 +85,14 @@ class PendingAccountsManager {
             console.log("reject", account_details.id);
         }
         card.append(card_header);
+
+        let discount_group = this.createElement("div", ["group"]);
+        discount_group.append(this.createElement("small", [], "Discount: "));
+        let discount_box = this.createElement("input");
+        discount_box.name = `discount`
+        discount_box.id = `discount${account_details.id}`
+        discount_group.append(discount_box);
+        card.append(discount_group)
 
         let keys = ["company", "business", "email", "purchase", "telephone", "fax", "address1", "address2", "province", "city", "postal"];
         let field_name = ["Company Name", "Business Type", "E-Mail", "Spending Amount", "Phone", "Fax", "Address Line 1", "Address Line 2", "Province", "City", "Postal"];

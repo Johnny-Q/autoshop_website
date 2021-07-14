@@ -360,9 +360,11 @@ async function resetPassword(email: string) { // refactored
 }
 
 
-async function approveUser(id: number, status: number) { // refactored
+async function approveUser(id: number, status: number, discount: number) { // refactored
+    if(!discount) discount = 0
     await db("Accounts").where('id', id).update({
-        approved: status
+        approved: status,
+        discount: discount
     });
     let res = await db('Accounts').where('id', id);
     return res;

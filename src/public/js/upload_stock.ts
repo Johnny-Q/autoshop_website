@@ -56,7 +56,7 @@ function parseExcelStock(file) {
 
 function parseRowStock(row) {
     //check all column names exist and have vlaue, 
-    let must_have = ["OE No.", "Stock"];
+    let must_have = ["OE No.", "Make", "Stock"];
     for (let i = 0; i < must_have.length; i++) {
         if (!row[must_have[i]]) {
             throw "no value found for " + must_have[i];
@@ -65,15 +65,18 @@ function parseRowStock(row) {
         }
     };
 
-    let { "OE No.": oe_number, "Stock": stock } = row;
+    let { "OE No.": oe_number,"Make": make, "Stock": stock } = row;
     // check stock is number
     try{
         stock = parseInt(stock);
     } catch {
         throw "stock is not a number"
     }
+
+    make = make.toLowerCase();
+    if(make == 'mb') make = 'mercedes-benz'
     
-    let update = { oe_number, stock };
+    let update = { oe_number, stock, make };
     return update;
 }
 

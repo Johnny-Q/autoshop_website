@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/express": "^4.17.9",
     "@types/node": "^14.14.10",
-    "bcrypt": "^5.0.0",
+    "bcrypt": "^5.0.1",
     "connect-sqlite3": "^0.9.11",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",

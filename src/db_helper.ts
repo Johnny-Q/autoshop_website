@@ -131,8 +131,8 @@ async function addPart(part: Part, applications: Array<Application>, interchange
             part[key] = value.toLowerCase();
         }
     }
-    // check if oe_number already exists
-    let parts = await db('Parts').select('id').where('oe_number', part.oe_number);
+    // check if oe_number and make already exists pairwise
+    let parts = await db('Parts').select('id').where('oe_number', part.oe_number).andWhere('make', part.make);
     let part_id = null;
     let app_id = null;
 
@@ -188,7 +188,6 @@ async function addPart(part: Part, applications: Array<Application>, interchange
 async function deletePart(part_id: string) { // refactored
     // delete all matching parts (for some reason if there are more than one part with OE num)
     await db("Parts").where('id', part_id).del()
-
     // delete all YearModel, Interchange, Engine entries
     await db("Applications").where('parts_id', part_id).del()
     await db("Interchange").where('parts_id', part_id).del()
@@ -484,16 +483,16 @@ async function editUser(id, email, username, additional_info) {
 
 async function updateStock( updates ){
     for(let i = 0; i < updates.length; i++){
-        let part = await db('Parts').where('oe_number', updates[i].oe_number)
+        let part = await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make)
         console.log(part)
         if(part.length > 0){
             if(part[0].in_stock){
-                await db('Parts').where('oe_number', updates[i].oe_number).update({
+                await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make).update({
                     "in_stock": db.raw('in_stock + ?', updates[i].stock)
                 });
             }
             else{
-                await db('Parts').where('oe_number', updates[i].oe_number).update({
+                await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make).update({
                     "in_stock": updates[i].stock
                 });
             }

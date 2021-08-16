@@ -1694,6 +1694,12 @@ app.post("/admin/update_stock", async (req, res) => {
     res.sendStatus(200);
 });
 
+app.post("/admin/update_price", async (req, res) => {
+    let { updates } = req.body;
+    await db.updatePriceBatch(updates);
+    res.sendStatus(200);
+});
+
 //for add to cart, single part updates
 app.post("/cart/part", async (req, res) => {
     try {

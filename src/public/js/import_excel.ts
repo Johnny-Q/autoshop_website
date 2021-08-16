@@ -80,11 +80,13 @@ function parseRow(row) {
 
     // price guaranteed is a not empty string at this point
     if (price) {
-        price = price.replace(".", "");
-        let test = parseInt(price);
+        
+        let test = parseFloat(price);
         if (isNaN(test)) {
             throw "price not number";
         }
+
+        price = Math.round(parseFloat(price)*100);
     }
 
     // sanitize unicode quotation marks

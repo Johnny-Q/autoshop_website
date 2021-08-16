@@ -481,6 +481,17 @@ async function editUser(id, email, username, additional_info) {
     return res;
 }
 
+async function updatePriceBatch( updates ){
+    for(let i = 0; i < updates.length; i++){
+        let part = await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make)
+        if(part.length > 0){
+            await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make).update({
+                "price": updates[i].price
+            });
+        }
+    }
+}
+
 async function updateStock( updates ){
     for(let i = 0; i < updates.length; i++){
         let part = await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make)
@@ -557,5 +568,6 @@ module.exports = {
     existsOE,
     execSql,
     updatePrice,
-    revertPrice
+    revertPrice,
+    updatePriceBatch
 }

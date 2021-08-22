@@ -182,6 +182,12 @@ async function addPart(part: Part, applications: Array<Application>, interchange
         });
     }
 
+    // after insertion maintain that all matching OE have same in_stock
+
+    let parts_oe = await db('Parts').where('oe_number', part.oe_number);
+    if(parts_oe.length > 1){
+        await db('Parts').where('oe_number', part.oe_number).update('in_stock', part.in_stock)
+    }
     return part_id
 }
 

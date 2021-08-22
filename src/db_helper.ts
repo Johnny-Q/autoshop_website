@@ -494,16 +494,16 @@ async function updatePriceBatch( updates ){
 
 async function updateStock( updates ){
     for(let i = 0; i < updates.length; i++){
-        let part = await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make)
+        let part = await db('Parts').where('oe_number', updates[i].oe_number)
         console.log(part)
         if(part.length > 0){
             if(part[0].in_stock){
-                await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make).update({
+                await db('Parts').where('oe_number', updates[i].oe_number).update({
                     "in_stock": db.raw('in_stock + ?', updates[i].stock)
                 });
             }
             else{
-                await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make).update({
+                await db('Parts').where('oe_number', updates[i].oe_number).update({
                     "in_stock": updates[i].stock
                 });
             }
@@ -511,8 +511,8 @@ async function updateStock( updates ){
     }
 }
 
-async function reduceStock(id, reduction){
-    await db('Parts').where('id', id).update({
+async function reduceStock(oe_number, reduction){
+    await db('Parts').where('oe_number', oe_number).update({
         in_stock: db.raw('?? - ' + reduction, ['in_stock'])
     })
 }

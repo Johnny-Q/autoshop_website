@@ -135,7 +135,6 @@ function parseRow(row) {
 
         //extract model
         if (application[0] == '"') { //spaced model names will start with a quote
-            //find the closing quote
             const close = application.substr(1).indexOf('"'); //from substr 1 because we don't want to match the first quote
             if (close == -1) {
                 throw "no closing quote found for " + application;

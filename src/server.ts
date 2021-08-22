@@ -2031,6 +2031,6 @@ async function reduceStock(cart){
             delete cart[key];
             continue
         }
-        db.reduceStock(part.id, part.quantity)
+        db.reduceStock(part.oe_number, part.quantity)
     }
 }

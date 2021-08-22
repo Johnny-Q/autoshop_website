@@ -56,7 +56,7 @@ function parseExcelStock(file) {
 
 function parseRowStock(row) {
     //check all column names exist and have vlaue, 
-    let must_have = ["OE No.", "Make", "Stock"];
+    let must_have = ["OE No.", "Stock"];
     for (let i = 0; i < must_have.length; i++) {
         if (!row[must_have[i]]) {
             throw "no value found for " + must_have[i];
@@ -73,8 +73,12 @@ function parseRowStock(row) {
         throw "stock is not a number"
     }
 
-    make = make.toLowerCase();
-    if(make == 'mb') make = 'mercedes-benz'
+    try{
+        make = make.toLowerCase();
+        if(make == 'mb') make = 'mercedes-benz'
+    } catch{
+        console.log('make not present but also not needed')
+    }
     
     let update = { oe_number, stock, make };
     return update;

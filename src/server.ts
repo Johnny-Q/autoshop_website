@@ -1400,6 +1400,7 @@ app.post("/admin/addpart", async (req, res) => {
     if (!properties.admin) return res.sendStatus(403);
     try {
         let { parts, errors } = req.body;
+        console.log(parts);
         let errmsgs = [];
         errors.forEach((error) => {
             errmsgs.push({

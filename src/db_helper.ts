@@ -136,6 +136,8 @@ async function addPart(part: Part, applications: Array<Application>, interchange
     let part_id = null;
     let app_id = null;
 
+    console.log(part, parts)
+
     //clear every entry for the previous part if existed
     if (parts.length > 0) {
         part_id = parts[0].id;
@@ -185,7 +187,7 @@ async function addPart(part: Part, applications: Array<Application>, interchange
     // after insertion maintain that all matching OE have same in_stock
 
     let parts_oe = await db('Parts').where('oe_number', part.oe_number);
-    if(parts_oe.length > 1){
+    if(parts_oe.length > 1 && part.in_stock){
         await db('Parts').where('oe_number', part.oe_number).update('in_stock', part.in_stock)
     }
     return part_id

@@ -491,9 +491,9 @@ async function editUser(id, email, username, additional_info) {
 
 async function updatePriceBatch( updates ){
     for(let i = 0; i < updates.length; i++){
-        let part = await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make)
+        let part = await db('Parts').where('oe_number', updates[i].oe_number)
         if(part.length > 0){
-            await db('Parts').where('oe_number', updates[i].oe_number).andWhere('make', updates[i].make).update({
+            await db('Parts').where('oe_number', updates[i].oe_number).update({
                 "price": updates[i].price
             });
         }

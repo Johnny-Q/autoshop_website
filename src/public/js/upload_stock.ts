@@ -65,22 +65,15 @@ function parseRowStock(row) {
         }
     };
 
-    let { "OE No.": oe_number,"Make": make, "Stock": stock } = row;
+    let { "OE No.": oe_number, "Stock": stock } = row;
     // check stock is number
     try{
         stock = parseInt(stock);
     } catch {
         throw "stock is not a number"
     }
-
-    try{
-        make = make.toLowerCase();
-        if(make == 'mb') make = 'mercedes-benz'
-    } catch{
-        console.log('make not present but also not needed')
-    }
     
-    let update = { oe_number, stock, make };
+    let update = { oe_number, stock};
     return update;
 }
 

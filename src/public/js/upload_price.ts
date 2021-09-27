@@ -56,7 +56,7 @@ function parseExcelPrice(file) {
 
 function parseRowPrice(row) {
     //check all column names exist and have vlaue, 
-    let must_have = ["OE No.", "Price", "Make"];
+    let must_have = ["OE No.", "Price"];
     for (let i = 0; i < must_have.length; i++) {
         if (!row[must_have[i]]) {
             throw "no value found for " + must_have[i];
@@ -65,18 +65,15 @@ function parseRowPrice(row) {
         }
     };
 
-    let { "OE No.": oe_number, "Price": price, "Make": make } = row;
+    let { "OE No.": oe_number, "Price": price,} = row;
     // check stock is number
     try{
         price = Math.round(parseFloat(price)*100)
     } catch {
         throw "price is not a number"
     }
-    
-    make = make.toLowerCase();
-    if(make == 'mb') make = 'mercedes-benz'
 
-    let update = { oe_number, price, make };
+    let update = { oe_number, price};
     return update;
 }
 

@@ -98,6 +98,7 @@ filter_bar.custom_selects[4].getOptions = (filter) => {
         "Alternators",
         "Starters",
         "Brake Sensors",
+        "Brake Calipers",
         "ABS Sensors",
         "Crankshaft Sensors",
         "Camshaft Sensors"
@@ -106,6 +107,7 @@ filter_bar.custom_selects[4].getOptions = (filter) => {
         "Alternator",
         "Starter",
         "Brake Sensor",
+        "Brake Caliper",
         "ABS Sensor",
         "Crankshaft",
         "Camshaft"

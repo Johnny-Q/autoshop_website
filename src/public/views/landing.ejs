@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <%- include('partials/header.ejs', {
+        stylesheets: ['landing'], 
+        scripts: [{name: 'landing', defer: true}], 
+        page_name: "Aceway Auto Parts"}) %>
+
+        <body>
+            <%- include('partials/navbar.ejs', {logged_in}) %> 
+            
+            <main>
+                <div class="hero">
+                    <div class="row">
+                        <div class="text">
+                            <h1>ACEWAY Canada Inc</h1>
+                            <h3>High-Quality OE-Spec Auto Parts Warehouse Distributor</h3>
+                        </div>
+                        <div class="search_row">
+                            <button onclick="window.location.href='/search'" class="search-button">
+                                <div class="button-text">Search All Products</div>
+                            </button>
+
+                            <div class="dropdown">
+                                <div class="dd-element-first">
+                                    <button class="dd-button">
+                                        <div class="button-text">Browse By Category</div>
+                                    </button>
+                                </div>
+                               
+                                <div class="dd-content">
+                                    <% categories.forEach(category => { %>
+                                        <div class="dd-element">
+                                            <button class="dd-button">
+                                                <div class="button-text" onclick="search('<%=category[1]%>')"><%=category[0]%></div>
+                                            </button>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Photo by Daen van Beers on Unsplash-->
+                    <!-- <div class="logo"></div> -->
+                </div>
+
+                <div class="offer">
+                    <div class="centered-text">
+                        What We Offer
+                    </div>
+                    <div class="content">
+                        <div class="display-item">
+                            <img src="/img/truck.svg">
+                            <!--Icon by Shabna Ashraf on freeicons.io--> 
+                            <p>Fast Delivery</p>
+                        </div>
+                        <div class="display-item">
+                            <img src="/img/truck.svg">
+                            <!--Icon by Shabna Ashraf on freeicons.io--> 
+                            <p>Description</p>
+                        </div>
+                        <div class="display-item">
+                            <img src="/img/truck.svg">
+                            <!--Icon by Shabna Ashraf on freeicons.io--> 
+                            <p>Description</p>
+                        </div>
+                        <div class="display-item">
+                            <img src="/img/truck.svg">
+                            <!--Icon by Shabna Ashraf on freeicons.io--> 
+                            <p>Description</p>
+                        </div>
+                       
+                    </div>
+                </div>
+
+                <div class="featured">
+                    <div class="centered-text">Featured Items</div>
+                    <div class="carousel">
+                        <div class="left-arrow">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="4.29656" y1="18.5957" x2="25.6666" y2="39.651" stroke="black" stroke-width="10" />
+                                <line x1="4.34898" y1="25.6666" x2="25.4042" y2="4.29659" stroke="black" stroke-width="10" />
+                            </svg>
+                        </div>
+                        <div class="images">
+                            <img class="active" src="/img/truck.svg">
+                            <img class="inactive" src="/img/hero.jpg">
+                        </div>
+                        <div class="right-arrow">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="39.6776" y1="25.5355" x2="18.4644" y2="4.32233" stroke="black" stroke-width="10" />
+                                <line x1="39.6776" y1="18.4645" x2="18.4644" y2="39.6777" stroke="black" stroke-width="10" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="dots">
+
+                    </div>
+                </div>
+            </main>
+            <%- include('partials/footer.ejs') %>
+
+        </body>
+</html>

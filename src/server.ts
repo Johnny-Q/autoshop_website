@@ -136,6 +136,7 @@ const HTMLpages = [
     "reset_password",
     "partials/search_box",
     "import_test",
+    // "hi",
 ];
 HTMLpages.forEach((page) => {
     app.get(`/${page}`, (req, res) => {
@@ -159,6 +160,31 @@ HTMLpages.forEach((page) => {
         }
     });
 });
+
+const categories = [
+        ["ABS Sensors", "ABS Sensor"],
+        ["Alternators", "Alternator"],
+        ["Brake Sensors", "Brake Sensor"],
+        [ "Brake Calipers", "Brake Caliper"],
+        ["Camshaft Sensors", "Camshaft"],
+        ["Crankshaft Sensors", "Crankshaft"],
+        ["Starters", "Starter"]
+    ]
+app.get("/landing", (req, res) => {
+    let properties = {
+        logged_in: false,
+        user: null,
+        user_id: null,
+        admin: false,
+        cart: {},
+    };
+    for (let [key, value] of Object.entries(properties)) {
+        if (req.session[key]) {
+            properties[key] = req.session[key];
+        }
+    }
+    res.render("landing", {...properties, categories})
+})
 
 app.get("/edit_info", async(req, res) => {
     if(!req.session.logged_in) return res.sendStatus(401)

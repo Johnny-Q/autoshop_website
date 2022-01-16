@@ -46,11 +46,26 @@ main {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 50px 0px;;
+    margin: 50px 0px;
 
     .section_title {
         font-size: 35px;
         margin-top: 10vh;
+
+        h3{
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        div.contact_hours{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+
+            div{
+                display: flex;
+            }
+        }
     }
 
     div.double {

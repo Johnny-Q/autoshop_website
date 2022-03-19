@@ -242,10 +242,14 @@ class PartsManager {
 
         //buttons
         if (part.price) {
+
             let price = row.insertCell();
             let cents = part.price % 100;
             if (cents < 10) cents = "0" + cents.toString();
             price.innerText = `$${parseInt(part.price / 100)}.${cents}`;
+
+            let stock = row.insertCell();
+            stock.innerText = part.in_stock ? part.in_stock : 0;
 
             let button_td = row.insertCell();
             button_td.classList.add("add_cart");

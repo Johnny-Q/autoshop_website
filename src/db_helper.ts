@@ -22,7 +22,7 @@ const bcrypt = require('bcrypt');
 async function paginatedSearch(make: string, model: string, year: number, engine: string, offset = 0, num_results = 1000, logged_in = false) { // refactored
     try {
         let columns = ['Parts.id', 'Parts.make', 'oe_number', 'description', 'frey_number'];
-        if (logged_in) columns.push("price");
+        if (logged_in) columns.push("price",  'in_stock');
 
         return db('Parts').distinct(...columns).leftJoin("Applications", 'Applications.parts_id', "Parts.id")
             .whereRaw("IFNULL(? , Parts.make) like Parts.make", make)
@@ -41,7 +41,7 @@ async function getPartByIdNumber(id_number: string, logged_in = false): Promise<
     id_number += '%'
     try {
         let columns = ['Parts.id', 'make', 'oe_number', 'description', 'frey_number'];
-        if (logged_in) columns.push("price");
+        if (logged_in) columns.push("price",'in_stock');
         return db.distinct(...columns).from('Parts')
             .leftJoin('Interchange', 'Parts.id', 'Interchange.parts_id')
             .whereRaw('Parts.oe_number like ?', id_number)
@@ -393,7 +393,7 @@ function randString(length) {
 
 async function searchCategories(category: string, logged_in = false) {
     let columns = ['Parts.id', 'Parts.make', 'oe_number', 'description', 'frey_number'];
-    if (logged_in) columns.push("price");
+    if (logged_in) columns.push("price", "in_stock");
 
     if (category == "") {
         return db('Parts').distinct(...columns).orderBy('description', 'asc');

@@ -250,6 +250,7 @@ class PartsManager {
 
             let stock = row.insertCell();
             stock.innerText = part.in_stock ? part.in_stock : 0;
+            stock.style.cssText = 'text-align:center';
 
             let button_td = row.insertCell();
             button_td.classList.add("add_cart");

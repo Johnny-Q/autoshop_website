@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Domine&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/test.css">
+
+    <!-- <script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script> -->
+    <!-- <script type="module" src="/js/import_excel.js" defer></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+    <script src="/js/import_excel.js" defer></script>
+</head>
+
+<body>
+    <%-include("partials/navbar.ejs", {logged_in: false}) %>
+        <main>
+            <div>
+                import test
+                <img src="/img/loader.gif" alt="" id="loader" style="display: none">
+                <input type="file" name="" id="file_selector">
+            </div>
+        </main>
+        <%- include("partials/footer.ejs") %>
+</body>
+
+</html>

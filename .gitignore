@@ -1,4 +1,5 @@
 *.db
+*.bak
 !schema.db
 .db-journal
 build
@@ -8,6 +9,7 @@ run.bat
 src/public/img/parts
 sessions
 nohup.out
+output/*
 
 # Logs
 logs
